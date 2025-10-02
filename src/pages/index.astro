@@ -1,9 +1,8 @@
 ---
 import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
-import ImageUploader from '../components/ImageUploader.astro';
-import ImageUploaderReact from '../components/ImageUploaderReact';
-import Buttonclicktest from '../components/Buttonclicktest';
+// import ImageUploader from '../components/ImageUploader.astro';
+import ImageUploader from '../components/ImageUploader';
 
 // Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
 // Don't want to use any of this? Delete everything in this file, the `assets`, `components`, and `layouts` directories, and start fresh.
@@ -14,7 +13,7 @@ import Buttonclicktest from '../components/Buttonclicktest';
 	<section>
 		<h1>Colorsmosis</h1>
 		<!-- <ImageUploader client:load/> -->
-		<ImageUploaderReact client:load/>
+		<ImageUploader client:load/>
 		<!-- <Buttonclicktest client:load> -->
 	</section>
 </Layout>
