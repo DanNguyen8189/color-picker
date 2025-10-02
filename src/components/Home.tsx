@@ -28,7 +28,7 @@ function Home(){
         // <Slider sendData={handleCallback} />
         <div>
             <Slider handleClick={handleClick} />
-            <SliderTwo />
+            {/* <SliderTwo /> */}
         </div>
     )
 
