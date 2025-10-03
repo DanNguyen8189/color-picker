@@ -1,52 +1,60 @@
 import React, { useState } from "react";
-interface image {
-  image: File;
-}
-const ImagePinDrop = (props:image) => {
+import type {Pin} from "./Types";
+import type {Image} from "./Types";
 
-interface Pin {
-  x: number;
-  y: number;
-}
+// the image needed to be passed in as a interface prop to avoid Type '{ props: File; }' is not assignable to type 'IntrinsicAttributes & File'.
+// that occurs in the parent component when attempting to pass in the image file directly. Found here: 
+// https://stackoverflow.com/questions/48240449/type-is-not-assignable-to-type-intrinsicattributes-intrinsicclassattribu
+
+// Define the props type
+type ChildProps = {
+    props: Image;
+    handlePins: (pins:Pin[])=>void;
+};
+const ImagePinDrop = ({props, handlePins}: ChildProps) => {
+//const ImagePinDrop = ({props:Image, {handlePins}:{handlePins : (pins:Pin[])=>void}}) => {
+
 const [pins, setPins] = useState<Pin[]>([]);
 
 interface ImageClickEvent extends React.MouseEvent<HTMLImageElement> {}
 
 const handleImageClick = (e: ImageClickEvent) => {
-  const node = e.target as HTMLElement;
-  const rect = node.getBoundingClientRect();
-  const x: number = e.clientX - rect.left; // X-coordinate relative to the image
-  const y: number = e.clientY - rect.top;  // Y-coordinate relative to the image
+    const node = e.target as HTMLElement;
+    const rect = node.getBoundingClientRect();
+    const x: number = e.clientX - rect.left; // X-coordinate relative to the image
+    const y: number = e.clientY - rect.top;  // Y-coordinate relative to the image
 
-  setPins([...pins, { x, y }]);
-  console.log(pins);
+    setPins([...pins, { x, y }]);
+    handlePins(pins);
+    // console.log(pins);
 };
 
+
 return (
-  <div style={{ position: "relative", display: "inline-block" }}>
-    <img
-      src={URL.createObjectURL(props.image)}
-      alt="Example"
-      onClick={handleImageClick}
-      style={{ width: "100%", height: "auto" }}
-    />
-    {pins.map((pin, index) => (
-      <div
-        key={index}
-        style={{
-          position: "absolute",
-          top: `${pin.y}px`,
-          left: `${pin.x}px`,
-          width: "10px",
-          height: "10px",
-          backgroundColor: "red",
-          borderRadius: "50%",
-          transform: "translate(-50%, -50%)",
-        }}
-      />
-    ))}
-  </div>
-);
+    <div style={{ position: "relative", display: "inline-block" }}>
+        <img
+        src={URL.createObjectURL(props.image)}
+        alt="Example"
+        onClick={handleImageClick}
+        style={{ width: "100%", height: "auto" }}
+        />
+        {pins.map((pin, index) => (
+        <div
+            key={index}
+            style={{
+                position: "absolute",
+                top: `${pin.y}px`,
+                left: `${pin.x}px`,
+                width: "10px",
+                height: "10px",
+                backgroundColor: "red",
+                borderRadius: "50%",
+                transform: "translate(-50%, -50%)",
+            }}
+        />
+        ))}
+    </div>
+    );
 };
 
 export default ImagePinDrop;
