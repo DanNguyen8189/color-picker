@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 // function Slider({sendData}: {sendData: (value:number) => void}) {
-function Slider({handleClick}: {handleClick: (value:number) => void}) {
+function Slider({handleSlide}: {handleSlide: (value:number) => void}) {
    const [value, setValue] = useState(1);
 
    return (
@@ -19,7 +19,7 @@ function Slider({handleClick}: {handleClick: (value:number) => void}) {
                 value={value}
                 onChange={(e) => {
                     setValue(+e.target.value)
-                    handleClick(+e.target.value)
+                    handleSlide(+e.target.value)
                 }
                 }
             />

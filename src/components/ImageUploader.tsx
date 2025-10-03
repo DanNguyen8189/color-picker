@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function ImageUploader() {
+function ImageUploader({ handlePickImage }: { handlePickImage: (image: File) => void }) {
     // Define a state variable to store the selected image
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
@@ -12,20 +12,6 @@ function ImageUploader() {
         <h3>using React Hooks</h3> */}
 
         {/* Conditionally render the selected image if it exists */}
-        {selectedImage && (
-            <div>
-            {/* Display the selected image */}
-            <p>What</p>
-            <img
-                alt="not found"
-                width={"250px"}
-                src={URL.createObjectURL(selectedImage)}
-            />
-            <br /> <br />
-            {/* Button to remove the selected image */}
-            <button onClick={() => setSelectedImage(null)}>Remove</button>
-            </div>
-        )}
         {/* <Image/> */}
         <br />
 
@@ -38,7 +24,8 @@ function ImageUploader() {
                 if (!event.target.files) return;
                 let image = event.target.files[0]
                 console.log(image); // Log the selected file
-                setSelectedImage(image); // Update the state with the selected file
+                //setSelectedImage(image); // Update the state with the selected file
+                handlePickImage(image);
             }}
         />
         </div>
