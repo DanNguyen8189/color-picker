@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import type {Pin} from "./Types";
+import type {ImagePin} from "./Types";
 import type {Image} from "./Types";
 
 // the image needed to be passed in as a interface prop to avoid Type '{ props: File; }' is not assignable to type 'IntrinsicAttributes & File'.
@@ -9,12 +9,12 @@ import type {Image} from "./Types";
 // Define the props type
 type ChildProps = {
     props: Image;
-    handlePins: (pins:Pin[])=>void;
+    handlePins: (pins:ImagePin[])=>void;
 };
 const ImagePinDrop = ({props, handlePins}: ChildProps) => {
 //const ImagePinDrop = ({props:Image, {handlePins}:{handlePins : (pins:Pin[])=>void}}) => {
 
-const [pins, setPins] = useState<Pin[]>([]);
+const [pins, setPins] = useState<ImagePin[]>([]);
 
 interface ImageClickEvent extends React.MouseEvent<HTMLImageElement> {}
 
@@ -24,7 +24,13 @@ const handleImageClick = (e: ImageClickEvent) => {
     const x: number = e.clientX - rect.left; // X-coordinate relative to the image
     const y: number = e.clientY - rect.top;  // Y-coordinate relative to the image
 
-    setPins([...pins, { x, y }]);
+    const imagePin = {
+        id: crypto && typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2,7),
+        positionX: x,
+        positionY: y,
+        draggable: true,
+    };
+    setPins([...pins, imagePin]);
     handlePins(pins);
     // console.log(pins);
 };
@@ -43,8 +49,8 @@ return (
             key={index}
             style={{
                 position: "absolute",
-                top: `${pin.y}px`,
-                left: `${pin.x}px`,
+                top: `${pin.positionY}px`,
+                left: `${pin.positionX}px`,
                 width: "10px",
                 height: "10px",
                 backgroundColor: "red",
