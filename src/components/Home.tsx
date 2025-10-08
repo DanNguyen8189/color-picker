@@ -1,17 +1,12 @@
 import React, { useCallback, useState, useEffect } from 'react';
 import Slider from './Slider';
 import ImageUploader from './ImageUploader';
-import ImagePinDrop from '../placeholder/ImagePinDrop';
-import type { number } from 'astro:schema';
 
-import type {ImagePin} from "./Types";
-import { ImagePinContainer } from 'react-image-pin';
-import { ImagePinContainer2 } from '../placeholder/ImagePinContainer2';
+import type { ImagePin } from "./Types";
+
 import { ImageColorPicker } from 'react-image-color-picker';
 import { useRef } from 'react';
-// import Draggable from "react-draggable";
-// import type { DraggableEvent } from "react-draggable";
-import ReactDOM from 'react-dom';
+import { set } from 'astro:schema';
 
 function Home(){
     const [count, setCount] = useState(1);
@@ -26,9 +21,27 @@ function Home(){
     const handleSlide = (num:number) => {
         // 👇️ take the parameter passed from the Child component
         setCount(current => current + num);
-
+        generatePins(num);
         console.log('argument from Child: ', num);
     };
+
+    const generatePins = (amount:number) => {
+        if (pins.length > amount) {
+            setPins(prev => prev.slice(0, amount));
+        }
+        else if (pins.length < amount) {
+            for (let i = 0; i < amount - pins.length; i++) {
+                const newPin: ImagePin = {
+                    id: crypto && typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2,7),
+                    positionX: Math.random() * 100, // random position in percentage
+                    positionY: Math.random() * 100, // random position in percentage
+                    draggable: true,
+                };
+                setPins(prev => [...prev, newPin]);
+            }
+        }
+        console.log("pins after generatePins: ", pins);
+    }
 
     const handlePickImage = (image:File) => {
         setSelectedImage(image);
@@ -41,35 +54,31 @@ function Home(){
     const containerRef = useRef<HTMLDivElement | null>(null);
     interface ImageClickEvent extends React.MouseEvent<HTMLImageElement> {}
 
-    const handleImageClick = (e: ImageClickEvent) => {
-        // use containerRef (parent with position:relative) to compute coords
-        //const container = containerRef.current;
-        if (containerRef.current === null) return;
-        const rect = containerRef.current.getBoundingClientRect()
-        const xPx = e.clientX - rect.left;
-        const yPx = e.clientY - rect.top;
+    // const handleImageClick = (e: ImageClickEvent) => {
+    //     // use containerRef (parent with position:relative) to compute coords
+    //     //const container = containerRef.current;
+    //     if (containerRef.current === null) return;
+    //     const rect = containerRef.current.getBoundingClientRect()
+    //     const xPx = e.clientX - rect.left;
+    //     const yPx = e.clientY - rect.top;
 
-        const positionX = (xPx / rect.width) * 100;
-        const positionY = (yPx / rect.height) * 100;
+    //     const positionX = (xPx / rect.width) * 100;
+    //     const positionY = (yPx / rect.height) * 100;
 
-        const imagePin = {
-            id: crypto && typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2,7),
-            positionX,
-            positionY,
-            draggable: true,
-        };
+    //     const imagePin = {
+    //         id: crypto && typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2,7),
+    //         positionX,
+    //         positionY,
+    //         draggable: true,
+    //     };
 
-        setPins(prev => {
-            const next = [...prev, imagePin];
-            console.log('new pins', next); // now logs correct updated array
-            return next;
-        });
-    };
+    //     setPins(prev => {
+    //         const next = [...prev, imagePin];
+    //         console.log('new pins', next); // now logs correct updated array
+    //         return next;
+    //     });
+    // };
 
-    // const handlePinDrag = (id:string, positionX:number, positionY:number) => {
-    //     setPins((pins.map(pin => pin.id === id ? { ...pin, positionX, positionY } : pin)));
-    //     console.log("pin dragged ", id, positionX, positionY);
-    // }
     const handlePinDrag = (e:ImageClickEvent, id:string) => {
         if (containerRef.current === null) return;
         const rect = containerRef.current.getBoundingClientRect()
@@ -87,13 +96,13 @@ function Home(){
     // Dynamically import Draggable to avoid SSR issues
     const [Draggable, setDraggable] = useState<any>(null);
     useEffect(() => {
-      let mounted = true;
-      // load react-draggable only on the client
-      import('react-draggable').then((mod) => {
-        if (mounted) setDraggable(() => mod.default || mod);
-      }).catch(() => {
-        // ignore; we'll render non-draggable pins
-      });
+        let mounted = true;
+        // load react-draggable only on the client
+        import('react-draggable').then((mod) => {
+            if (mounted) setDraggable(() => mod.default || mod);
+        }).catch(() => {
+            // ignore; we'll render non-draggable pins
+        });
       return () => { mounted = false; };
     }, []);
 
@@ -102,58 +111,12 @@ function Home(){
         // <Slider onChange={handleCallback} />
         // <Slider sendData={handleCallback} />
         <div>
-            <Slider handleSlide={handleSlide} />
             <ImageUploader handlePickImage={handlePickImage}/>
-            {/* {selectedImage && (
-                <div>
-                <img
-                    alt="not found"
-                    width={"250px"}
-                    src={URL.createObjectURL(selectedImage)}
-                />
-                <br /> <br />
-                <button onClick={() => setSelectedImage(null)}>Remove</button>
-                </div>
-            )} */}
-            {/* <SliderTwo /> */}
-
-            {/* {selectedImage && (
-                <ImagePinDrop props={{ image: selectedImage }} handlePins={handlePins}/>
-            )} */}
-            {/* <ImagePinDrop image={selectedImage}/> */}
-            
-            {/* {selectedImage && (
-            <ImagePinContainer2
-                image={URL.createObjectURL(selectedImage)}
-                imageAlt="A beautiful image"
-                draggable={true}
-                pins={pins}
-                onNewPin={(pin) => {
-                    const imagePin = {
-                        id: crypto && typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2,7),
-                        positionX: pin.positionX,
-                        positionY: pin.positionY,
-                        draggable: true,
-                    };
-                    setPins(prev => [...prev, imagePin]);
-                    console.log('new pin', imagePin);
-                }}
-                onExistingPin={(pin) => {
-                    setPins((prev) =>
-                        prev.map((p) => (p.id === pin.id ? { ...p, positionX: pin.positionX, positionY: pin.positionY } : p))
-                    );
-                    console.log('existing pin changed', pin);
-                }}
-                onDraggedPin={(pin) => {
-                    setPins((prev) =>
-                        prev.map((p) => (p.id === pin.id ? { ...p, positionX: pin.positionX, positionY: pin.positionY } : p))
-                    );
-                    console.log('dragged pin', pin);
-                }}
-            />
-            )} */}
             {selectedImage && (
-            <div ref={containerRef} onClick={handleImageClick} style={{ position: "relative", display: "inline-block" }}>
+                <Slider handleSlide={handleSlide} />
+            )}
+            {selectedImage && (
+            <div ref={containerRef} style={{ position: "relative", display: "inline-block" }}>
                 <ImageColorPicker
                     imgSrc={URL.createObjectURL(selectedImage)}
                     onColorPick={handleColorPick}
@@ -193,6 +156,5 @@ function Home(){
             )}
         </div>
     )
-
 }
 export default Home;
