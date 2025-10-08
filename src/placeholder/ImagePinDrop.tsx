@@ -1,6 +1,6 @@
 import React, { useState } from "react";
-import type {ImagePin} from "./Types";
-import type {Image} from "./Types";
+import type {ImagePin} from "../components/Types";
+import type {Image} from "../components/Types";
 
 // the image needed to be passed in as a interface prop to avoid Type '{ props: File; }' is not assignable to type 'IntrinsicAttributes & File'.
 // that occurs in the parent component when attempting to pass in the image file directly. Found here: 

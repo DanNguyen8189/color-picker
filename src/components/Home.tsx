@@ -1,15 +1,17 @@
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useState, useEffect } from 'react';
 import Slider from './Slider';
 import ImageUploader from './ImageUploader';
-import ImagePinDrop from './ImagePinDrop';
-import SliderTwo from './SliderTwo';
+import ImagePinDrop from '../placeholder/ImagePinDrop';
 import type { number } from 'astro:schema';
 
 import type {ImagePin} from "./Types";
 import { ImagePinContainer } from 'react-image-pin';
-import { ImagePinContainer2 } from './ImagePinContainer2';
+import { ImagePinContainer2 } from '../placeholder/ImagePinContainer2';
 import { ImageColorPicker } from 'react-image-color-picker';
 import { useRef } from 'react';
+// import Draggable from "react-draggable";
+// import type { DraggableEvent } from "react-draggable";
+import ReactDOM from 'react-dom';
 
 function Home(){
     const [count, setCount] = useState(1);
@@ -20,10 +22,6 @@ function Home(){
     //     setValue(childData);
     //     console.log(value)
     // };
-
-    const handleCallback = () => {
-        console.log("callback called");
-    };
 
     const handleSlide = (num:number) => {
         // 👇️ take the parameter passed from the Child component
@@ -36,39 +34,70 @@ function Home(){
         setSelectedImage(image);
     }
 
-    const handlePins = (pins:ImagePin[]) => {
-        setPins(pins);
-        console.log("pins: ", pins);
-    }
+    // const handlePins = (pins:ImagePin[]) => {
+    //     setPins(pins);
+    //     console.log("pins: ", pins);
+    // }
     const containerRef = useRef<HTMLDivElement | null>(null);
     interface ImageClickEvent extends React.MouseEvent<HTMLImageElement> {}
+
     const handleImageClick = (e: ImageClickEvent) => {
-    // use containerRef (parent with position:relative) to compute coords
-    //const container = containerRef.current;
-    if (containerRef.current === null) return;
-    const rect = containerRef.current.getBoundingClientRect()
-    const xPx = e.clientX - rect.left;
-    const yPx = e.clientY - rect.top;
+        // use containerRef (parent with position:relative) to compute coords
+        //const container = containerRef.current;
+        if (containerRef.current === null) return;
+        const rect = containerRef.current.getBoundingClientRect()
+        const xPx = e.clientX - rect.left;
+        const yPx = e.clientY - rect.top;
 
-    const positionX = (xPx / rect.width) * 100;
-    const positionY = (yPx / rect.height) * 100;
+        const positionX = (xPx / rect.width) * 100;
+        const positionY = (yPx / rect.height) * 100;
 
-    const imagePin = {
-        id: crypto && typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2,7),
-        positionX,
-        positionY,
-        draggable: true,
+        const imagePin = {
+            id: crypto && typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2,7),
+            positionX,
+            positionY,
+            draggable: true,
+        };
+
+        setPins(prev => {
+            const next = [...prev, imagePin];
+            console.log('new pins', next); // now logs correct updated array
+            return next;
+        });
     };
 
-    setPins(prev => {
-        const next = [...prev, imagePin];
-        console.log('new pins', next); // now logs correct updated array
-        return next;
-    });
-    };
+    // const handlePinDrag = (id:string, positionX:number, positionY:number) => {
+    //     setPins((pins.map(pin => pin.id === id ? { ...pin, positionX, positionY } : pin)));
+    //     console.log("pin dragged ", id, positionX, positionY);
+    // }
+    const handlePinDrag = (e:ImageClickEvent, id:string) => {
+        if (containerRef.current === null) return;
+        const rect = containerRef.current.getBoundingClientRect()
+        const xPx = e.clientX - rect.left;
+        const yPx = e.clientY - rect.top;
+        const positionX = (xPx / rect.width) * 100;
+        const positionY = (yPx / rect.height) * 100; // convert px to %
+        setPins((pins.map(pin => pin.id === id ? { ...pin, positionX, positionY } : pin)));
+        console.log("pin dragged ", id, positionX, positionY);
+    }
     const handleColorPick = (color:string) => {
         console.log("color picked ", color );
     }
+
+    // Dynamically import Draggable to avoid SSR issues
+    const [Draggable, setDraggable] = useState<any>(null);
+    useEffect(() => {
+      let mounted = true;
+      // load react-draggable only on the client
+      import('react-draggable').then((mod) => {
+        if (mounted) setDraggable(() => mod.default || mod);
+      }).catch(() => {
+        // ignore; we'll render non-draggable pins
+      });
+      return () => { mounted = false; };
+    }, []);
+
+    const nodeRef = React.useRef(null);
     return (
         // <Slider onChange={handleCallback} />
         // <Slider sendData={handleCallback} />
@@ -134,21 +163,30 @@ function Home(){
                 {/* Overlay for pins - fills the same area as the image and sits on top */}
                 <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 9998 }}>
                     {pins.map((pin, index) => (
-                        <div
-                            key={pin.id ?? index}
-                            style={{
-                                position: 'absolute',
-                                top: `${pin.positionY}%`,
-                                left: `${pin.positionX}%`,
-                                width: '10px',
-                                height: '10px',
-                                backgroundColor: 'red',
-                                borderRadius: '50%',
-                                transform: 'translate(-50%, -50%)',
-                                zIndex: 9999,
-                                pointerEvents: 'auto', // allow clicking/drags on the pin itself
-                            }}
-                        />
+                        <Draggable
+                            axis='both'
+                            bounds='parent'
+                            nodeRef={nodeRef}
+                            //event e parameter provided by Draggable's onStop callback, and properly typed to match handler
+                            onStop={(e: any) => handlePinDrag(e as unknown as React.MouseEvent<HTMLImageElement>, pin.id)}
+                        >
+                            <div
+                                ref={nodeRef}
+                                key={pin.id ?? index}
+                                style={{
+                                    position: 'absolute',
+                                    top: `${pin.positionY}%`,
+                                    left: `${pin.positionX}%`,
+                                    width: '10px',
+                                    height: '10px',
+                                    backgroundColor: 'red',
+                                    borderRadius: '50%',
+                                    transform: 'translate(-50%, -50%)',
+                                    zIndex: 9999,
+                                    pointerEvents: 'auto', // allow clicking/drags on the pin itself
+                                }}
+                            />
+                        </Draggable>
                     ))}
                 </div>
             </div>
