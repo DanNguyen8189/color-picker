@@ -4,7 +4,6 @@ function ImageUploader({ handlePickImage }: { handlePickImage: (image: File) => 
     // Define a state variable to store the selected image
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
-    // Return the JSX for rendering
     return (
         <div>
         {/* Header */}
