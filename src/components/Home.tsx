@@ -1,14 +1,15 @@
-import React, { useCallback, useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Slider from './Slider';
 import ImageUploader from './ImageUploader';
 
 import type { ImagePin } from "./Types";
 
 import { ImageColorPicker } from 'react-image-color-picker';
-import { useRef } from 'react';
+
 import { set } from 'astro:schema';
 
-import { useColorPick } from './useColorPick';
+import { writeImage } from '../hooks/writeImage';
+import PinOverlay from './PinOverlay';
 
 
 function Home(){
@@ -16,17 +17,20 @@ function Home(){
     const [selectedImage, setSelectedImage] = useState<File | null>(null);
     const [pins, setPins] = useState<ImagePin[]>([]);
 
-    const [color2, setColor2] = useState<string>('');
-    const [draggedPinId, setDraggedPinId] = useState<string>('');
+    // const [color2, setColor2] = useState<string>('');
+    // const [draggedPinId, setDraggedPinId] = useState<string>('');
 
+
+    //reference to container div that holds both the image and the pins
     const containerRef = useRef<HTMLDivElement | null>(null); // Ref for the image container
 
     const canvasRef = useRef<HTMLCanvasElement| null>(null);
 
+    // handles image upload display
+    const { dimensions } = writeImage(canvasRef, selectedImage ? URL.createObjectURL(selectedImage) : '');
+
     // map of node refs for each pin so react-draggable can use nodeRef per draggable
     const pinRefs = useRef<Record<string, React.RefObject<HTMLDivElement | null>>>({});
-
-    const { color, coordinates, dimensions } = useColorPick(canvasRef, selectedImage ? URL.createObjectURL(selectedImage) : '');
 
 
     const handleSlide = (num:number) => {
@@ -82,7 +86,7 @@ function Home(){
 
         const positionX = data.x;
         const positionY = data.y;
-        setDraggedPinId(id);
+        //setDraggedPinId(id);
         setPins(prev => prev.map(pin => pin.id === id ? { ...pin, positionX, positionY } : pin));
         console.log('position from draggable', id, positionX, positionY);
         //console.log('color picked', color, coordinates, dimensions);
@@ -93,10 +97,10 @@ function Home(){
         console.log("color from useColorPick: ", newx, ", ", newy, ", ", getPixelColor(newx, newy));
     }
 
-    const handleColorPick = (color:string) => {
-        setColor2(color);
-        console.log("color picked from handlecolorpick: ", color );
-    }
+    // const handleColorPick = (color:string) => {
+    //     setColor2(color);
+    //     console.log("color picked from handlecolorpick: ", color );
+    // }
 
     const getPixelColor = (x: number, y: number) =>{
         const ctx = canvasRef.current?.getContext("2d");
@@ -112,14 +116,6 @@ function Home(){
             const [red, green, blue] = pixelData
             return `rgb(${red}, ${green}, ${blue})`
         }
-    // useEffect(() => {
-    //     if (draggedPinId && color) {
-    //         setPins(prev => prev.map(pin => pin.id === draggedPinId ? { ...pin, color } : pin));
-    //         setDraggedPinId('');
-    //         setColor('');
-    //         console.log("pins after color set: ", pins)
-    //     }
-    // }, []);
 
     // Dynamically import Draggable to avoid SSR issues
     const [Draggable, setDraggable] = useState<any>(null);
@@ -131,7 +127,7 @@ function Home(){
         }).catch(() => {
             // ignore; we'll render non-draggable pins
         });
-      return () => { mounted = false; };
+        return () => { mounted = false; };
     }, []);
 
     // const handleImageClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
@@ -221,7 +217,7 @@ function Home(){
                         ></canvas>
                 </div>
                 {/* Overlay for pins - fills the same area as the image and sits on top */}
-                <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 9998 }}>
+                {/* <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 9998 }}>
                     {pins.map((pin, index) => {
                         // create nodeRef for each individual pin
                         // using createref here because the number of pins can change
@@ -255,7 +251,8 @@ function Home(){
                             </Draggable>
                         );
                     })}
-                </div>
+                </div> */}
+                <PinOverlay pins={pins} canvasRef={canvasRef}/>
             </div>
             )}
         </div>

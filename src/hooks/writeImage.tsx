@@ -1,14 +1,14 @@
 import { useEffect, useRef, useState } from 'react'
-import { Canvas, loadImageHandler } from '../../util'
+import { Canvas, loadImageHandler } from '../util'
 
-export function useColorPick(
+export function writeImage(
     canvasRef: React.RefObject<HTMLCanvasElement | null>,
     imgSrc: string
 ) {
     const canvasInstanceRef = useRef<Canvas | null>(null)
 
-    const [color, setColor] = useState<string>('tranparent')
-    const [coordinates, setCoordinates] = useState({ x: 0, y: 0 })
+    // const [color, setColor] = useState<string>('tranparent')
+    // const [coordinates, setCoordinates] = useState({ x: 0, y: 0 })
 
     // const onMove = (
     //     event: TouchEvent | React.PointerEvent<HTMLCanvasElement>
@@ -39,11 +39,11 @@ export function useColorPick(
             canvas.setDimensions(image.width, image.height)
             canvas.drawImage(image)
 
-            const centerPoint = canvas.getCanvasCenterPoint()
-            const initialColor = canvas.getPixelColor(centerPoint)
+            // const centerPoint = canvas.getCanvasCenterPoint()
+            // const initialColor = canvas.getPixelColor(centerPoint)
 
-            setColor(initialColor)
-            setCoordinates(centerPoint)
+            // setColor(initialColor)
+            // setCoordinates(centerPoint)
         }
 
         initializeCanvas()
@@ -54,8 +54,6 @@ export function useColorPick(
     }, [imgSrc])
 
     return {
-        color,
-        coordinates,
         dimensions: canvasInstanceRef.current?.getDimensions() ?? {
             width: 0,
             height: 0

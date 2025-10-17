@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 // function Slider({sendData}: {sendData: (value:number) => void}) {
 function Slider({handleSlide}: {handleSlide: (value:number) => void}) {
-   const [value, setValue] = useState(1);
+    const [value, setValue] = useState(1);
 
-   return (
-       <div>
+    return (
+        <div>
            {/* <input
                type="range"
                min="1"
