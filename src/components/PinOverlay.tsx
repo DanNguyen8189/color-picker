@@ -1,20 +1,25 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useRef, use } from 'react';
 import { Canvas, loadImageHandler } from '../util';
+import { useColorPick } from '../hooks/useColorPick';
 
 import type { ImagePin } from "./Types";
 // function Slider({handleSlide}: {handleSlide: (value:number) => void})
 type PinOverlayProps = {
-    pins: ImagePin[],
-    canvasRef: React.RefObject<HTMLCanvasElement | null>
-    // handleDrag: (e: any, data: any, id: string) => void;
-    // handleDragStop: (e: any, data: any, id: string) => void;
+    pins2: ImagePin[],
+    count: number,
+    //canvasRef: React.RefObject<HTMLCanvasElement | null>
+    //canvas: Canvas | null
+    canvasInstanceRef: React.RefObject<Canvas | null>
 }
 
-function PinOverlay({ pins, canvasRef }: PinOverlayProps) {
+function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
+    const [pins, setPins] = useState<ImagePin[]>([]);
+
     // map of node refs for each pin so react-draggable can use nodeRef per draggable
     const pinRefs = useRef<Record<string, React.RefObject<HTMLDivElement | null>>>({});
 
     const [Draggable, setDraggable] = useState<any>(null);
+    // Dynamically import react-draggable to avoid SSR issues
     useEffect(() => {
         let mounted = true;
         // load react-draggable only on the client
@@ -26,25 +31,14 @@ function PinOverlay({ pins, canvasRef }: PinOverlayProps) {
     return () => { mounted = false; };
     }, []);
 
-    const handleDrag = (e:any, data:any, id:string) => {
-        e.preventDefault();
-        //setDraggedPinId(id);
-        //setPins(prev => prev.map(pin => pin.id === id ? { ...pin, positionX, positionY } : pin));
+    useEffect(() =>{
+        console.log("canvas size ", canvasInstanceRef.current?.getDimensions());
+        if (canvasInstanceRef == null) return;
+        generatePins(count);
+    }, [count])
 
 
-        const canvas = new Canvas(canvasRef.current!);
-        
-        console.log('position from draggable', id, data.x, data.y);
-        //console.log('color picked', color, coordinates, dimensions);
-        const coordinates = {x: data.x, y: data.y};
-        const canvasCordinates = canvas.getCanvasCoordinates(coordinates) ?? {x:0, y:0};
-        // if (newx === undefined || newy === undefined) return;
-
-        //console.log("color from useColorPick: ", getPixelColor(newx, newy));
-        console.log("color from useColorPick: ", canvas.getPixelColor(canvasCordinates));
-    }
-
-    // const handleDragStop = (e: any, data: any, id: string) => {
+    // const handleDrag = (e:any, data:any, id:string) => {
     //     e.preventDefault();
     //     //setDraggedPinId(id);
     //     //setPins(prev => prev.map(pin => pin.id === id ? { ...pin, positionX, positionY } : pin));
@@ -61,7 +55,48 @@ function PinOverlay({ pins, canvasRef }: PinOverlayProps) {
     //     //console.log("color from useColorPick: ", getPixelColor(newx, newy));
     //     console.log("color from useColorPick: ", canvas.getPixelColor(canvasCordinates));
     // }
+    
+    const handleDrag = (e:any, data:any, id:string) => {
+        if (canvasInstanceRef == null) return;
+        const color = useColorPick(canvasInstanceRef, e, data, id);
+    }
+    
+    const generatePins = (amount:number) => {
+        if (canvasInstanceRef == null) return;
+        if (canvasInstanceRef.current == null) return;
+        console.log("amount of current pins: ", pins.length, " amount to generate to: ", amount);
+        if (pins.length > amount) {
+            for (let i = amount; i < pins.length; i++) {
+                delete pinRefs.current[pins[i].id];
+            }
+            setPins(prev => prev.slice(0, amount));
+            console.log("deleting pins to: ", amount);
+        }
+        else if (pins.length < amount) {
+            console.log("hmm")
+            // generate pins at random locations within the image bounds
+            // const rect = canvas.getBoundingClientRect();
+            // const width = rect.width;
+            // const height = rect.height;
+            //const width = canvasInstanceRef.current.getDimensions().width;
+            //const height = canvasInstanceRef.current.getDimensions().height;
+            const width = canvasInstanceRef.current.getDragDimensions().width;
+            const height = canvasInstanceRef.current.getDragDimensions().height;
+            console.log("canvas size in generatePins: ", width, height);
 
+            for (let i = 0; i < amount - pins.length; i++) {
+                const newPin: ImagePin = {
+                    id: crypto && typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2,7),
+                    positionX: (Math.random() * width), 
+                    positionY: (Math.random() * height), 
+                    draggable: true,
+                };
+                setPins(prev => [...prev, newPin]);
+            }
+        }
+        console.log("pins after generatePins: ", pins);
+    }
+    
     return (
         <div>
                 {/* Overlay for pins - fills the same area as the image and sits on top */}
@@ -82,7 +117,7 @@ function PinOverlay({ pins, canvasRef }: PinOverlayProps) {
                                 defaultPosition={{ x: pin.positionX, y: pin.positionY }}
                                 nodeRef={pinRef}
                                 onDrag={(e: any, data: any) => handleDrag(e, data, pin.id)}
-                                onStop={(e: any, data: any) => handleDrag(e, data, pin.id)}
+                                //onStop={(e: any, data: any) => handleDrag(canvasRef, e, data, pin.id)}
                             >
                                 <div
                                     ref={pinRef}

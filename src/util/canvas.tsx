@@ -40,6 +40,14 @@ export class Canvas {
         }
     }
 
+    public getDragDimensions(){
+        const rect = this.canvas.getBoundingClientRect();
+        return {
+            width: rect.width,
+            height: rect.height,
+        }
+    }
+
     public getCanvasCenterPoint() {
         return {
         x: this.canvas.width / 2,
