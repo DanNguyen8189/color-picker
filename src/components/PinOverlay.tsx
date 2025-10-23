@@ -38,21 +38,6 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
         generatePins(count);
     }, [count]);
 
-    // useEffect(() => {
-    //     const canvas = canvasInstanceRef?.current;
-    //     if (!canvas || typeof canvas.on !== 'function') return;
-
-    //     const handleCanvasDrawn = () => {
-    //         // regenerate pins now that the canvas/image has been drawn
-    //         generatePins(count);
-    //     };
-
-    //     canvas.on('canvasDrawn', handleCanvasDrawn);
-    //     return () => {
-    //         canvas.off('canvasDrawn', handleCanvasDrawn);
-    //     };
-    // },[]);
-
     // for use in useEffect below, to cover case where image is uploaded for the first time
     const attachedCanvasRef = useRef<Canvas | null>(null);
 
@@ -82,44 +67,7 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
         };
     }, [canvasInstanceRef?.current, count]);
 
-    // useEffect(() =>{
-    //     //generatePins(0);
-    //     generatePins(count);
-    // },[imgSrc]);
 
-    // useEffect(() => {
-    //     console.log("useeffect triggered in PinOverlay");
-    //     if (!canvasInstanceRef?.current) return;
-        
-    //     // Only regenerate pins if canvas has valid dimensions
-    //     const dimensions = canvasInstanceRef.current.getDragDimensions();
-    //     // if (dimensions.width > 0 && dimensions.height > 0) {
-    //     //     generatePins(count);
-    //     // }
-    //     generatePins(count);
-    // }, [canvasInstanceRef?.current, count]);
-
-    // }, [imgSrc, count]);
-    // const handleDrag = (e:any, data:any, id:string) => {
-    //     e.preventDefault();
-    //     //setDraggedPinId(id);
-    //     //setPins(prev => prev.map(pin => pin.id === id ? { ...pin, positionX, positionY } : pin));
-
-
-    //     const canvas = new Canvas(canvasRef.current!);
-        
-    //     console.log('position from draggable', id, data.x, data.y);
-    //     //console.log('color picked', color, coordinates, dimensions);
-    //     const coordinates = {x: data.x, y: data.y};
-    //     const canvasCordinates = canvas.getCanvasCoordinates(coordinates) ?? {x:0, y:0};
-    //     // if (newx === undefined || newy === undefined) return;
-
-    //     //console.log("color from useColorPick: ", getPixelColor(newx, newy));
-    //     console.log("color from useColorPick: ", canvas.getPixelColor(canvasCordinates));
-    // }
-
-
-    
     const handleDrag = (e:any, data:any, id:string) => {
         if (canvasInstanceRef == null) return;
         const color = useColorPick(canvasInstanceRef, e, data, id);
@@ -128,6 +76,57 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
     const generatePins = (amount:number) => {
         if (canvasInstanceRef == null) return;
         if (canvasInstanceRef.current == null) return;
+
+        // const width = canvasInstanceRef.current!.getDragDimensions().width;
+        // const height = canvasInstanceRef.current!.getDragDimensions().height;
+
+        // // remove extra pins
+        // if (pins.length > amount) {
+        //     for (let i = amount; i < pins.length; i++) {
+        //         delete pinRefs.current[pins[i].id];
+        //     }
+        //     pins.slice(0, amount);
+        //     return 
+        // }
+
+        // // add missing pins
+        // if (pins.length < amount) {
+        //     const newPins: ImagePin[] = [];
+        //     for (let i = 0; i < amount - pins.length; i++) {
+        //         const id = crypto && typeof crypto.randomUUID === 'function'
+        //             ? crypto.randomUUID()
+        //             : String(Date.now()) + Math.random().toString(36).slice(2,7);
+        //         newPins.push({
+        //             id,
+        //             positionX: Math.random() * width,
+        //             positionY: Math.random() * height,
+        //             draggable: true,
+        //         });
+        //     }
+        //     setPins(prev =>[...prev, ...newPins]);
+        // }
+
+        // // same length -> regenerate all pins
+        // if (pins.length === amount) {
+        //     for (let i = 0; i < pins.length; i++) {
+        //         delete pinRefs.current[pins[i].id];
+        //     }
+        //     const newPins: ImagePin[] = [];
+        //     for (let i = 0; i < amount; i++) {
+        //         const id = crypto && typeof crypto.randomUUID === 'function'
+        //             ? crypto.randomUUID()
+        //             : String(Date.now()) + Math.random().toString(36).slice(2,7);
+        //         newPins.push({
+        //             id,
+        //             positionX: Math.random() * width,
+        //             positionY: Math.random() * height,
+        //             draggable: true,
+        //         });
+        //     }
+        //     setPins(newPins);
+        // }
+
+        
         setPins(prev => {
             const width = canvasInstanceRef.current!.getDragDimensions().width;
             const height = canvasInstanceRef.current!.getDragDimensions().height;
@@ -142,19 +141,19 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
 
             // add missing pins
             if (prev.length < amount) {
-                const additions: ImagePin[] = [];
+                const newPins: ImagePin[] = [];
                 for (let i = 0; i < amount - prev.length; i++) {
                     const id = crypto && typeof crypto.randomUUID === 'function'
                         ? crypto.randomUUID()
                         : String(Date.now()) + Math.random().toString(36).slice(2,7);
-                    additions.push({
+                    newPins.push({
                         id,
                         positionX: Math.random() * width,
                         positionY: Math.random() * height,
                         draggable: true,
                     });
                 }
-                return [...prev, ...additions];
+                return [...prev, ...newPins];
             }
 
             // same length -> regenerate all pins
@@ -162,72 +161,23 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
                 for (let i = 0; i < prev.length; i++) {
                     delete pinRefs.current[prev[i].id];
                 }
-                const regenerated: ImagePin[] = [];
+                const newPins: ImagePin[] = [];
                 for (let i = 0; i < amount; i++) {
                     const id = crypto && typeof crypto.randomUUID === 'function'
                         ? crypto.randomUUID()
                         : String(Date.now()) + Math.random().toString(36).slice(2,7);
-                    regenerated.push({
+                    newPins.push({
                         id,
                         positionX: Math.random() * width,
                         positionY: Math.random() * height,
                         draggable: true,
                     });
                 }
-                return regenerated;
+                return newPins;
             }
 
             return prev;
         });
-        console.log("pins after generatePins: ", pins);
-
-        // //console.log("amount of current pins: ", pins.length, " amount to generate to: ", amount);
-        // if (pins.length > amount) {
-        //     console.log("deleting pins to: ", amount);
-        //     for (let i = amount; i < pins.length; i++) {
-        //         delete pinRefs.current[pins[i].id];
-        //     }
-        //     setPins(prev => prev.slice(0, amount ));
-        //     //console.log("deleting pins to: ", amount);
-        // }
-        // else if (pins.length < amount) {
-
-        //     console.log("adding pins from", pins.length, " to ", amount);
-        //     const width = canvasInstanceRef.current.getDragDimensions().width;
-        //     const height = canvasInstanceRef.current.getDragDimensions().height;
-
-        //     for (let i = 0; i < amount - pins.length; i++) {
-        //         const newPin: ImagePin = {
-        //             id: crypto && typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2,7),
-        //             positionX: (Math.random() * width), 
-        //             positionY: (Math.random() * height), 
-        //             draggable: true,
-        //         };
-        //         setPins(prev => [...prev, newPin]);
-        //     }
-        // }
-        // else if (pins.length === amount){
-        //     console.log("regenerating all pins");
-        //     // want to regenerate all pins in this case
-
-        //     for (let i = 0; i < amount; i++) {
-        //         delete pinRefs.current[pins[i].id];
-        //     }
-        //     setPins([]);
-        //     const width = canvasInstanceRef.current.getDragDimensions().width;
-        //     const height = canvasInstanceRef.current.getDragDimensions().height;
-
-            
-        //     for (let i = 0; i < amount; i++) {
-        //         const newPin: ImagePin = {
-        //             id: crypto && typeof crypto.randomUUID === 'function' ? crypto.randomUUID() : String(Date.now()) + Math.random().toString(36).slice(2,7),
-        //             positionX: (Math.random() * width), 
-        //             positionY: (Math.random() * height), 
-        //             draggable: true,
-        //         };
-        //         setPins(prev => [...prev, newPin]);
-        //     }
-        // }
     }
     
     return (
