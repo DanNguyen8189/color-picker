@@ -6,6 +6,7 @@ export type Coordinates = {
 export class Canvas {
     private readonly canvas!: HTMLCanvasElement
     private readonly context!: CanvasRenderingContext2D
+    private eventListeners: { [key: string]: Function[] } = {};
 
     constructor(canvasElement: HTMLCanvasElement) {
         this.canvas = canvasElement
@@ -26,6 +27,11 @@ export class Canvas {
 
     public drawImage(img: any) {
         this.context.drawImage(img, 0, 0)
+        this.emitCanvasDrawn();
+    }
+
+    public getImageSrc() {
+        return this.canvas.toDataURL();
     }
 
     public setDimensions(width: number, height: number) {
@@ -40,6 +46,7 @@ export class Canvas {
         }
     }
 
+    // for returning canvas bounds, translated for react-draggable library
     public getDragDimensions(){
         const rect = this.canvas.getBoundingClientRect();
         return {
@@ -65,7 +72,7 @@ export class Canvas {
     //     return { x, y }
     // }
 
-    // canavs coordates are different from coordinates that are returned from react-draggable
+    // translates coordinates from react-draggable to be useable by color picker
     public getCanvasCoordinates = (coordinates: Coordinates) => {
         // const canvas = canvasRef.current;
         // if (canvas === null) return;
@@ -105,4 +112,22 @@ export class Canvas {
     //         const [red, green, blue] = pixelData
     //         return `rgb(${red}, ${green}, ${blue})`
     //     }
+
+    on(event: string, callback: Function) {
+        if (!this.eventListeners[event]) {
+            this.eventListeners[event] = [];
+        }
+        this.eventListeners[event].push(callback);
+    }
+
+    off(event: string, callback: Function) {
+        if (!this.eventListeners[event]) return;
+        this.eventListeners[event] = this.eventListeners[event].filter(cb => cb !== callback);
+    }
+
+    // emitted when image is loaded
+    protected emitCanvasDrawn() {
+        if (!this.eventListeners['canvasDrawn']) return;
+        this.eventListeners['canvasDrawn'].forEach(callback => callback());
+    }
 }

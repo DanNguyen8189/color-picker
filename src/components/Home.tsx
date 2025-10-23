@@ -4,17 +4,19 @@ import ImageUploader from './ImageUploader';
 
 import type { ImagePin } from "./Types";
 
-import { ImageColorPicker } from 'react-image-color-picker';
+// import { ImageColorPicker } from 'react-image-color-picker';
 
-import { set } from 'astro:schema';
+// import { set } from 'astro:schema';
 
 import { writeImage } from '../hooks/writeImage';
 import PinOverlay from './PinOverlay';
 
 
+
 function Home(){
     const [count, setCount] = useState(1);
-    const [selectedImage, setSelectedImage] = useState<File | null>(null);
+    // const [selectedImage, setSelectedImage] = useState<File | null>(null);
+    const [selectedImage, setSelectedImage] = useState<string>('');
     const [pins, setPins] = useState<ImagePin[]>([]);
 
     //reference to container div that holds both the image and the pins
@@ -24,7 +26,8 @@ function Home(){
 
     // handles image upload display
     //const { dimensions } = writeImage(canvasRef, selectedImage ? URL.createObjectURL(selectedImage) : '');
-    const canvasInstanceRef = writeImage(canvasRef, selectedImage ? URL.createObjectURL(selectedImage) : '');
+    //const canvasInstanceRef = writeImage(canvasRef, selectedImage ? URL.createObjectURL(selectedImage) : '');
+    const canvasInstanceRef = writeImage(canvasRef, selectedImage);
 
     // // map of node refs for each pin so react-draggable can use nodeRef per draggable
     // const pinRefs = useRef<Record<string, React.RefObject<HTMLDivElement | null>>>({});
@@ -34,10 +37,10 @@ function Home(){
         // 👇️ take the parameter passed from the Child component
         setCount(num);
         //generatePins(num);
-        if (containerRef.current === null) return;
-        const width = containerRef.current.getBoundingClientRect().width
-        const height = containerRef.current.getBoundingClientRect().height
-        console.log("container size in handleSlide: ", width, height);
+        // if (containerRef.current === null) return;
+        // const width = containerRef.current.getBoundingClientRect().width
+        // const height = containerRef.current.getBoundingClientRect().height
+        //console.log("container size in handleSlide: ", width, height);
     };
 
     // const generatePins = (amount:number) => {
@@ -66,7 +69,8 @@ function Home(){
     // }
 
     const handlePickImage = (image:File) => {
-        setSelectedImage(image);
+        setSelectedImage(URL.createObjectURL(image));
+        //setSelectedImage(image);
     }
 
     return (

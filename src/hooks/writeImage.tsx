@@ -12,8 +12,12 @@ export function writeImage(
             canvasInstanceRef.current = new Canvas(canvasRef.current!)
             //canvasInstanceRef.current.listenMovements(onMove)
         }
+        //console.log("new  image in writeImage");
+        // canvasInstanceRef.current = null;
+        //canvasInstanceRef.current = new Canvas(canvasRef.current!);
 
         const canvas = canvasInstanceRef.current
+
 
         async function initializeCanvas() {
             const image = await loadImageHandler(imgSrc)

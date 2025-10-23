@@ -18,6 +18,7 @@ function ImageUploader({ handlePickImage }: { handlePickImage: (image: File) => 
         <input
             type="file"
             name="myImage"
+            accept="image/*"
             // Event handler to capture file selection and update the state
             onChange={async(event) => {
                 if (!event.target.files) return;
@@ -30,17 +31,6 @@ function ImageUploader({ handlePickImage }: { handlePickImage: (image: File) => 
         </div>
     );
 
-    // function Image(){
-    //     if (selectedImage){
-    //         return (          
-    //             <img
-    //                 alt="not found"
-    //                 width={"250px"}
-    //                 src={URL.createObjectURL(selectedImage)}
-    //             />
-    //         )
-    //     }
-    // }
 };
 
 
