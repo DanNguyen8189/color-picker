@@ -70,8 +70,19 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
 
     const handleDrag = (e:any, data:any, id:string) => {
         if (canvasInstanceRef == null) return;
-        const color = useColorPick(canvasInstanceRef, e, data, id);
-    }
+        const color = useColorPick(canvasInstanceRef, data, id);
+        setPins(prevPins => prevPins.map(pin => {
+            if (pin.id === id) {
+                return {
+                    ...pin,
+                    positionX: data.x,
+                    positionY: data.y,
+                    color: color,
+                };
+            }
+            return pin;
+        }));
+    };
     
     const generatePins = (amount:number) => {
         if (canvasInstanceRef == null) return;
@@ -91,6 +102,7 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
 
         // // add missing pins
         // if (pins.length < amount) {
+        //     console.log("adding missing pins to: ", amount, " from: ", pins.length);
         //     const newPins: ImagePin[] = [];
         //     for (let i = 0; i < amount - pins.length; i++) {
         //         const id = crypto && typeof crypto.randomUUID === 'function'
@@ -108,6 +120,7 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
 
         // // same length -> regenerate all pins
         // if (pins.length === amount) {
+        //     console.log("regenerating all pins");
         //     for (let i = 0; i < pins.length; i++) {
         //         delete pinRefs.current[pins[i].id];
         //     }
@@ -146,10 +159,13 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
                     const id = crypto && typeof crypto.randomUUID === 'function'
                         ? crypto.randomUUID()
                         : String(Date.now()) + Math.random().toString(36).slice(2,7);
+                    const positionX = Math.random() * width;
+                    const positionY = Math.random() * height;
                     newPins.push({
-                        id,
-                        positionX: Math.random() * width,
-                        positionY: Math.random() * height,
+                        id: id,
+                        positionX: positionX,
+                        positionY: positionY,
+                        color: useColorPick(canvasInstanceRef, {x:positionX, y:positionY}, id) || undefined,
                         draggable: true,
                     });
                 }
@@ -166,10 +182,13 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
                     const id = crypto && typeof crypto.randomUUID === 'function'
                         ? crypto.randomUUID()
                         : String(Date.now()) + Math.random().toString(36).slice(2,7);
+                    const positionX = Math.random() * width;
+                    const positionY = Math.random() * height;
                     newPins.push({
-                        id,
-                        positionX: Math.random() * width,
-                        positionY: Math.random() * height,
+                        id: id,
+                        positionX: positionX,
+                        positionY: positionY,
+                        color: useColorPick(canvasInstanceRef, {x:positionX, y:positionY}, id) || undefined,
                         draggable: true,
                     });
                 }
@@ -206,10 +225,10 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
                                     ref={pinRef}
                                     style={{
                                         position: 'absolute',
-                                        width: '10px',
-                                        height: '10px',
+                                        width: '15px',
+                                        height: '15px',
                                         border: '2px solid white',
-                                        backgroundColor: 'red',
+                                        backgroundColor: pin.color || 'red',
                                         borderRadius: '50%',
                                         zIndex: 9999,
                                         pointerEvents: 'auto', // allow clicking/drags on the pin itself
