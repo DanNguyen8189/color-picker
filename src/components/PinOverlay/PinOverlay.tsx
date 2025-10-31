@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useRef, use } from 'react';
-import { Canvas, loadImageHandler } from '../util';
-import { useColorPick } from '../hooks/useColorPick';
+import { Canvas, loadImageHandler } from '../../util';
+import { useColorPick } from '../../hooks/useColorPick';
+import { Pin }from '../Pin/Pin';
 
-import type { ImagePin } from "./Types";
+import type { ImagePin } from "../Types";
 // function Slider({handleSlide}: {handleSlide: (value:number) => void})
 type PinOverlayProps = {
     pins2: ImagePin[],
@@ -88,58 +89,6 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
         if (canvasInstanceRef == null) return;
         if (canvasInstanceRef.current == null) return;
 
-        // const width = canvasInstanceRef.current!.getDragDimensions().width;
-        // const height = canvasInstanceRef.current!.getDragDimensions().height;
-
-        // // remove extra pins
-        // if (pins.length > amount) {
-        //     for (let i = amount; i < pins.length; i++) {
-        //         delete pinRefs.current[pins[i].id];
-        //     }
-        //     pins.slice(0, amount);
-        //     return 
-        // }
-
-        // // add missing pins
-        // if (pins.length < amount) {
-        //     console.log("adding missing pins to: ", amount, " from: ", pins.length);
-        //     const newPins: ImagePin[] = [];
-        //     for (let i = 0; i < amount - pins.length; i++) {
-        //         const id = crypto && typeof crypto.randomUUID === 'function'
-        //             ? crypto.randomUUID()
-        //             : String(Date.now()) + Math.random().toString(36).slice(2,7);
-        //         newPins.push({
-        //             id,
-        //             positionX: Math.random() * width,
-        //             positionY: Math.random() * height,
-        //             draggable: true,
-        //         });
-        //     }
-        //     setPins(prev =>[...prev, ...newPins]);
-        // }
-
-        // // same length -> regenerate all pins
-        // if (pins.length === amount) {
-        //     console.log("regenerating all pins");
-        //     for (let i = 0; i < pins.length; i++) {
-        //         delete pinRefs.current[pins[i].id];
-        //     }
-        //     const newPins: ImagePin[] = [];
-        //     for (let i = 0; i < amount; i++) {
-        //         const id = crypto && typeof crypto.randomUUID === 'function'
-        //             ? crypto.randomUUID()
-        //             : String(Date.now()) + Math.random().toString(36).slice(2,7);
-        //         newPins.push({
-        //             id,
-        //             positionX: Math.random() * width,
-        //             positionY: Math.random() * height,
-        //             draggable: true,
-        //         });
-        //     }
-        //     setPins(newPins);
-        // }
-
-        
         setPins(prev => {
             const width = canvasInstanceRef.current!.getDragDimensions().width;
             const height = canvasInstanceRef.current!.getDragDimensions().height;
@@ -221,7 +170,7 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
                                 onDrag={(e: any, data: any) => handleDrag(e, data, pin.id)}
                                 //onStop={(e: any, data: any) => handleDrag(canvasRef, e, data, pin.id)}
                             >
-                                <div
+                                {/* <div
                                     ref={pinRef}
                                     style={{
                                         position: 'absolute',
@@ -233,7 +182,8 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
                                         zIndex: 9999,
                                         pointerEvents: 'auto', // allow clicking/drags on the pin itself
                                     }}
-                                />
+                                /> */}
+                                {Pin(pinRef, pin)}
                             </Draggable>
                         );
                     })}

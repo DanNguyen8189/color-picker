@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Slider from './Slider';
-import ImageUploader from './ImageUploader';
+import Slider from './Slider/Slider';
+import ImageUploader from './ImageUploader/ImageUploader';
 
 import type { ImagePin } from "./Types";
 
@@ -9,7 +9,7 @@ import type { ImagePin } from "./Types";
 // import { set } from 'astro:schema';
 
 import { writeImage } from '../hooks/writeImage';
-import PinOverlay from './PinOverlay';
+import PinOverlay from './PinOverlay/PinOverlay';
 
 
 
