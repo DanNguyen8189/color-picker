@@ -142,42 +142,7 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
                 {/* Overlay for pins - fills the same area as the image and sits on top */}
                 <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 9998 }}>
                     {pins.map((pin, index) => {
-                        // create nodeRef for each individual pin
-                        // using createref here because the number of pins can change
-                        // useref here results in "Rendered more hooks than during the previous render"
-                        // when more pins are added
-                        // if (!pinRefs.current[pin.id]) pinRefs.current[pin.id] = React.createRef<HTMLDivElement>();
-                        // const pinRef = pinRefs.current[pin.id];
-
                         return (
-                            // <Draggable
-                            //     key={pin.id ?? index}
-                            //     axis='both'
-                            //     bounds='parent'
-                            //     defaultPosition={{ x: pin.positionX, y: pin.positionY }}
-                            //     nodeRef={pinRef}
-                            //     onDrag={(e: any, data: any) => handleDrag(e, data, pin.id)}
-                            //     //onStop={(e: any, data: any) => handleDrag(canvasRef, e, data, pin.id)}
-                            // >
-                            //     <div
-                            //         ref={pinRef}
-                            //         style={{
-                            //             position: 'absolute',
-                            //             width: '15px',
-                            //             height: '15px',
-                            //             border: '2px solid white',
-                            //             backgroundColor: pin.color || 'red',
-                            //             borderRadius: '50%',
-                            //             zIndex: 9999,
-                            //             pointerEvents: 'auto', // allow clicking/drags on the pin itself
-                            //         }}
-                            //     />
-                            //     {/* {Pin(pinRef, pin)} */}
-                            // </Draggable>
-                            // <div key={pin.id ?? index}>
-                            //     {Pin(pinRef, pin, {handleDrag})}
-                            // </div>
-
                             <Pin
                                 key={pin.id ?? index}
                                 Draggable={Draggable}

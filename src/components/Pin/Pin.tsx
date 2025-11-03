@@ -15,8 +15,8 @@ type PinProps = {
 }
 
 export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onDrag }) => {
-    // const pinRef2 = React.createRef<HTMLDivElement>();
-    const [pinRef2, setPinRef2] = useState<React.RefObject<HTMLDivElement | null>>(React.createRef<HTMLDivElement>());
+    // NodeRef required for react-draggable
+    const [nodeRef, setNodeRef] = useState<React.RefObject<HTMLDivElement | null>>(React.createRef<HTMLDivElement>());
     const [color, setColor] = useState<string>('red');
     const [coordinates, setCoordinates] = useState<{x:number, y:number} | null>(null);
 
@@ -33,11 +33,12 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
             const c = canvas.getPixelColorFromDraggableCoordinates({x: positionX, y: positionY}) || 'red';
             setColor(c);
             setCoordinates({x: positionX, y: positionY});
-            setPinRef2(React.createRef<HTMLDivElement>());
+            //setNodeRef(React.createRef<HTMLDivElement>());
 
             // cleanup function (runs when the component is unmounted)
             return () => {
-                console.log('Component is being destroyed!');
+                //console.log('Component is being destroyed!');
+                //setNodeRef(React.createRef<HTMLDivElement>());
             };
     }, [canvasInstanceRef]);
 
@@ -70,7 +71,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
     if (!Draggable) {
         return (
             <div
-                ref={pinRef2}
+                ref={nodeRef}
                 style={{
                     position: 'absolute',
                     width: '15px',
@@ -96,11 +97,11 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
             axis='both'
             bounds='parent'
             defaultPosition={{ x: coordinates.x, y: coordinates.y }}
-            nodeRef={pinRef2}
+            nodeRef={nodeRef}
             onDrag={handleDrag}
         >
             <div
-                ref={pinRef2}
+                ref={nodeRef}
                 style={{
                     position: 'absolute',
                     width: '15px',
