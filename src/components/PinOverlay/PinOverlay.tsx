@@ -161,30 +161,41 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
                         const pinRef = pinRefs.current[pin.id];
 
                         return (
-                            <Draggable
+                            // <Draggable
+                            //     key={pin.id ?? index}
+                            //     axis='both'
+                            //     bounds='parent'
+                            //     defaultPosition={{ x: pin.positionX, y: pin.positionY }}
+                            //     nodeRef={pinRef}
+                            //     onDrag={(e: any, data: any) => handleDrag(e, data, pin.id)}
+                            //     //onStop={(e: any, data: any) => handleDrag(canvasRef, e, data, pin.id)}
+                            // >
+                            //     <div
+                            //         ref={pinRef}
+                            //         style={{
+                            //             position: 'absolute',
+                            //             width: '15px',
+                            //             height: '15px',
+                            //             border: '2px solid white',
+                            //             backgroundColor: pin.color || 'red',
+                            //             borderRadius: '50%',
+                            //             zIndex: 9999,
+                            //             pointerEvents: 'auto', // allow clicking/drags on the pin itself
+                            //         }}
+                            //     />
+                            //     {/* {Pin(pinRef, pin)} */}
+                            // </Draggable>
+                            // <div key={pin.id ?? index}>
+                            //     {Pin(pinRef, pin, {handleDrag})}
+                            // </div>
+
+                            <Pin
+                                Draggable={Draggable}
                                 key={pin.id ?? index}
-                                axis='both'
-                                bounds='parent'
-                                defaultPosition={{ x: pin.positionX, y: pin.positionY }}
-                                nodeRef={pinRef}
+                                pinRef={pinRef}
+                                pin={pin}
                                 onDrag={(e: any, data: any) => handleDrag(e, data, pin.id)}
-                                //onStop={(e: any, data: any) => handleDrag(canvasRef, e, data, pin.id)}
-                            >
-                                {/* <div
-                                    ref={pinRef}
-                                    style={{
-                                        position: 'absolute',
-                                        width: '15px',
-                                        height: '15px',
-                                        border: '2px solid white',
-                                        backgroundColor: pin.color || 'red',
-                                        borderRadius: '50%',
-                                        zIndex: 9999,
-                                        pointerEvents: 'auto', // allow clicking/drags on the pin itself
-                                    }}
-                                /> */}
-                                {Pin(pinRef, pin)}
-                            </Draggable>
+                            />
                         );
                     })}
                 </div>
