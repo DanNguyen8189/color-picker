@@ -69,15 +69,11 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
     }, [canvasInstanceRef?.current, count]);
 
 
-    const handleDrag = (e:any, data:any, id:string) => {
-        if (canvasInstanceRef == null) return;
-        const color = useColorPick(canvasInstanceRef, data);
+    const handleDrag = (e:any, color:string, id:string) => {
         setPins(prevPins => prevPins.map(pin => {
             if (pin.id === id) {
                 return {
                     ...pin,
-                    positionX: data.x,
-                    positionY: data.y,
                     color: color,
                 };
             }
@@ -90,8 +86,6 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
         if (canvasInstanceRef.current == null) return;
 
         setPins(prev => {
-            const width = canvasInstanceRef.current!.getDragDimensions().width;
-            const height = canvasInstanceRef.current!.getDragDimensions().height;
 
             // remove extra pins
             if (prev.length > amount) {
@@ -108,13 +102,12 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
                     const id = crypto && typeof crypto.randomUUID === 'function'
                         ? crypto.randomUUID()
                         : String(Date.now()) + Math.random().toString(36).slice(2,7);
-                    const positionX = Math.random() * width;
-                    const positionY = Math.random() * height;
+
                     newPins.push({
                         id: id,
-                        positionX: positionX,
-                        positionY: positionY,
-                        color: useColorPick(canvasInstanceRef, {x:positionX, y:positionY}) || undefined,
+                        positionX: 0,
+                        positionY: 0,
+                        color: undefined,
                     });
                 }
                 return [...prev, ...newPins];
@@ -130,13 +123,11 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
                     const id = crypto && typeof crypto.randomUUID === 'function'
                         ? crypto.randomUUID()
                         : String(Date.now()) + Math.random().toString(36).slice(2,7);
-                    const positionX = Math.random() * width;
-                    const positionY = Math.random() * height;
                     newPins.push({
                         id: id,
-                        positionX: positionX,
-                        positionY: positionY,
-                        color: useColorPick(canvasInstanceRef, {x:positionX, y:positionY}) || undefined,
+                        positionX: 0,
+                        positionY: 0,
+                        color: undefined,
                     });
                 }
                 return newPins;

@@ -124,7 +124,7 @@ export class Canvas {
         const canvasCordinates = this.getCanvasCoordinates(coordinates) ?? {x:0, y:0};
 
         const color = this.getPixelColor(canvasCordinates);
-        console.log("color from useColorPick: ", color);
+        // console.log("color from useColorPick: ", color);
         return color;
     }
 

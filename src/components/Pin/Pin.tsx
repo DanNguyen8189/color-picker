@@ -11,7 +11,7 @@ type PinProps = {
     // import it directly in Pin component because we'd be running it for every Pin
     canvasInstanceRef: React.RefObject<Canvas | null>,
     pin: ImagePin,
-    onDrag: (e: any, data: any) => void
+    onDrag: (e: any, color: string, id:string) => void
 }
 
 export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onDrag }) => {
@@ -30,8 +30,8 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
             const positionY = Math.random() * height;
             // TODO block this? Ansync promise?
             //const color2 = useColorPick(canvasInstanceRef, {x:positionX, y:positionY}) || undefined;
-            const c = canvas.getPixelColorFromDraggableCoordinates({x: positionX, y: positionY});
-            setColor(c || 'red');
+            const c = canvas.getPixelColorFromDraggableCoordinates({x: positionX, y: positionY}) || 'red';
+            setColor(c);
             setCoordinates({x: positionX, y: positionY});
             setPinRef2(React.createRef<HTMLDivElement>());
 
@@ -59,9 +59,9 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
         //     setColor(c || 'red');
         // }
         //const c = useColorPick(canvasInstanceRef, data);
-        const c = canvasInstanceRef.current.getPixelColorFromDraggableCoordinates({x: data.x, y: data.y});
-        setColor(c || 'red');
-        onDrag(e, data);
+        const c = canvasInstanceRef.current.getPixelColorFromDraggableCoordinates({x: data.x, y: data.y}) || 'red';
+        setColor(c);
+        onDrag(e, c, pin.id);
     };
 
     if (!coordinates) return null;
