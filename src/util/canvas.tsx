@@ -113,6 +113,21 @@ export class Canvas {
     //         return `rgb(${red}, ${green}, ${blue})`
     //     }
 
+    public getPixelColorFromDraggableCoordinates = (coordinates: {x:number, y:number}) => {
+        if (this.canvas == null) return;
+        //e.preventDefault();
+        //const canvas = new Canvas(canvasRef.current!);
+        
+        //const coordinates = {x: data.x, y: data.y};
+
+        //convert coordinates to "canvas" class coordinates
+        const canvasCordinates = this.getCanvasCoordinates(coordinates) ?? {x:0, y:0};
+
+        const color = this.getPixelColor(canvasCordinates);
+        console.log("color from useColorPick: ", color);
+        return color;
+    }
+
     on(event: string, callback: Function) {
         if (!this.eventListeners[event]) {
             this.eventListeners[event] = [];

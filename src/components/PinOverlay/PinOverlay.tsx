@@ -17,7 +17,7 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
     const [pins, setPins] = useState<ImagePin[]>([]);
 
     // map of node refs for each pin so react-draggable can use nodeRef per draggable
-    const pinRefs = useRef<Record<string, React.RefObject<HTMLDivElement | null>>>({});
+    //const pinRefs = useRef<Record<string, React.RefObject<HTMLDivElement | null>>>({});
 
     const [Draggable, setDraggable] = useState<any>(null);
     // Dynamically import react-draggable to avoid SSR issues
@@ -71,7 +71,7 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
 
     const handleDrag = (e:any, data:any, id:string) => {
         if (canvasInstanceRef == null) return;
-        const color = useColorPick(canvasInstanceRef, data, id);
+        const color = useColorPick(canvasInstanceRef, data);
         setPins(prevPins => prevPins.map(pin => {
             if (pin.id === id) {
                 return {
@@ -95,9 +95,9 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
 
             // remove extra pins
             if (prev.length > amount) {
-                for (let i = amount; i < prev.length; i++) {
-                    delete pinRefs.current[prev[i].id];
-                }
+                // for (let i = amount; i < prev.length; i++) {
+                //     delete pinRefs.current[prev[i].id];
+                // }
                 return prev.slice(0, amount);
             }
 
@@ -114,8 +114,7 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
                         id: id,
                         positionX: positionX,
                         positionY: positionY,
-                        color: useColorPick(canvasInstanceRef, {x:positionX, y:positionY}, id) || undefined,
-                        draggable: true,
+                        color: useColorPick(canvasInstanceRef, {x:positionX, y:positionY}) || undefined,
                     });
                 }
                 return [...prev, ...newPins];
@@ -123,9 +122,9 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
 
             // same length -> regenerate all pins
             if (prev.length === amount) {
-                for (let i = 0; i < prev.length; i++) {
-                    delete pinRefs.current[prev[i].id];
-                }
+                // for (let i = 0; i < prev.length; i++) {
+                //     delete pinRefs.current[prev[i].id];
+                // }
                 const newPins: ImagePin[] = [];
                 for (let i = 0; i < amount; i++) {
                     const id = crypto && typeof crypto.randomUUID === 'function'
@@ -137,8 +136,7 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
                         id: id,
                         positionX: positionX,
                         positionY: positionY,
-                        color: useColorPick(canvasInstanceRef, {x:positionX, y:positionY}, id) || undefined,
-                        draggable: true,
+                        color: useColorPick(canvasInstanceRef, {x:positionX, y:positionY}) || undefined,
                     });
                 }
                 return newPins;
@@ -157,8 +155,8 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
                         // using createref here because the number of pins can change
                         // useref here results in "Rendered more hooks than during the previous render"
                         // when more pins are added
-                        if (!pinRefs.current[pin.id]) pinRefs.current[pin.id] = React.createRef<HTMLDivElement>();
-                        const pinRef = pinRefs.current[pin.id];
+                        // if (!pinRefs.current[pin.id]) pinRefs.current[pin.id] = React.createRef<HTMLDivElement>();
+                        // const pinRef = pinRefs.current[pin.id];
 
                         return (
                             // <Draggable
@@ -190,9 +188,10 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
                             // </div>
 
                             <Pin
-                                Draggable={Draggable}
                                 key={pin.id ?? index}
-                                pinRef={pinRef}
+                                Draggable={Draggable}
+                                canvasInstanceRef={canvasInstanceRef}
+                                // pinRef={pinRef}
                                 pin={pin}
                                 onDrag={(e: any, data: any) => handleDrag(e, data, pin.id)}
                             />

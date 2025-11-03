@@ -6,7 +6,6 @@ export function useColorPick(
     canvasInstanceRef: React.RefObject<Canvas | null>,
     //e:any, 
     coordinates: {x:number, y:number},
-    id:string,
 ) {
     if (canvasInstanceRef.current == null) return;
     //e.preventDefault();

@@ -3,7 +3,6 @@ export interface ImagePin {
     positionX: number;
     positionY: number;
     color?: string;
-    draggable?: boolean;
 }
 
 export interface Image {
