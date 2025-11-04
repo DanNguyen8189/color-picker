@@ -1,19 +1,19 @@
-import React, { useState, useEffect, useRef, use } from 'react';
-import { Canvas, loadImageHandler } from '../../util';
-import { useColorPick } from '../../hooks/useColorPick';
+import React, { useState, useEffect, useRef } from 'react';
+import { Canvas } from '../../util';
 import { Pin }from '../Pin/Pin';
 
 import type { ImagePin } from "../Types";
 // function Slider({handleSlide}: {handleSlide: (value:number) => void})
 type PinOverlayProps = {
-    pins2: ImagePin[],
     count: number,
     //canvasRef: React.RefObject<HTMLCanvasElement | null>
     //canvas: Canvas | null
     canvasInstanceRef: React.RefObject<Canvas | null>,
+    setPinsParent: React.Dispatch<React.SetStateAction<ImagePin[]>>
 }
 
-function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
+// function PinOverlay({ count, canvasInstanceRef, setPinsParent }: PinOverlayProps) {
+export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef, setPinsParent }) => {
     const [pins, setPins] = useState<ImagePin[]>([]);
 
     // map of node refs for each pin so react-draggable can use nodeRef per draggable
@@ -34,7 +34,6 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
 
 
     useEffect(() =>{
-        //console.log("canvas size ", canvasInstanceRef.current?.getDimensions());
         if (canvasInstanceRef == null) return;
         generatePins(count);
     }, [count]);
@@ -68,6 +67,10 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
         };
     }, [canvasInstanceRef?.current, count]);
 
+    // pass up pin changes to parent
+    useEffect(() => {   
+        setPinsParent(pins);
+    }, [pins]);
 
     const handleDrag = (e:any, color:string, id:string) => {
         setPins(prevPins => prevPins.map(pin => {
@@ -147,17 +150,14 @@ function PinOverlay({ pins2, count, canvasInstanceRef }: PinOverlayProps) {
                                 key={pin.id ?? index}
                                 Draggable={Draggable}
                                 canvasInstanceRef={canvasInstanceRef}
-                                // pinRef={pinRef}
                                 pin={pin}
                                 onDrag={(e: any, data: any) => handleDrag(e, data, pin.id)}
                             />
                         );
                     })}
                 </div>
-                {/* <p>length of pins array: {pins.length}</p>
-                <p>count var: {count}</p> */}
         </div>
     );
     
 }
-export default PinOverlay;
+// export default PinOverlay;

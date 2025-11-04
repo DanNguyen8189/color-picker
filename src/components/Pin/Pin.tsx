@@ -115,29 +115,4 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
             />
         </Draggable>
     );
-
-    // return (
-    //     <Draggable
-    //         key={pin.id}
-    //         axis='both'
-    //         bounds='parent'
-    //         defaultPosition={{ x: pin.positionX, y: pin.positionY }}
-    //         nodeRef={pinRef}
-    //         onDrag={onDrag}
-    //     >
-    //         <div
-    //             ref={pinRef}
-    //             style={{
-    //                 position: 'absolute',
-    //                 width: '15px',
-    //                 height: '15px',
-    //                 border: '2px solid white',
-    //                 backgroundColor: pin.color || 'red',
-    //                 borderRadius: '50%',
-    //                 zIndex: 9999,
-    //                 pointerEvents: 'auto',
-    //             }}
-    //         />
-    //     </Draggable>
-    // );
 };
