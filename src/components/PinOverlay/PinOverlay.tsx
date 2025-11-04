@@ -3,11 +3,10 @@ import { Canvas } from '../../util';
 import { Pin }from '../Pin/Pin';
 
 import type { ImagePin } from "../Types";
-// function Slider({handleSlide}: {handleSlide: (value:number) => void})
+import { set } from 'astro:schema';
+
 type PinOverlayProps = {
     count: number,
-    //canvasRef: React.RefObject<HTMLCanvasElement | null>
-    //canvas: Canvas | null
     canvasInstanceRef: React.RefObject<Canvas | null>,
     setPinsParent: React.Dispatch<React.SetStateAction<ImagePin[]>>
 }
@@ -16,36 +15,50 @@ type PinOverlayProps = {
 export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef, setPinsParent }) => {
     const [pins, setPins] = useState<ImagePin[]>([]);
 
-    // map of node refs for each pin so react-draggable can use nodeRef per draggable
-    //const pinRefs = useRef<Record<string, React.RefObject<HTMLDivElement | null>>>({});
-
-    const [Draggable, setDraggable] = useState<any>(null);
+    //const [Draggable, setDraggable] = useState<any>(null);
+    const [Draggable, setDraggable] = useState<typeof import('react-draggable')['default'] | null>(null);
     // Dynamically import react-draggable to avoid SSR issues
+    // useEffect(() => {
+    //     let mounted = true;
+    //     // load react-draggable only on the client
+    //     import('react-draggable').then((mod) => {
+    //         if (mounted) setDraggable(() => mod.default || mod);
+    //     }).catch(() => {
+    //         console.error("Error importing react-draggable");
+    //     });
+    //     //return () => { mounted = false; };
+    // }, []);
+
     useEffect(() => {
-        let mounted = true;
-        // load react-draggable only on the client
-        import('react-draggable').then((mod) => {
-            if (mounted) setDraggable(() => mod.default || mod);
-        }).catch(() => {
-            // ignore; we'll render non-draggable pins
-        });
-    return () => { mounted = false; };
+        let mounted = true; // prevent calling setState on unmounted component
+        import('react-draggable')
+            .then((module) => {
+                if (!mounted) return;
+
+                // take returned module and assign to Draggable state
+                // react-draggable's defult export is the Draggable component itself
+                const reactDraggableComponent = (module as any).default ?? (module as any);
+                // ESM: component is in default export
+                // CommonJS: component is the module itself
+                // mod could be either type, depending on the build system
+                // so types re unkown at compile time
+
+
+                // wrap in a function so React doesn't try call it. which causes
+                // “Class constructor … cannot be invoked without 'new'”
+                setDraggable(() => reactDraggableComponent as typeof import('react-draggable')['default']);
+            }).catch((err) => {
+                console.error('Error importing react-draggable', err);
+                setDraggable(null);
+            });
+        return () => { mounted = false; };
     }, []);
 
-
-    // useEffect(() =>{
-    //     if (!canvasInstanceRef?.current) {
-    //         return;
-    //     }
-
-    //     generatePins(count);
-    // }, [count]);
 
     // for use in useEffect below, to cover case where image is uploaded for the first time
     //const attachedCanvasRef = useRef<Canvas | null>(null);
 
     useEffect(() => {
-        console.log("PinOverlay useEffect for canvasDrawn, count: ", count);
         // attaches event listener 'canvasDrawn' once, when canvasInstanceRef.current becomes available
         const canvas = canvasInstanceRef?.current;
         if (!canvas || typeof canvas.on !== 'function') return;
@@ -99,7 +112,6 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
     };
     
     const generatePins = (amount:number) => {
-        console.log("generatePins called with amount: ", amount);
         if (!canvasInstanceRef?.current) {
             return;
         }
@@ -108,9 +120,6 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
 
             // remove extra pins
             if (prev.length > amount) {
-                // for (let i = amount; i < prev.length; i++) {
-                //     delete pinRefs.current[prev[i].id];
-                // }
                 return prev.slice(0, amount);
             }
 

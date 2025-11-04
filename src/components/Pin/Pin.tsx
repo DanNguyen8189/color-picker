@@ -1,14 +1,12 @@
 
-import React from 'react';
-// import Draggable from 'react-draggable';
+import React, { useEffect, useState } from 'react';
 import type { ImagePin } from '../Types';
 import { Canvas } from '../../util';
-import { useEffect, useState } from 'react';
-//import { useColorPick } from '../../hooks/useColorPick';
 
 type PinProps = {
-    Draggable: any,  // for dynamic import of react-draggable. Didn't want to
+    //Draggable: any,  // for dynamic import of react-draggable. Didn't want to
     // import it directly in Pin component because we'd be running it for every Pin
+    Draggable: typeof import('react-draggable')['default'] | null,
     canvasInstanceRef: React.RefObject<Canvas | null>,
     pin: ImagePin,
     onDrag: (e: any, color: string, id:string) => void
@@ -51,7 +49,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
             };
     }, [canvasInstanceRef]);
 
-    const handleDrag = (e:any, data:any) => {
+    const handleDrag = (e:any, data:{x: number, y:number}) => {
         // update controlled position and color on drag
         if (!canvasInstanceRef?.current) {
             return;
