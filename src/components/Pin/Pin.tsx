@@ -21,16 +21,25 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
     const [coordinates, setCoordinates] = useState<{x:number, y:number} | null>(null);
 
     useEffect(() => {
+            if (!canvasInstanceRef?.current) {
+                // optional chaining operator ? checks both ref and current prop
+                // at same time
+                return;
+            }
+            
             const canvas = canvasInstanceRef.current;
-            if (!canvas) return;
-            const width = canvasInstanceRef.current!.getDragDimensions().width;
-            const height = canvasInstanceRef.current!.getDragDimensions().height;
+            const { width, height } = canvas.getDragDimensions();
 
             const positionX = Math.random() * width;
             const positionY = Math.random() * height;
+
             // TODO block this? Ansync promise?
             //const color2 = useColorPick(canvasInstanceRef, {x:positionX, y:positionY}) || undefined;
-            const c = canvas.getPixelColorFromDraggableCoordinates({x: positionX, y: positionY}) || 'red';
+            const c = canvas.getPixelColorFromDraggableCoordinates({
+                x: positionX,
+                y: positionY
+            }) || 'red';
+
             setColor(c);
             setCoordinates({x: positionX, y: positionY});
             //setNodeRef(React.createRef<HTMLDivElement>());
@@ -42,25 +51,17 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
             };
     }, [canvasInstanceRef]);
 
-    // const handleDrag = (e:any, data:any) => {
-    //     if (canvasInstanceRef == null) return;
-    //     const color = useColorPick(canvasInstanceRef, data);
-    //     setColor(color || 'red');
-    //     const newCoordinates = {x: data.x, y: data.y};
-    //     setCoordinates(newCoordinates);
-    // };
-
     const handleDrag = (e:any, data:any) => {
         // update controlled position and color on drag
-        if (canvasInstanceRef == null) return;
-        if (canvasInstanceRef.current == null) return;
-        setCoordinates({ x: data.x, y: data.y });
-        // if (canvas && typeof canvas.getPixelColor === 'function') {
-        //     const c = canvas.getPixelColor({ x: data.x, y: data.y });
-        //     setColor(c || 'red');
-        // }
-        //const c = useColorPick(canvasInstanceRef, data);
-        const c = canvasInstanceRef.current.getPixelColorFromDraggableCoordinates({x: data.x, y: data.y}) || 'red';
+        if (!canvasInstanceRef?.current) {
+            return;
+        }
+        
+        const canvas = canvasInstanceRef.current;
+        const { x, y } = data;
+        setCoordinates({ x, y });
+
+        const c = canvas.getPixelColorFromDraggableCoordinates({x, y}) || 'red';
         setColor(c);
         onDrag(e, c, pin.id);
     };
