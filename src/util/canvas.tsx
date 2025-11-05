@@ -93,10 +93,11 @@ export class Canvas {
         1,
         1
         ).data
-        if (pixelData.length < 4) return 'rgb(0,0,0)' // Return black color if unable to retrieve pixel data
+        if (pixelData.length < 4) return {r: 0, g: 0, b: 0}; // Return black color if unable to retrieve pixel data
 
         const [red, green, blue] = pixelData
-        return `rgb(${red}, ${green}, ${blue})`
+        //return `rgb(${red}, ${green}, ${blue})`
+        return {r: red, g: green, b: blue};
     }
     // const getPixelColor = (x: number, y: number) =>{
     //     const ctx = canvasRef.current?.getContext("2d");
@@ -112,6 +113,21 @@ export class Canvas {
     //         const [red, green, blue] = pixelData
     //         return `rgb(${red}, ${green}, ${blue})`
     //     }
+
+    public getPixelColorFromDraggableCoordinates = (coordinates: {x:number, y:number}) => {
+        if (this.canvas == null) return;
+        //e.preventDefault();
+        //const canvas = new Canvas(canvasRef.current!);
+        
+        //const coordinates = {x: data.x, y: data.y};
+
+        //convert coordinates to "canvas" class coordinates
+        const canvasCordinates = this.getCanvasCoordinates(coordinates) ?? {x:0, y:0};
+
+        const color = this.getPixelColor(canvasCordinates);
+        // console.log("color from useColorPick: ", color);
+        return color;
+    }
 
     on(event: string, callback: Function) {
         if (!this.eventListeners[event]) {
