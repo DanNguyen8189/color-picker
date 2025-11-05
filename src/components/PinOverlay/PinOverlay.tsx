@@ -15,19 +15,8 @@ type PinOverlayProps = {
 export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef, setPinsParent }) => {
     const [pins, setPins] = useState<ImagePin[]>([]);
 
-    //const [Draggable, setDraggable] = useState<any>(null);
     const [Draggable, setDraggable] = useState<typeof import('react-draggable')['default'] | null>(null);
     // Dynamically import react-draggable to avoid SSR issues
-    // useEffect(() => {
-    //     let mounted = true;
-    //     // load react-draggable only on the client
-    //     import('react-draggable').then((mod) => {
-    //         if (mounted) setDraggable(() => mod.default || mod);
-    //     }).catch(() => {
-    //         console.error("Error importing react-draggable");
-    //     });
-    //     //return () => { mounted = false; };
-    // }, []);
 
     useEffect(() => {
         let mounted = true; // prevent calling setState on unmounted component
@@ -44,7 +33,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
                 // so types re unkown at compile time
 
 
-                // wrap in a function so React doesn't try call it. which causes
+                // wrap in a function so React doesn't try call it during assignment, which causes
                 // “Class constructor … cannot be invoked without 'new'”
                 setDraggable(() => reactDraggableComponent as typeof import('react-draggable')['default']);
             }).catch((err) => {
@@ -99,7 +88,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
         setPinsParent(pins);
     }, [pins]);
 
-    const handleDrag = (e:any, color:string, id:string) => {
+    const handleDrag = (e: any, color:{r: number, g: number, b: number}, id:string) => {
         setPins(prevPins => prevPins.map(pin => {
             if (pin.id === id) {
                 return {

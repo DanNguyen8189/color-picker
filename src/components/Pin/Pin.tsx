@@ -2,21 +2,23 @@
 import React, { useEffect, useState } from 'react';
 import type { ImagePin } from '../Types';
 import { Canvas } from '../../util';
+import { rgbToString, type RGB } from '../Types';
 
 type PinProps = {
     //Draggable: any,  // for dynamic import of react-draggable. Didn't want to
     // import it directly in Pin component because we'd be running it for every Pin
-    Draggable: typeof import('react-draggable')['default'] | null,
+    Draggable: typeof import('react-draggable')['default'] | undefined,
     canvasInstanceRef: React.RefObject<Canvas | null>,
     pin: ImagePin,
-    onDrag: (e: any, color: string, id:string) => void
+    onDrag: (e: any, color: RGB, id:string) => void
 }
 
 export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onDrag }) => {
     // NodeRef required for react-draggable
     const [nodeRef, setNodeRef] = useState<React.RefObject<HTMLDivElement | null>>(React.createRef<HTMLDivElement>());
-    const [color, setColor] = useState<string>('red');
-    const [coordinates, setCoordinates] = useState<{x:number, y:number} | null>(null);
+    //const [color, setColor] = useState<string>('red');
+    const [color, setColor] = useState<{r: number, g: number, b: number} | undefined>(undefined);
+    const [coordinates, setCoordinates] = useState<{x:number, y:number} | undefined>(undefined);
 
     useEffect(() => {
             if (!canvasInstanceRef?.current) {
@@ -36,10 +38,11 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
             const c = canvas.getPixelColorFromDraggableCoordinates({
                 x: positionX,
                 y: positionY
-            }) || 'red';
+            }) || {r:0, g:0, b:0};
 
             setColor(c);
             setCoordinates({x: positionX, y: positionY});
+            onDrag(undefined, c, pin.id);
             //setNodeRef(React.createRef<HTMLDivElement>());
 
             // cleanup function (runs when the component is unmounted)
@@ -59,7 +62,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
         const { x, y } = data;
         setCoordinates({ x, y });
 
-        const c = canvas.getPixelColorFromDraggableCoordinates({x, y}) || 'red';
+        const c = canvas.getPixelColorFromDraggableCoordinates({x, y}) || {r:0, g:0, b:0};
         setColor(c);
         onDrag(e, c, pin.id);
     };
@@ -76,7 +79,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
                     width: '15px',
                     height: '15px',
                     border: '2px solid white',
-                    backgroundColor: color || 'red',
+                    backgroundColor: rgbToString(color) || 'red',
                     borderRadius: '50%',
                     zIndex: 9999,
                     pointerEvents: 'auto',
@@ -106,7 +109,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
                     width: '15px',
                     height: '15px',
                     border: '2px solid white',
-                    backgroundColor: color || 'red',
+                    backgroundColor: rgbToString(color)  || 'red',
                     borderRadius: '50%',
                     zIndex: 9999,
                     pointerEvents: 'auto',

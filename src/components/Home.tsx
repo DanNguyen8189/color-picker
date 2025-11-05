@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef, use } from 'react';
 import Slider from './Slider/Slider';
 import ImageUploader from './ImageUploader/ImageUploader';
+import { Palette } from './Pallete/Pallete';
 
 import type { ImagePin } from "./Types";
 
@@ -81,6 +82,7 @@ function Home(){
                         ></canvas>
                 </div>
                 <PinOverlay count={count} canvasInstanceRef={canvasInstanceRef} setPinsParent={setPins}/>
+                <Palette Pins={pins} />
             </div>
             )}
         </div>
