@@ -21,7 +21,7 @@ export class Canvas {
         return this.canvas.toDataURL();
     }
 
-    public setDimensions(width: number, height: number) {
+    public setDimensions( width: number, height: number) {
         this.canvas.width = width
         this.canvas.height = height
     }
@@ -34,7 +34,7 @@ export class Canvas {
     }
 
     // for returning canvas bounds, translated for react-draggable library
-    public getDragDimensions(): { width: number; height: number } {
+    public getBounds(): { width: number; height: number } {
         const rect = this.canvas.getBoundingClientRect();
 
         // these return 0 if canvas is not yet drawn
@@ -78,8 +78,8 @@ export class Canvas {
 
 
     public getPixelColorFromDraggableCoordinates = (
-        coordinates: { x: number; y: number }
-    ): { r: number; g: number; b: number } | undefined => {
+        coordinates: Coordinates
+    ): RGB | undefined => {
         const canvasCoords = this.getCanvasCoordinates(coordinates);
 
         if (!canvasCoords) return undefined;

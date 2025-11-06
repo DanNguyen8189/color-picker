@@ -43,7 +43,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
             }
             
             const canvas = canvasInstanceRef.current;
-            const { width, height } = canvas.getDragDimensions();
+            const { width, height } = canvas.getBounds();
 
             if (width === 0 || height === 0) return;
 
