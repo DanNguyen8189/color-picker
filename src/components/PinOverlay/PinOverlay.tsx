@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Canvas } from '../../util';
 import { Pin }from '../Pin/Pin';
 
-import type { ImagePin } from "../Types";
+import type { RGB, ImagePin } from "../Types";
 import { set } from 'astro:schema';
 
 type PinOverlayProps = {
@@ -49,7 +49,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
 
     useEffect(() => {
         // attaches event listener 'canvasDrawn' once, when canvasInstanceRef.current becomes available
-        const canvas = canvasInstanceRef?.current;
+        const canvas = canvasInstanceRef.current;
         if (!canvas || typeof canvas.on !== 'function') return;
 
         const handleCanvasDrawn = () => {
@@ -88,7 +88,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
         setPinsParent(pins);
     }, [pins]);
 
-    const handleDrag = (e: any, color:{r: number, g: number, b: number}, id:string) => {
+    const handleDrag = (e: any, color:RGB, id:string) => {
         setPins(prevPins => prevPins.map(pin => {
             if (pin.id === id) {
                 return {

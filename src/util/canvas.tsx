@@ -1,3 +1,5 @@
+import type { RGB } from "../components/Types"
+
 export type Coordinates = {
     x: number
     y: number
@@ -15,22 +17,12 @@ export class Canvas {
         }) as CanvasRenderingContext2D
     }
 
-    public listenMovements(listener: any) {
-        this.canvas.addEventListener('touchmove', listener)
-        this.canvas.addEventListener('pointermove', listener)
-    }
-
-    public cleanUp(listener: any) {
-        this.canvas.removeEventListener('touchmove', listener)
-        this.canvas.addEventListener('pointermove', listener)
-    }
-
-    public drawImage(img: any) {
+    public drawImage(img: any): void {
         this.context.drawImage(img, 0, 0)
         this.emitCanvasDrawn();
     }
 
-    public getImageSrc() {
+    public getImageSrc(): string {
         return this.canvas.toDataURL();
     }
 
@@ -39,7 +31,7 @@ export class Canvas {
         this.canvas.height = height
     }
 
-    public getDimensions() {
+    public getDimensions(): { width: number; height: number } {
         return {
             width: this.canvas.width,
             height: this.canvas.height
@@ -47,86 +39,67 @@ export class Canvas {
     }
 
     // for returning canvas bounds, translated for react-draggable library
-    public getDragDimensions(){
+    public getDragDimensions(): { width: number; height: number } {
         const rect = this.canvas.getBoundingClientRect();
+
+        // these return 0 if canvas is not yet drawn
         return {
             width: rect.width,
             height: rect.height,
         }
     }
 
-    public getCanvasCenterPoint() {
+    public getCanvasCenterPoint(): Coordinates {
         return {
-        x: this.canvas.width / 2,
-        y: this.canvas.height / 2
+            x: this.canvas.width / 2,
+            y: this.canvas.height / 2
         }
     }
 
-    // public getCanvasCoordinates(coordinates: Coordinates) {
-    //     const rect = this.canvas.getBoundingClientRect()
-    //     const scaleX = this.canvas.width / rect.width
-    //     const scaleY = this.canvas.height / rect.height
-    //     const x = (coordinates.x - rect.left) * scaleX
-    //     const y = (coordinates.y - rect.top) * scaleY
-
-    //     return { x, y }
-    // }
-
     // translates coordinates from react-draggable to be useable by color picker
-    public getCanvasCoordinates = (coordinates: Coordinates) => {
-        // const canvas = canvasRef.current;
-        // if (canvas === null) return;
-        // const ctx = canvas.getContext("2d");
-        // if (ctx === null) return;
+    public getCanvasCoordinates = (coordinates: Coordinates): Coordinates | undefined => {
         const rect = this.canvas.getBoundingClientRect();
+        if (rect.width === 0 || rect.height === 0) return undefined;
         const scaleX = this.canvas.width / rect.width
         const scaleY = this.canvas.height / rect.height
         const x = (coordinates.x - rect.left) * scaleX
         const y = (coordinates.y) * scaleY
+        
+        if (!Number.isFinite(x) || !Number.isFinite(y)) return undefined;
         return { x, y }
     }
 
-    public getPixelColor(coordinates: Coordinates) {
-        const pixelData = this.context.getImageData(
-        coordinates.x,
-        coordinates.y,
-        1,
-        1
-        ).data
-        if (pixelData.length < 4) return {r: 0, g: 0, b: 0}; // Return black color if unable to retrieve pixel data
+    public getPixelColor(coordinates: Coordinates):RGB | undefined {
+        const x = Math.floor(coordinates.x);
+        const y = Math.floor(coordinates.y);
+        if (x < 0 || y < 0 || x >= this.canvas.width || y >= this.canvas.height) return undefined;
+        const pixelData = this.context.getImageData(x, y, 1, 1).data
+        if (pixelData.length < 4) return undefined; 
 
-        const [red, green, blue] = pixelData
-        //return `rgb(${red}, ${green}, ${blue})`
-        return {r: red, g: green, b: blue};
+        const [r, g, b, a] = pixelData
+        if (a === 0) return undefined; // transparent pixel -> no color
+        return { r, g, b };
     }
-    // const getPixelColor = (x: number, y: number) =>{
-    //     const ctx = canvasRef.current?.getContext("2d");
-    //     if (!ctx || !canvasRef.current) return 'rgb(0,0,0)';
-    //         const pixelData = ctx.getImageData(
-    //             x,
-    //             y,
-    //         1,
-    //         1
-    //         ).data
-    //         if (pixelData.length < 4) return 'rgb(0,0,0)' // Return black color if unable to retrieve pixel data
-    
-    //         const [red, green, blue] = pixelData
-    //         return `rgb(${red}, ${green}, ${blue})`
-    //     }
 
-    public getPixelColorFromDraggableCoordinates = (coordinates: {x:number, y:number}) => {
-        if (this.canvas == null) return;
-        //e.preventDefault();
-        //const canvas = new Canvas(canvasRef.current!);
-        
-        //const coordinates = {x: data.x, y: data.y};
 
-        //convert coordinates to "canvas" class coordinates
-        const canvasCordinates = this.getCanvasCoordinates(coordinates) ?? {x:0, y:0};
+    public getPixelColorFromDraggableCoordinates = (
+        coordinates: { x: number; y: number }
+    ): { r: number; g: number; b: number } | undefined => {
+        const canvasCoords = this.getCanvasCoordinates(coordinates);
 
-        const color = this.getPixelColor(canvasCordinates);
-        // console.log("color from useColorPick: ", color);
-        return color;
+        if (!canvasCoords) return undefined;
+        return this.getPixelColor(canvasCoords);
+    }
+
+    public reset(): void {
+        const ctx = this.context;
+        // Reset all transforms and styles to defaults
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.globalAlpha = 1;
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.imageSmoothingEnabled = true;
+        // Clear the canvas
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
     }
 
     on(event: string, callback: Function) {
@@ -145,5 +118,10 @@ export class Canvas {
     protected emitCanvasDrawn() {
         if (!this.eventListeners['canvasDrawn']) return;
         this.eventListeners['canvasDrawn'].forEach(callback => callback());
+    }
+
+    public destroy(): void {
+        // remove custom event listeners
+        this.eventListeners = {};
     }
 }

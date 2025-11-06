@@ -7,7 +7,7 @@ import { rgbToString, type RGB } from '../Types';
 type PinProps = {
     //Draggable: any,  // for dynamic import of react-draggable. Didn't want to
     // import it directly in Pin component because we'd be running it for every Pin
-    Draggable: typeof import('react-draggable')['default'] | undefined,
+    Draggable: typeof import('react-draggable')['default'] | null,
     canvasInstanceRef: React.RefObject<Canvas | null>,
     pin: ImagePin,
     onDrag: (e: any, color: RGB, id:string) => void
@@ -17,8 +17,24 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
     // NodeRef required for react-draggable
     const [nodeRef, setNodeRef] = useState<React.RefObject<HTMLDivElement | null>>(React.createRef<HTMLDivElement>());
     //const [color, setColor] = useState<string>('red');
-    const [color, setColor] = useState<{r: number, g: number, b: number} | undefined>(undefined);
-    const [coordinates, setCoordinates] = useState<{x:number, y:number} | undefined>(undefined);
+    const [color, setColor] = useState<RGB | null>(null);
+    const [coordinates, setCoordinates] = useState<{x:number, y:number} | null>(null);
+
+    const warnOnceRef = React.useRef(false); // per-pin instance ref that persists
+    // across renders, to avoid spamming console with CORS warnings. 
+    // A reg boolean would rerender the component every time
+    
+    const readColorSafe = (canvas: Canvas, coords: {x:number;y:number}): RGB | undefined => {
+        try {
+            return canvas.getPixelColorFromDraggableCoordinates(coords);
+        } catch (e) {
+            if (!warnOnceRef.current) {
+                console.warn('Pixel read failed (canvas possibly not ready or CORS-related).', e);
+                warnOnceRef.current = true;
+            }
+            return undefined;
+        }
+    };
 
     useEffect(() => {
             if (!canvasInstanceRef?.current) {
@@ -30,41 +46,41 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
             const canvas = canvasInstanceRef.current;
             const { width, height } = canvas.getDragDimensions();
 
+            if (width === 0 || height === 0) return;
+
             const positionX = Math.random() * width;
             const positionY = Math.random() * height;
 
-            // TODO block this? Ansync promise?
-            //const color2 = useColorPick(canvasInstanceRef, {x:positionX, y:positionY}) || undefined;
-            const c = canvas.getPixelColorFromDraggableCoordinates({
-                x: positionX,
-                y: positionY
-            }) || {r:0, g:0, b:0};
+            const color = readColorSafe(canvas, { x: positionX, y: positionY });
 
-            setColor(c);
+            // setColor(c);
             setCoordinates({x: positionX, y: positionY});
-            onDrag(undefined, c, pin.id);
-            //setNodeRef(React.createRef<HTMLDivElement>());
-
+            if (color){
+                setColor(color);
+                onDrag(undefined, color, pin.id);
+            }
+            // TODO call onDRag with fallback???
+    
             // cleanup function (runs when the component is unmounted)
             return () => {
                 //console.log('Component is being destroyed!');
-                //setNodeRef(React.createRef<HTMLDivElement>());
             };
     }, [canvasInstanceRef]);
 
-    const handleDrag = (e:any, data:{x: number, y:number}) => {
+    const handleDrag = (e:any, data:{x: number, y:number}): void => {
         // update controlled position and color on drag
-        if (!canvasInstanceRef?.current) {
-            return;
-        }
+        if (!canvasInstanceRef?.current) return;
         
         const canvas = canvasInstanceRef.current;
-        const { x, y } = data;
-        setCoordinates({ x, y });
+        const newColor = readColorSafe(canvas, { x: data.x, y: data.y });;
+        setCoordinates({ x:data.x, y:data.y });
 
-        const c = canvas.getPixelColorFromDraggableCoordinates({x, y}) || {r:0, g:0, b:0};
-        setColor(c);
-        onDrag(e, c, pin.id);
+        // Keep last known color if read fails
+        const next = newColor ?? color;
+        if (next) {
+            setColor(next);
+            onDrag(e, next, pin.id);
+        }
     };
 
     if (!coordinates) return null;
@@ -79,7 +95,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
                     width: '15px',
                     height: '15px',
                     border: '2px solid white',
-                    backgroundColor: rgbToString(color) || 'red',
+                    backgroundColor: color ? rgbToString(color) : 'transparent',
                     borderRadius: '50%',
                     zIndex: 9999,
                     pointerEvents: 'auto',
@@ -109,7 +125,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
                     width: '15px',
                     height: '15px',
                     border: '2px solid white',
-                    backgroundColor: rgbToString(color)  || 'red',
+                    backgroundColor: color ? rgbToString(color) : 'transparent',
                     borderRadius: '50%',
                     zIndex: 9999,
                     pointerEvents: 'auto',
