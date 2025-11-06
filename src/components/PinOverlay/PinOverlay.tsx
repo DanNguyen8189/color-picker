@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Pin } from '../Pin/Pin';
 import { Canvas } from '../../util';
-import { Pin }from '../Pin/Pin';
-
-import type { RGB, ImagePin } from "../Types";
+import type { RGB, ImagePin } from "../../util";
 import { set } from 'astro:schema';
 
 type PinOverlayProps = {

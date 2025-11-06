@@ -1,8 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
-import type { ImagePin } from '../Types';
-import { Canvas } from '../../util';
-import { rgbToString, type RGB } from '../Types';
+import { Canvas, rgbToString } from '../../util';
+import type { ImagePin, RGB, Coordinates } from '../../util';
 
 type PinProps = {
     //Draggable: any,  // for dynamic import of react-draggable. Didn't want to
@@ -18,13 +17,13 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
     const [nodeRef, setNodeRef] = useState<React.RefObject<HTMLDivElement | null>>(React.createRef<HTMLDivElement>());
     //const [color, setColor] = useState<string>('red');
     const [color, setColor] = useState<RGB | null>(null);
-    const [coordinates, setCoordinates] = useState<{x:number, y:number} | null>(null);
+    const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
 
     const warnOnceRef = React.useRef(false); // per-pin instance ref that persists
     // across renders, to avoid spamming console with CORS warnings. 
     // A reg boolean would rerender the component every time
     
-    const readColorSafe = (canvas: Canvas, coords: {x:number;y:number}): RGB | undefined => {
+    const readColorSafe = (canvas: Canvas, coords: Coordinates): RGB | undefined => {
         try {
             return canvas.getPixelColorFromDraggableCoordinates(coords);
         } catch (e) {
@@ -67,7 +66,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
             };
     }, [canvasInstanceRef]);
 
-    const handleDrag = (e:any, data:{x: number, y:number}): void => {
+    const handleDrag = (e:any, data:Coordinates): void => {
         // update controlled position and color on drag
         if (!canvasInstanceRef?.current) return;
         

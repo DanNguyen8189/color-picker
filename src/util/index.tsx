@@ -1,3 +1,2 @@
 export { Canvas } from './canvas'
-export type { Coordinates } from './canvas'
-export { loadImageHandler } from './imageLoader'
+export { rgbToHex, rgbToString,type ImagePin, type Image, type RGB, type Coordinates } from './Types'

@@ -7,8 +7,18 @@
     "exclude": [
       "dist"
     ],
+    // "compilerOptions": {
+    //   "jsx": "react-jsx",
+    //   "jsxImportSource": "react"
+    // }
     "compilerOptions": {
+      "module": "ESNext",
+      "moduleResolution": "Bundler",
+      "esModuleInterop": true,
+      "allowSyntheticDefaultImports": true,
+      "verbatimModuleSyntax": false,
       "jsx": "react-jsx",
       "jsxImportSource": "react"
+      // ...other options
     }
 }

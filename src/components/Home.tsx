@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef, use } from 'react';
 import Slider from './Slider/Slider';
 import ImageUploader from './ImageUploader/ImageUploader';
 
-import type { ImagePin } from "./Types";
+import type { ImagePin } from "../util/Types";
 
 // import { set } from 'astro:schema';
 

@@ -1,9 +1,4 @@
-import type { RGB } from "../components/Types"
-
-export type Coordinates = {
-    x: number
-    y: number
-}
+import type { RGB, Coordinates } from "./Types"
 
 export class Canvas {
     private readonly canvas!: HTMLCanvasElement
@@ -62,8 +57,8 @@ export class Canvas {
         if (rect.width === 0 || rect.height === 0) return undefined;
         const scaleX = this.canvas.width / rect.width
         const scaleY = this.canvas.height / rect.height
-        const x = (coordinates.x - rect.left) * scaleX
-        const y = (coordinates.y) * scaleY
+        const x = coordinates.x * scaleX
+        const y = coordinates.y * scaleY
         
         if (!Number.isFinite(x) || !Number.isFinite(y)) return undefined;
         return { x, y }
