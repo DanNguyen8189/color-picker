@@ -17,16 +17,6 @@ export class Canvas {
         }) as CanvasRenderingContext2D
     }
 
-    public listenMovements(listener: any): void {
-        this.canvas.addEventListener('touchmove', listener)
-        this.canvas.addEventListener('pointermove', listener)
-    }
-
-    public cleanUp(listener: any): void {
-        this.canvas.removeEventListener('touchmove', listener)
-        this.canvas.addEventListener('pointermove', listener)
-    }
-
     public drawImage(img: any): void {
         this.context.drawImage(img, 0, 0)
         this.emitCanvasDrawn();
@@ -101,6 +91,17 @@ export class Canvas {
         return this.getPixelColor(canvasCoords);
     }
 
+    public reset(): void {
+        const ctx = this.context;
+        // Reset all transforms and styles to defaults
+        ctx.setTransform(1, 0, 0, 1, 0, 0);
+        ctx.globalAlpha = 1;
+        ctx.globalCompositeOperation = 'source-over';
+        ctx.imageSmoothingEnabled = true;
+        // Clear the canvas
+        ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+    }
+
     on(event: string, callback: Function) {
         if (!this.eventListeners[event]) {
             this.eventListeners[event] = [];
@@ -117,5 +118,10 @@ export class Canvas {
     protected emitCanvasDrawn() {
         if (!this.eventListeners['canvasDrawn']) return;
         this.eventListeners['canvasDrawn'].forEach(callback => callback());
+    }
+
+    public destroy(): void {
+        // remove custom event listeners
+        this.eventListeners = {};
     }
 }

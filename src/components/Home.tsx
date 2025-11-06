@@ -1,34 +1,30 @@
 import React, { useState, useEffect, useRef, use } from 'react';
 import Slider from './Slider/Slider';
 import ImageUploader from './ImageUploader/ImageUploader';
-import { Palette } from './Pallete/Pallete';
 
 import type { ImagePin } from "./Types";
-
-// import { ImageColorPicker } from 'react-image-color-picker';
 
 // import { set } from 'astro:schema';
 
 import { writeImage } from '../hooks/writeImage';
 import { PinOverlay } from './PinOverlay/PinOverlay';
+import { Palette } from './Pallete/Pallete';
 
 
 
 function Home(){
     const [count, setCount] = useState(1);
-    // const [selectedImage, setSelectedImage] = useState<File | null>(null);
+
     const [selectedImage, setSelectedImage] = useState<string>('');
+    const prevUrlRef = useRef<string | null>(null);
 
     const [pins, setPins] = useState<ImagePin[]>([]);
 
-    //reference to container div that holds both the image and the pins
+    // reference to container div that holds both the image and the pins
     const containerRef = useRef<HTMLDivElement | null>(null); // Ref for the image container
 
     const canvasRef = useRef<HTMLCanvasElement| null>(null);
 
-    // handles image upload display
-    //const { dimensions } = writeImage(canvasRef, selectedImage ? URL.createObjectURL(selectedImage) : '');
-    //const canvasInstanceRef = writeImage(canvasRef, selectedImage ? URL.createObjectURL(selectedImage) : '');
     const canvasInstanceRef = writeImage(canvasRef, selectedImage);
 
     // // map of node refs for each pin so react-draggable can use nodeRef per draggable
@@ -40,13 +36,25 @@ function Home(){
 
 
     const handlePickImage = (image:File) => {
-        setSelectedImage(URL.createObjectURL(image));
-        //setSelectedImage(image);
+        const url = URL.createObjectURL(image);
+        // URL.createObjectURL creates a new blob URL each time it's called,
+        // so we need to clean up the previous one.
+        if (prevUrlRef.current) {
+            URL.revokeObjectURL(prevUrlRef.current);
+        }
+        prevUrlRef.current = url;
+        setSelectedImage(url);
     }
 
-    // useEffect(() => {    
-    //     console.log("pins in Home component: ", pins);
-    // }, [pins]);
+
+    useEffect(() => {
+        // cleanup blob URL on unmount
+        return () => {
+            if (prevUrlRef.current) {
+            URL.revokeObjectURL(prevUrlRef.current);
+            }
+        };
+    }, []);
 
     return (
         <div>
@@ -82,7 +90,7 @@ function Home(){
                         ></canvas>
                 </div>
                 <PinOverlay count={count} canvasInstanceRef={canvasInstanceRef} setPinsParent={setPins}/>
-                <Palette Pins={pins} />
+                {/* <Palette Pins={pins} /> */}
             </div>
             )}
         </div>

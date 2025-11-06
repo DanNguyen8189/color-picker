@@ -49,7 +49,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
 
     useEffect(() => {
         // attaches event listener 'canvasDrawn' once, when canvasInstanceRef.current becomes available
-        const canvas = canvasInstanceRef?.current;
+        const canvas = canvasInstanceRef.current;
         if (!canvas || typeof canvas.on !== 'function') return;
 
         const handleCanvasDrawn = () => {
