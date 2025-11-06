@@ -17,7 +17,6 @@ import 'jest-canvas-mock';
 //     }))
 // })
 
-console.log('Setup file loaded');
 // Blob URL helpers so writeImage/ImageUploader don’t crash
 global.URL.createObjectURL = jest.fn(() => 'blob://test');
 global.URL.revokeObjectURL = jest.fn();
