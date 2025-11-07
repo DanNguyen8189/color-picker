@@ -88,6 +88,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
     if (!Draggable) {
         return (
             <div
+                data-testid='pin-without-draggable'
                 ref={nodeRef}
                 style={{
                     position: 'absolute',
@@ -110,6 +111,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
     // Once Draggable is loaded, return draggable pin
     return (
         <Draggable
+            data-testid='pin-with-draggable'
             key={pin.id}
             axis='both'
             bounds='parent'
