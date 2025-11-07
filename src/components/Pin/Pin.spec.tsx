@@ -3,6 +3,16 @@ import { render, waitFor } from '@testing-library/react'
 import { Pin } from './Pin'
 import { Canvas } from '../../util/canvas';
 
+/**
+ * Pin Component Tests
+ * Checks for:
+ * - rendering with and without Draggable (SSR compatibility)
+ * - correct color picking from canvas quadrants    
+ * - guards against uninitialized canvas reads
+ * - Handling of undefined colors gracefully
+ * - Prevention of infinite re-render loops on drag
+ */
+
 // mock canvas for testing - a full actual canvas would be overkill/slower, 
 // brittle to canvas changes
 function mockCanvas(): React.RefObject<Partial<Canvas>> {
@@ -175,7 +185,8 @@ describe('Pin Component', () => {
         await waitFor(() => {
             const pin = getByTestId('pin-with-draggable');
             expect(canvasInstanceRef.current?.getPixelColor).toHaveBeenCalled();
-            expect(onDragMock).toHaveBeenCalledTimes(0);
+            expect(onDragMock).toHaveBeenCalledTimes(0); // since getpixelcolor returns undefined
+            // pin never gets a valid color. OnDrag only called when color is read.
             expect(getComputedStyle(pin).backgroundColor).toBe('transparent');
         });
     });
