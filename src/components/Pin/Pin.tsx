@@ -25,7 +25,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
     
     const readColorSafe = (canvas: Canvas, coords: Coordinates): RGB | undefined => {
         try {
-            return canvas.getPixelColorFromDraggableCoordinates(coords);
+            return canvas.getPixelColor(coords);
         } catch (e) {
             if (!warnOnceRef.current) {
                 console.warn('Pixel read failed (canvas possibly not ready or CORS-related).', e);
@@ -49,11 +49,10 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
 
             const positionX = Math.random() * width;
             const positionY = Math.random() * height;
+            setCoordinates({x: positionX, y: positionY});
 
             const color = readColorSafe(canvas, { x: positionX, y: positionY });
 
-            // setColor(c);
-            setCoordinates({x: positionX, y: positionY});
             if (color){
                 setColor(color);
                 onDrag(undefined, color, pin.id);
@@ -69,6 +68,11 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
     const handleDrag = (e:any, data:Coordinates): void => {
         // update controlled position and color on drag
         if (!canvasInstanceRef?.current) return;
+
+        //prevents updates that might cause rerender infinite loops in testing
+        //setCoordinates -> rerenders Pin -> mock calls ondrag again -> setcoordinates called
+        // again
+        if (coordinates && data.x === coordinates.x && data.y === coordinates.y) return;
         
         const canvas = canvasInstanceRef.current;
         const newColor = readColorSafe(canvas, { x: data.x, y: data.y });;
@@ -111,7 +115,6 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
     // Once Draggable is loaded, return draggable pin
     return (
         <Draggable
-            data-testid='pin-with-draggable'
             key={pin.id}
             axis='both'
             bounds='parent'
@@ -120,6 +123,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
             onDrag={handleDrag}
         >
             <div
+                data-testid='pin-with-draggable'
                 ref={nodeRef}
                 style={{
                     position: 'absolute',

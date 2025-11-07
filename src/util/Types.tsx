@@ -1,7 +1,5 @@
 export interface ImagePin {
     id: string;
-    positionX: number;
-    positionY: number;
     color?: {r: number; g: number; b: number};
 }
 

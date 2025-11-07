@@ -6,6 +6,21 @@ const config: Config = {
     moduleNameMapper: {
         '^src/(.*)$': '<rootDir>/src/$1',
     },
+    coverageProvider: 'v8',
+    // collectCoverageFrom: [
+    //     'src/**/*.{ts,tsx}',
+    //     '!src/**/*.d.ts',
+    //     '!src/**/*.test.{ts,tsx}',
+    //     '!src/**/*.spec.{ts,tsx}',
+    // ],
+    // coverageThreshold: {
+    //     global: {
+    //         branches: 70,
+    //         functions: 70,
+    //         lines: 70,
+    //         statements: 70,
+    //     },
+    // },
 };
 export default config;
 

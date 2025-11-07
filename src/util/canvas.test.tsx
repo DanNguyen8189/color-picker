@@ -32,9 +32,9 @@ test('getCanvasCoordinates converts react-draggable coords to canvas class coord
 test('getPixelColor returns undefined if out-of-bounds', () => {
     const el = makeCanvasEl(10, 10);
     const c = new Canvas(el);
-    const color = c.getPixelColor({ x: 999, y: 999 });
+    const color = c.getPixelColorRaw({ x: 999, y: 999 });
     expect(color).toBeUndefined();
-    const color2 = c.getPixelColor({ x: -5, y: -5 });
+    const color2 = c.getPixelColorRaw({ x: -5, y: -5 });
     expect(color2).toBeUndefined();
 });
 

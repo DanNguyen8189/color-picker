@@ -121,8 +121,6 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
 
                     newPins.push({
                         id: id,
-                        positionX: 0,
-                        positionY: 0,
                         color: undefined,
                     });
                 }
@@ -138,8 +136,6 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
                         : String(Date.now()) + Math.random().toString(36).slice(2,7);
                     newPins.push({
                         id: id,
-                        positionX: 0,
-                        positionY: 0,
                         color: undefined,
                     });
                 }
