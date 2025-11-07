@@ -1,9 +1,4 @@
-import type { RGB } from "../components/Types"
-
-export type Coordinates = {
-    x: number
-    y: number
-}
+import type { RGB, Coordinates } from "./Types"
 
 export class Canvas {
     private readonly canvas!: HTMLCanvasElement
@@ -26,7 +21,7 @@ export class Canvas {
         return this.canvas.toDataURL();
     }
 
-    public setDimensions(width: number, height: number) {
+    public setDimensions( width: number, height: number) {
         this.canvas.width = width
         this.canvas.height = height
     }
@@ -39,7 +34,7 @@ export class Canvas {
     }
 
     // for returning canvas bounds, translated for react-draggable library
-    public getDragDimensions(): { width: number; height: number } {
+    public getBounds(): { width: number; height: number } {
         const rect = this.canvas.getBoundingClientRect();
 
         // these return 0 if canvas is not yet drawn
@@ -62,8 +57,8 @@ export class Canvas {
         if (rect.width === 0 || rect.height === 0) return undefined;
         const scaleX = this.canvas.width / rect.width
         const scaleY = this.canvas.height / rect.height
-        const x = (coordinates.x - rect.left) * scaleX
-        const y = (coordinates.y) * scaleY
+        const x = coordinates.x * scaleX
+        const y = coordinates.y * scaleY
         
         if (!Number.isFinite(x) || !Number.isFinite(y)) return undefined;
         return { x, y }
@@ -83,8 +78,8 @@ export class Canvas {
 
 
     public getPixelColorFromDraggableCoordinates = (
-        coordinates: { x: number; y: number }
-    ): { r: number; g: number; b: number } | undefined => {
+        coordinates: Coordinates
+    ): RGB | undefined => {
         const canvasCoords = this.getCanvasCoordinates(coordinates);
 
         if (!canvasCoords) return undefined;

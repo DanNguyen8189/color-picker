@@ -1,8 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
+import { Pin } from '../Pin/Pin';
 import { Canvas } from '../../util';
-import { Pin }from '../Pin/Pin';
-
-import type { RGB, ImagePin } from "../Types";
+import type { RGB, ImagePin } from "../../util";
 import { set } from 'astro:schema';
 
 type PinOverlayProps = {
@@ -68,7 +67,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
         //generatePins(count);
 
         //generate pins when count changes (and canvas is ready)
-        if (canvas.getDragDimensions().width > 0) generatePins(count);
+        if (canvas.getBounds().width > 0) generatePins(count);
 
         canvas.on('canvasDrawn', handleCanvasDrawn);
         return () => {

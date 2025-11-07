@@ -9,7 +9,16 @@ export interface Image {
     image: File;
 }
 
-export type RGB = { r: number; g: number; b: number };
+export interface RGB { 
+    r: number; 
+    g: number; 
+    b: number 
+};
+
+export interface Coordinates {
+    x: number
+    y: number
+}
 
 export function rgbToHex(rgb: RGB | undefined): string {
     if (!rgb) return "#000000";

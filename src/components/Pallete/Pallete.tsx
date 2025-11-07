@@ -1,6 +1,6 @@
 import React from 'react';
-import type { ImagePin } from '../Types';
-import { rgbToString, rgbToHex, type RGB } from '../Types';
+import type { ImagePin } from '../../util/Types';
+import { rgbToString, rgbToHex, type RGB } from '../../util/Types';
 
 type PaletteProps = {
     Pins: ImagePin[]
