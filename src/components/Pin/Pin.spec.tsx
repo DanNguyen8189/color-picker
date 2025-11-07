@@ -114,20 +114,14 @@ describe('Pin Component', () => {
 
     it("should not attempt to read color when coordinates are not set/canvas not laid out", async () => {
         // Mock canvas with zero bounds (not laid out)
-        const canvasRef = {
-            current: {
-                getBounds: jest.fn(() => ({ width: 0, height: 0 })), // Returns zero
-                getPixelColor: jest.fn(),
-                on: jest.fn(),
-                off: jest.fn(),
-            }
-        } as React.RefObject<Partial<Canvas>> as React.RefObject<Canvas>;
+        const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;
+        (canvasInstanceRef.current!.getBounds as jest.Mock).mockReturnValue({ width: 0, height: 0 });
 
 
         const { container } = render(
             <Pin
                 Draggable={MockDraggable as any}
-                canvasInstanceRef={canvasRef}
+                canvasInstanceRef={canvasInstanceRef}
                 pin={{ id: 'test-pin' }}
                 onDrag={() => {}}
             />
@@ -137,7 +131,7 @@ describe('Pin Component', () => {
         expect(container.firstChild).toBeNull();
         
         // Should never try to read pixels
-        expect(canvasRef.current?.getPixelColor).not.toHaveBeenCalled();
+        expect(canvasInstanceRef.current?.getPixelColor).not.toHaveBeenCalled();
     })
 
     it('does not enter infinite loop on rapid drags', async () => {
