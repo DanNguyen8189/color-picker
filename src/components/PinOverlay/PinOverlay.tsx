@@ -82,6 +82,10 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
      * Adding count here ensures the effect is re-run whenever count changes,
     */
 
+    useEffect(() => {
+        //if (pins.length) setPinsParent(pins);
+        setPinsParent(pins);
+    }, [pins]);
 
     const handleDrag = (e: any, color:RGB, id:string) => {
         setPins(prevPins => prevPins.map(pin => {
@@ -104,7 +108,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
 
             // remove extra pins
             if (prev.length > amount) {
-                setPinsParent(prev.slice(0, amount));
+                //setPinsParent(prev.slice(0, amount));
                 return prev.slice(0, amount);
             }
 
@@ -121,7 +125,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
                         color: undefined,
                     });
                 }
-                setPinsParent([...prev, ...newPins]);
+                //setPinsParent([...prev, ...newPins]);
                 return [...prev, ...newPins];
             }
 
@@ -137,7 +141,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
                         color: undefined,
                     });
                 }
-                setPinsParent(newPins);
+                //setPinsParent(newPins);
                 return newPins;
             }
 
