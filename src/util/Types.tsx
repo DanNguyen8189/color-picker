@@ -1,21 +1,22 @@
+export interface RGB { 
+    r: number, 
+    g: number, 
+    b: number, 
+};
+
 export interface ImagePin {
-    id: string;
-    color?: {r: number; g: number; b: number};
+    id: string,
+    color?: RGB,
 }
 
 export interface Image {
-    image: File;
+    image: File,
 }
 
-export interface RGB { 
-    r: number; 
-    g: number; 
-    b: number 
-};
 
 export interface Coordinates {
-    x: number
-    y: number
+    x: number,
+    y: number,
 }
 
 export function rgbToHex(rgb: RGB | undefined): string {

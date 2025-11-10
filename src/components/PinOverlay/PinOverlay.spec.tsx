@@ -3,6 +3,11 @@ import { render, waitFor } from '@testing-library/react'
 import { PinOverlay } from './PinOverlay'
 import { Canvas } from '../../util/canvas';
 
+
+type RGBTestType = { r: number; g: number; b: number } | undefined; // RGB dupe for tests
+type ImagePinTestType = { id: string; color?: RGBTestType }; // ImagePin dupe for tests
+type PinDragTestType = (e: any, color: RGBTestType, id: string) => void; // Pin on drag handler test type
+
 // mock canvas for testing - a full actual canvas would be overkill/slower, 
 // brittle to canvas changes
 function mockCanvas(): React.RefObject<Partial<Canvas>> {
@@ -16,16 +21,16 @@ function mockCanvas(): React.RefObject<Partial<Canvas>> {
     return mockCanvas
 }
 
-// Mock the Pin component to avoid Pin's internal behavior, like useEffects/reading color
+// Mock the Pin component to avoid using a full implementation
 // Jest hoists the mock before any imports run, so PinOverlay will use this mock instead of the real Pin
-//let pinOnDragHandlers: Map<string, Function> = new Map();
+let pinOnDragHandlers: Map<string, PinDragTestType> = new Map(); // on drag handlers; one for each pin
 jest.mock('../Pin/Pin', () => ({
-    //Pin: ({ pin, onDrag }: any) => {
-    Pin: ({ pin }: any) => {
-        // Store the onDrag handler
-        // if (onDrag) {
-        //     pinOnDragHandlers.set(pin.id, onDrag);
-        // }
+    Pin: ({ pin, onDrag }: any) => {
+    //Pin: ({ pin }: any) => {
+        // Store onDrag handler
+        if (onDrag) {
+            pinOnDragHandlers.set(pin.id, onDrag);
+        }
         return (
             <div data-testid="pin-with-draggable" id={pin.id}>
                 Mocked Pin {pin.id}
@@ -165,20 +170,24 @@ describe('PinOverlay Component', () => {
         });
 
 
-        /**
-         * Trigger the 'canvasDrawn' event to simulate an image change.
-         * Find the registered 'canvasDrawn' event handler and call it to simulate the event.
-         * Since we mocked the 'on' method, we can inspect its calls to find our handler.
-         * It's call is recorded as an array where element 0 is the event name
-         * and element 1 is the handler function. [ ['canvasDrawn', handler], ... ].
-         */
-        const callCanvasDrawn = (canvasInstanceRef.current!.on as jest.Mock).mock.calls
-            .find(call => call[0] === 'canvasDrawn')?.[1];
         
+        //  Trigger the 'canvasDrawn' event to simulate an image change.
+        //  Find the registered 'canvasDrawn' event handler and call it to simulate the event.
+        //  Since we mocked the 'on' method, we can inspect its calls to find our handler.
+        //  It's call is recorded as an array where element 0 is the event name
+        //  and element 1 is the handler function. [ ['canvasDrawn', handler], ... ].
+        
+        const canvasEventCalls = (canvasInstanceRef.current.on as jest.Mock).mock.calls;
+        // find the call for 'canvasDrawn'
+        const canvasDrawnCall = canvasEventCalls.find(call => call[0] === 'canvasDrawn');
+        expect(canvasDrawnCall).toBeDefined();
+        // get the handler function from that call
+        const canvasDrawnHandler = canvasDrawnCall?.[1];
+        expect(typeof canvasDrawnHandler).toBe('function');
         act(() => {
             // any code that causes state updates should be wrapped in act()
             // so that React processes all updates before we make assertions
-            callCanvasDrawn();
+            canvasDrawnHandler();
         });
 
         await waitFor(() => {
@@ -186,59 +195,82 @@ describe('PinOverlay Component', () => {
         });
     })
 
-//     it('should update pin color when handleDrag is called', async () => {
-//   pinOnDragHandlers.clear();
+    it('should update correct pin color when a pin is dragged', async () => {
+        // in this case, we can find out what pin was dragged/what color it was set to
+        // by viewing the calls to setPinsParent. Each time a pin is dragged, PinOverlay calls setPinsParent
+        // with the updated pins array that we can look at to verify
 
-//   const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;
-//   const setPinsParent = jest.fn();
+        pinOnDragHandlers.clear(); // Reset
 
-//   const { getAllByTestId } = render(
-//     <PinOverlay
-//       count={2}
-//       canvasInstanceRef={canvasInstanceRef}
-//       setPinsParent={setPinsParent}
-//     />
-//   );
+        const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;
+        const setPinsParent = jest.fn();
 
-//   // Ensure pins are rendered
-//   await waitFor(() => {
-//     expect(getAllByTestId('pin-with-draggable').length).toBe(2);
-//   });
+        const { getAllByTestId } = render(
+            <PinOverlay
+                count={2}
+                canvasInstanceRef={canvasInstanceRef}
+                setPinsParent={setPinsParent}
+            />
+        );
 
-//   // Ensure the effect that calls setPinsParent has run
-//   await waitFor(() => {
-//     expect(setPinsParent).toHaveBeenCalled();
-//   });
+        // Wait for pins to render
+        await waitFor(() => {
+            expect(getAllByTestId('pin-with-draggable').length).toBe(2);
+            expect(setPinsParent).toHaveBeenCalled();
+        });
 
-//   // Use the most recent call (effect can run more than once)
-//   const lastPins = setPinsParent.mock.calls.at(-1)![0] as any[];
-//   expect(Array.isArray(lastPins)).toBe(true);
-//   const pinId = lastPins[0].id;
+        // amount of times setPinsParent was called (our implementation starts with 2)
+        const initialCallCount = setPinsParent.mock.calls.length;
 
-//   setPinsParent.mockClear();
+        // get initial pins array
+        // setPinsParent.mock.calls is an array of all calls to setParent; 
+        // each call is stored as an array of arguments
+        // [ [arg1, arg2, ...], [arg1, arg2, ...], ... ]
+        // our case: we only pass one argument (the pins array), so we access index 0
+        const initialPins = setPinsParent.mock.calls.at(-1)?.[0] as ImagePinTestType[];
+        expect(Array.isArray(initialPins)).toBe(true);
+        const firstPinId = initialPins[0].id;
 
-//   // Drive handleDrag via the stored onDrag handler
-//   const handleDrag = pinOnDragHandlers.get(pinId);
-//   expect(handleDrag).toBeDefined();
+        // Get the handleDrag callback for the first pin
+        const handleDrag = pinOnDragHandlers.get(firstPinId);
+        expect(handleDrag).toBeDefined();
 
-//   act(() => {
-//     handleDrag?.({}, { r: 255, g: 128, b: 64 }, pinId);
-//   });
+        // Simulate a drag event with a new color
+        const newColor = { r: 255, g: 128, b: 64 };
+        if (!handleDrag) {
+            throw new Error('handleDrag is undefined');
+        }
+        act(() => {
+            handleDrag(
+                {},           // event (not used)
+                newColor,     // picked color
+                firstPinId    // pin id
+            );
+        });
 
-//   await waitFor(() => {
-//     expect(setPinsParent).toHaveBeenCalled();
-//     const updatedPins = setPinsParent.mock.calls.at(-1)![0] as any[];
-//     const updated = updatedPins.find(p => p.id === pinId);
-//     expect(updated.r).toBe(255);
-//     expect(updated.g).toBe(128);
-//     expect(updated.b).toBe(64);
-//   });
-//     });
+        // Verify setPinsParent was called again with the updated pin
+        await waitFor(() => {
+            expect(setPinsParent).toHaveBeenCalledTimes(initialCallCount + 1);
+
+            // get the last call's first argument (the updated pins array)
+            const updatedPins = setPinsParent.mock.calls.at(-1)?.[0] as ImagePinTestType[];
+            const updatedPin = updatedPins.find((p: ImagePinTestType) => p.id === firstPinId);
+
+            // expect(updatedPin).toBeDefined();
+            // expect(updatedPin!.color).toBeDefined();
+            if (!updatedPin?.color) {
+                throw new Error('Updated pin or color is undefined');
+            }
+            expect(updatedPin.color.r).toBe(255);
+            expect(updatedPin.color.g).toBe(128);
+            expect(updatedPin.color.b).toBe(64);
+        });
+    });
 
     it('should not generate pins if canvas is not ready', async () => {
 
         const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;  
-        canvasInstanceRef.current!.getBounds = jest.fn(() => ({ width: 0, height: 0 }));
+        canvasInstanceRef.current.getBounds = jest.fn(() => ({ width: 0, height: 0 }));
         const { getByTestId, queryAllByTestId } = render(
             <PinOverlay
 
@@ -247,18 +279,17 @@ describe('PinOverlay Component', () => {
                 setPinsParent={() => {}}
             />
         )
-        // Wait for the useEffect to initialize coordinates
         await waitFor(() => {
             const pinOverlay = getByTestId('pin-overlay-test');
             expect(pinOverlay).toBeInTheDocument();
             const pins = queryAllByTestId('pin-with-draggable'); 
-            expect(pins.length).toBe(0); // No pins should be generated
+            expect(pins.length).toBe(0); 
         });
     })
 
     it('should remove canvas event listener on unmount', async () => {
         const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;
-        const offSpy = canvasInstanceRef.current!.off as jest.Mock;
+        const canvasOff = canvasInstanceRef.current.off as jest.Mock;
         
         const { unmount } = render(
             <PinOverlay
@@ -269,11 +300,11 @@ describe('PinOverlay Component', () => {
         );
         
         await waitFor(() => {
-            expect(canvasInstanceRef.current!.on).toHaveBeenCalledWith('canvasDrawn', expect.any(Function));
+            expect(canvasInstanceRef.current.on).toHaveBeenCalledWith('canvasDrawn', expect.any(Function));
         });
         
         unmount();
         
-        expect(offSpy).toHaveBeenCalledWith('canvasDrawn', expect.any(Function));
+        expect(canvasOff).toHaveBeenCalledWith('canvasDrawn', expect.any(Function));
     });
 })
