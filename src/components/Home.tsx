@@ -90,7 +90,7 @@ function Home(){
                         ></canvas>
                 </div>
                 <PinOverlay count={count} canvasInstanceRef={canvasInstanceRef} setPinsParent={setPins}/>
-                {/* <Palette Pins={pins} /> */}
+                <Palette Pins={pins} />
             </div>
             )}
         </div>

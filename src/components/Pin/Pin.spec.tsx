@@ -3,63 +3,191 @@ import { render, waitFor } from '@testing-library/react'
 import { Pin } from './Pin'
 import { Canvas } from '../../util/canvas';
 
+/**
+ * Pin Component Tests
+ * Checks for:
+ * - rendering with and without Draggable (SSR compatibility)
+ * - correct color picking from canvas quadrants    
+ * - guards against uninitialized canvas reads
+ * - Handling of undefined colors gracefully
+ * - Prevention of infinite re-render loops on drag
+ */
 
-function mockCanvas(): React.RefObject<Canvas> {
-    const mock = {
-        getBounds: jest.fn(() => ({ width: 300, height: 200 })),
-        getPixelColorFromDraggableCoordinates: jest.fn(() => ({ r: 100, g: 150, b: 200 })),
-        on: jest.fn(),
-        off: jest.fn(),
-    } as unknown as Canvas;
-    return { current: mock };
+// mock canvas for testing - a full actual canvas would be overkill/slower, 
+// brittle to canvas changes
+function mockCanvas(): React.RefObject<Partial<Canvas>> {
+    const colorPick = (c: any) => {
+        const { x, y } = c;
+        if (x < 150 && y < 100) return { r: 255, g: 0, b: 0 };
+        if (x >= 150 && y < 100) return { r: 0, g: 255, b: 0 };
+        if (x < 150 && y >= 100) return { r: 0, g: 0, b: 255 };
+        return { r: 255, g: 255, b: 0 };
+    };
+    const mockCanvas = {
+        current: {
+            getBounds: jest.fn(() => ({ width: 300, height: 200 })),
+            // "c" is the coordinates object supplied by Pin component
+            getPixelColor: jest.fn((c: any) => colorPick(c)),
+            getPixelColorRaw: jest.fn((c: any) => colorPick(c)),
+            on: jest.fn(),
+            off: jest.fn(),
+        }
+    } as React.RefObject<Partial<Canvas>>;
+    return mockCanvas
 }
 
 // Mock Draggable component
-const mockDraggable: React.FC<any> = ({ children, nodeRef, ...props }) => {
+const MockDraggable: React.FC<any> = ({ 
+    children, 
+    nodeRef, 
+    defaultPosition,
+    bounds,
+    onDrag,
+    onStart,
+    onStop,
+    ...props }) => {
     return <div ref={nodeRef} data-testid="draggable-mock" {...props}>{children}</div>;
 };
 
-describe('Pin Component', () => {
-    it('Pin with Draggable should be able to render correctly', async () => {
+// Factory that simulates a drag to specific coordinates
+const makeDraggableThatDragsTo = (x: number, y: number): React.FC<any> =>
+    (props) => {
+        React.useLayoutEffect(() => {
+            props.onDrag?.({}, { x, y });
+        }, [props.onDrag]);
+        return <MockDraggable {...props} />;
+    };
 
-        const canvasInstanceRef = mockCanvas();
+describe('Pin Component', () => {
+    it('with Draggable should be able to render correctly', async () => {
+
+        const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;
 
         const { getByTestId } = render(
             <Pin
-                Draggable={mockDraggable as any}
+                Draggable={MockDraggable as any}
                 canvasInstanceRef={canvasInstanceRef}
-                pin={{ id: 'test-pin', positionX: 50, positionY: 50 }}
+                pin={{ id: 'test-pin'}}
                 onDrag={() => {}}
             />
         )
 
-        // const pinContainer = getByTestId('pin-container')
-        // expect(pinContainer).toBeInTheDocument()
-        // expect(pinContainer.hidden).toBe(false)
         // Wait for the useEffect to initialize coordinates
         await waitFor(() => {
-            const pinContainer = getByTestId('pin-with-draggable');
-            expect(pinContainer).toBeInTheDocument();
+            const pin = getByTestId('pin-with-draggable');
+            expect(pin).toBeInTheDocument();
         });
     })
 
-    it('Pin without Draggable should be able to render correctly', async () => {
+    it('without Draggable should be able to render correctly', async () => {
 
-        const canvasInstanceRef = mockCanvas();
+        const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;
 
         const { getByTestId } = render(
             <Pin
                 Draggable={null}
                 canvasInstanceRef={canvasInstanceRef}
-                pin={{ id: 'test-pin', positionX: 50, positionY: 50 }}
+                pin={{ id: 'test-pin'}}
                 onDrag={() => {}}
             />
         )
 
         await waitFor(() => {
-            const pinContainer = getByTestId('pin-without-draggable');
-            expect(pinContainer).toBeInTheDocument();
+            const pin = getByTestId('pin-without-draggable');
+            expect(pin).toBeInTheDocument();
         });
     })
 
-})
+    it('should read correct color based on where it is on canvas', async () => {
+
+        const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;
+        const onDragMock = jest.fn();
+        const DragToTR = makeDraggableThatDragsTo(250, 50); // top-right quadrant
+        
+        const { getByTestId } = render(
+            <Pin
+                Draggable={DragToTR as any}
+                canvasInstanceRef={canvasInstanceRef}
+                pin={{ id: 'test-pin'}}
+                onDrag={onDragMock}
+            />
+        )
+
+        await waitFor(() => {
+            const pin = getByTestId('pin-with-draggable');
+            // expect(pinContainer).toBeInTheDocument();      
+            expect(canvasInstanceRef.current?.getPixelColor).toHaveBeenCalled();
+            expect(onDragMock).toHaveBeenCalled(); 
+            expect(getComputedStyle(pin).backgroundColor).toBe('rgb(0, 255, 0)');
+        });
+    })
+
+    it("should not attempt to read color when coordinates are not set/canvas not laid out", async () => {
+        // Mock canvas with zero bounds (not laid out)
+        const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;
+        (canvasInstanceRef.current!.getBounds as jest.Mock).mockReturnValue({ width: 0, height: 0 });
+
+
+        const { container } = render(
+            <Pin
+                Draggable={MockDraggable as any}
+                canvasInstanceRef={canvasInstanceRef}
+                pin={{ id: 'test-pin' }}
+                onDrag={() => {}}
+            />
+        );
+
+        // Should return null (no coordinates set)
+        expect(container.firstChild).toBeNull();
+        
+        // Should never try to read pixels
+        expect(canvasInstanceRef.current?.getPixelColor).not.toHaveBeenCalled();
+    })
+
+    it('does not enter infinite loop on rapid drags', async () => {
+
+        const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;
+        const onDragMock = jest.fn();
+        const DragToSameSpot = makeDraggableThatDragsTo(100, 50); // top-left quadrant          
+        const { getByTestId } = render(
+            <Pin
+                Draggable={DragToSameSpot as any}
+                canvasInstanceRef={canvasInstanceRef}
+                pin={{ id: 'test-pin'}}
+                onDrag={onDragMock}
+            />
+        )
+        await waitFor(() => {
+            const pin = getByTestId('pin-with-draggable');
+            expect(canvasInstanceRef.current?.getPixelColor).toHaveBeenCalled();
+            expect(onDragMock).toHaveBeenCalledTimes(2); // pin initial read + drag
+            expect(getComputedStyle(pin).backgroundColor).toBe('rgb(255, 0, 0)');
+        });
+    });
+
+    it('does not crash when canvas returns undefined color', async () => {
+
+        const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;
+        (canvasInstanceRef.current!.getPixelColor as jest.Mock).mockReturnValue(undefined);      
+
+        const onDragMock = jest.fn();
+        const DragToUndefinedColor = makeDraggableThatDragsTo(100, 50); // top-left quadrant
+
+        const { getByTestId } = render(
+            <Pin
+                Draggable={DragToUndefinedColor as any}
+                canvasInstanceRef={canvasInstanceRef}
+                pin={{ id: 'test-pin'}}
+                onDrag={onDragMock}
+            />
+        )
+
+        await waitFor(() => {
+            const pin = getByTestId('pin-with-draggable');
+            expect(canvasInstanceRef.current?.getPixelColor).toHaveBeenCalled();
+            expect(onDragMock).toHaveBeenCalledTimes(0); // since getpixelcolor returns undefined
+            // pin never gets a valid color. OnDrag only called when color is read.
+            expect(getComputedStyle(pin).backgroundColor).toBe('transparent');
+        });
+    });
+});

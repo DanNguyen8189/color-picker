@@ -64,7 +64,7 @@ export class Canvas {
         return { x, y }
     }
 
-    public getPixelColor(coordinates: Coordinates):RGB | undefined {
+    public getPixelColorRaw(coordinates: Coordinates):RGB | undefined {
         const x = Math.floor(coordinates.x);
         const y = Math.floor(coordinates.y);
         if (x < 0 || y < 0 || x >= this.canvas.width || y >= this.canvas.height) return undefined;
@@ -77,13 +77,13 @@ export class Canvas {
     }
 
 
-    public getPixelColorFromDraggableCoordinates = (
+    public getPixelColor = (
         coordinates: Coordinates
     ): RGB | undefined => {
         const canvasCoords = this.getCanvasCoordinates(coordinates);
 
         if (!canvasCoords) return undefined;
-        return this.getPixelColor(canvasCoords);
+        return this.getPixelColorRaw(canvasCoords);
     }
 
     public reset(): void {
