@@ -8,7 +8,7 @@ type RGBTestType = { r: number; g: number; b: number } | undefined; // RGB dupe 
 type ImagePinTestType = { id: string; color?: RGBTestType }; // ImagePin dupe for tests
 type PinDragTestType = (e: any, color: RGBTestType, id: string) => void; // Pin on drag handler test type
 
-// mock canvas for testing - a full actual canvas would be overkill/slower, 
+// mock Canvas class for testing - a full actual canvas would be overkill/slower, 
 // brittle to canvas changes
 function mockCanvas(): React.RefObject<Partial<Canvas>> {
     const mockCanvas = {
@@ -57,7 +57,7 @@ describe('PinOverlay Component', () => {
             const pinOverlay = getByTestId('pin-overlay-test');
             expect(pinOverlay).toBeInTheDocument();
         });
-    })
+    });
 
 
     it('should render correct number of pins', async () => {
@@ -77,15 +77,37 @@ describe('PinOverlay Component', () => {
             const pinOverlay = getByTestId('pin-overlay-test');
             expect(pinOverlay).toBeInTheDocument();
             // either pin variant actually works beacause they both are possible in render  
-            const pins = getAllByTestId('pin-with-draggable'); 
-            expect(pins.length).toBe(pinCount);
+            expect(getAllByTestId('pin-with-draggable').length).toBe(7);
         });
-    })
+    });
+
+    it('should handle zero pins correctly', async () => {
+        const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;
+        const setPinsParent = jest.fn();
+        
+        const { getByTestId, queryAllByTestId } = render(
+            <PinOverlay
+                count={0}
+                canvasInstanceRef={canvasInstanceRef}
+                setPinsParent={setPinsParent}
+            />
+        );
+        
+        await waitFor(() => {
+            const pinOverlay = getByTestId('pin-overlay-test');
+            expect(pinOverlay).toBeInTheDocument();
+            expect(queryAllByTestId('pin-with-draggable').length).toBe(0);
+        });
+        
+        // Verify setPinsParent was called with empty array
+        expect(setPinsParent).toHaveBeenCalledWith([]);
+    });
 
     it('should update pins when count increases', async () => {
 
         const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;
         let pinCount = 3;          
+
         const { getByTestId, getAllByTestId, rerender } = render(
             <PinOverlay
                 count={pinCount}
@@ -100,7 +122,7 @@ describe('PinOverlay Component', () => {
             const pins = getAllByTestId('pin-with-draggable'); 
             expect(pins.length).toBe(pinCount);
         });
-        // Update pin count
+
         pinCount = 6;
         rerender(
             <PinOverlay
@@ -115,7 +137,7 @@ describe('PinOverlay Component', () => {
             expect(pins.length).toBe(pinCount);
         }
         );
-    })
+    });
 
     it('should update pins when count decreases', async () => {
 
@@ -150,7 +172,30 @@ describe('PinOverlay Component', () => {
             expect(pins.length).toBe(pinCount);
         }
         );
-    })
+    });
+
+    it('should handle rapid count changes correctly', async () => {
+        const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;
+        
+        const { getAllByTestId, rerender } = render(
+            <PinOverlay
+                count={3}
+                canvasInstanceRef={canvasInstanceRef}
+                setPinsParent={() => {}}
+            />
+        );
+        
+        await waitFor(() => {
+            expect(getAllByTestId('pin-with-draggable').length).toBe(3);
+        });
+        
+        rerender(<PinOverlay count={10} canvasInstanceRef={canvasInstanceRef} setPinsParent={() => {}} />);
+        rerender(<PinOverlay count={2} canvasInstanceRef={canvasInstanceRef} setPinsParent={() => {}} />);
+        
+        await waitFor(() => {
+            expect(getAllByTestId('pin-with-draggable').length).toBe(2);
+        });
+    });
 
     it('should have a new set of pins when image changes', async () => {
         const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;
@@ -193,7 +238,7 @@ describe('PinOverlay Component', () => {
         await waitFor(() => {
             expect(setPinsParent).toHaveBeenCalledTimes(3);
         });
-    })
+    });
 
     it('should update correct pin color when a pin is dragged', async () => {
         // in this case, we can find out what pin was dragged/what color it was set to
@@ -267,6 +312,50 @@ describe('PinOverlay Component', () => {
         });
     });
 
+    it('should be able to update multiple pins independently', async () => {
+        pinOnDragHandlers.clear(); // Reset on drag handlers for new pins
+        const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;
+        const setPinsParent = jest.fn();
+
+        const { getAllByTestId } = render(
+            <PinOverlay
+                count={2}
+                canvasInstanceRef={canvasInstanceRef}
+                setPinsParent={setPinsParent}
+            />
+        )
+
+        const pinsArray = setPinsParent.mock.calls.at(-1)?.[0] as ImagePinTestType[];
+        expect(pinsArray.length).toBe(2);
+        const [pin1, pin2] = pinsArray;
+        const handleDrag1 = pinOnDragHandlers.get(pin1.id);
+        const handleDrag2 = pinOnDragHandlers.get(pin2.id);
+        expect(handleDrag1).toBeDefined();
+        expect(handleDrag2).toBeDefined();
+
+        act(() => {
+            // Drag first pin
+            if (handleDrag1) {
+                handleDrag1({}, { r: 10, g: 20, b: 30 }, pin1.id);
+            }
+            // Drag second pin
+            if (handleDrag2) {
+                handleDrag2({}, { r: 200, g: 210, b: 220 }, pin2.id);
+            }
+        });
+
+        // Verify both pins updated correctly
+        await waitFor(() => {
+            // get the last call's first argument (the updated pins array)
+            const updatedPins = setPinsParent.mock.calls.at(-1)?.[0] as ImagePinTestType[];
+            const updatedPin1 = updatedPins.find((p: ImagePinTestType) => p.id === pin1.id);
+            const updatedPin2 = updatedPins.find((p: ImagePinTestType) => p.id === pin2.id);
+            expect(updatedPin1?.color).toEqual({ r: 10, g: 20, b: 30 });
+            expect(updatedPin2?.color).toEqual({ r: 200, g: 210, b: 220 });
+        });
+
+    });
+
     it('should not generate pins if canvas is not ready', async () => {
 
         const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;  
@@ -285,7 +374,7 @@ describe('PinOverlay Component', () => {
             const pins = queryAllByTestId('pin-with-draggable'); 
             expect(pins.length).toBe(0); 
         });
-    })
+    });
 
     it('should remove canvas event listener on unmount', async () => {
         const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;

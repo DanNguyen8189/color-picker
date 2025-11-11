@@ -13,7 +13,7 @@ import { Canvas } from '../../util/canvas';
  * - Prevention of infinite re-render loops on drag
  */
 
-// mock canvas for testing - a full actual canvas would be overkill/slower, 
+// mock Canvas class for testing - a full actual canvas would be overkill/slower, 
 // brittle to canvas changes
 function mockCanvas(): React.RefObject<Partial<Canvas>> {
     const colorPick = (c: any) => {
