@@ -223,8 +223,8 @@ describe('PinOverlay Component', () => {
         const initialCallCount = setPinsParent.mock.calls.length;
 
         // get initial pins array
-        // setPinsParent.mock.calls is an array of all calls to setParent; 
-        // each call is stored as an array of arguments
+        // setPinsParent.mock.calls is an array of all calls to setParent that have happened
+        // so far; each call is stored as an array of arguments
         // [ [arg1, arg2, ...], [arg1, arg2, ...], ... ]
         // our case: we only pass one argument (the pins array), so we access index 0
         const initialPins = setPinsParent.mock.calls.at(-1)?.[0] as ImagePinTestType[];
