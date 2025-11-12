@@ -1,0 +1,13 @@
+.pin {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    border: 2px solid white;
+    border-radius: 50%;
+    z-index: 9999;
+    pointer-events: auto;
+    left: 0;
+    top: 0;
+    background-color: var(--pin-color, transparent);
+    opacity: var(--pin-opacity, 1);
+}

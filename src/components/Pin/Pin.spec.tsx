@@ -69,6 +69,8 @@ describe('Pin Component', () => {
                 canvasInstanceRef={canvasInstanceRef}
                 pin={{ id: 'test-pin'}}
                 onDrag={() => {}}
+                onDragStop={() => {}}
+                isActive={true}
             />
         )
 
@@ -89,6 +91,8 @@ describe('Pin Component', () => {
                 canvasInstanceRef={canvasInstanceRef}
                 pin={{ id: 'test-pin'}}
                 onDrag={() => {}}
+                onDragStop={() => {}}
+                isActive={true}
             />
         )
 
@@ -110,6 +114,8 @@ describe('Pin Component', () => {
                 canvasInstanceRef={canvasInstanceRef}
                 pin={{ id: 'test-pin'}}
                 onDrag={onDragMock}
+                onDragStop={() => {}}
+                isActive={true}
             />
         )
 
@@ -134,6 +140,8 @@ describe('Pin Component', () => {
                 canvasInstanceRef={canvasInstanceRef}
                 pin={{ id: 'test-pin' }}
                 onDrag={() => {}}
+                onDragStop={() => {}}
+                isActive={true}
             />
         );
 
@@ -155,6 +163,8 @@ describe('Pin Component', () => {
                 canvasInstanceRef={canvasInstanceRef}
                 pin={{ id: 'test-pin'}}
                 onDrag={onDragMock}
+                onDragStop={() => {}}
+                isActive={true}
             />
         )
         await waitFor(() => {
@@ -179,6 +189,8 @@ describe('Pin Component', () => {
                 canvasInstanceRef={canvasInstanceRef}
                 pin={{ id: 'test-pin'}}
                 onDrag={onDragMock}
+                onDragStop={() => {}}
+                isActive={true}
             />
         )
 

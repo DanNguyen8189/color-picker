@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { Canvas, rgbToString } from '../../util';
 import type { ImagePin, RGB, Coordinates } from '../../util';
+import './Pin.scss';
 
 type PinProps = {
     //Draggable: any,  // for dynamic import of react-draggable. Didn't want to
@@ -9,10 +10,13 @@ type PinProps = {
     Draggable: typeof import('react-draggable')['default'] | null,
     canvasInstanceRef: React.RefObject<Canvas | null>,
     pin: ImagePin,
+    onDragStart: () => void
     onDrag: (e: any, color: RGB, id:string) => void
+    onDragStop: () => void
+    isActive: boolean
 }
 
-export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onDrag }) => {
+export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onDragStart, onDrag, onDragStop, isActive }) => {
     // NodeRef required for react-draggable
     const [nodeRef, setNodeRef] = useState<React.RefObject<HTMLDivElement | null>>(React.createRef<HTMLDivElement>());
     //const [color, setColor] = useState<string>('red');
@@ -86,28 +90,22 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
         }
     };
 
+    const handleDragStop = (e: any) => {
+        onDragStop();
+    };
+
     if (!coordinates) return null;
 
     // Return static pin while Draggable is loading
     if (!Draggable) {
         return (
             <div
+                className="pin"
                 data-testid='pin-without-draggable'
                 ref={nodeRef}
                 style={{
-                    position: 'absolute',
-                    width: '15px',
-                    height: '15px',
-                    border: '2px solid white',
-                    backgroundColor: color ? rgbToString(color) : 'transparent',
-                    borderRadius: '50%',
-                    zIndex: 9999,
-                    pointerEvents: 'auto',
-                    // left: pin.positionX,
-                    // top: pin.positionY,
-                    left: coordinates.x,
-                    top: coordinates.y,
-                }}
+                    '--pin-color': color ? rgbToString(color) : 'transparent',
+                } as React.CSSProperties}
             />
         );
     }
@@ -120,21 +118,18 @@ export const Pin: React.FC<PinProps> = ({ Draggable, canvasInstanceRef, pin, onD
             bounds='parent'
             defaultPosition={{ x: coordinates.x, y: coordinates.y }}
             nodeRef={nodeRef}
+            onStart={onDragStart}
             onDrag={handleDrag}
+            onStop={handleDragStop}
         >
             <div
+                className="pin"
                 data-testid='pin-with-draggable'
                 ref={nodeRef}
                 style={{
-                    position: 'absolute',
-                    width: '15px',
-                    height: '15px',
-                    border: '2px solid white',
-                    backgroundColor: color ? rgbToString(color) : 'transparent',
-                    borderRadius: '50%',
-                    zIndex: 9999,
-                    pointerEvents: 'auto',
-                }}
+                    '--pin-color': color ? rgbToString(color) : 'transparent',
+                    '--pin-opacity': isActive ? 1 : 0.3
+                } as React.CSSProperties}
             />
         </Draggable>
     );

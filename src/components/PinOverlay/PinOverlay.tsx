@@ -3,6 +3,7 @@ import { Pin } from '../Pin/Pin';
 import { Canvas } from '../../util';
 import type { RGB, ImagePin } from "../../util";
 import { set } from 'astro:schema';
+import './PinOverlay.scss';
 
 type PinOverlayProps = {
     count: number,
@@ -13,6 +14,8 @@ type PinOverlayProps = {
 // function PinOverlay({ count, canvasInstanceRef, setPinsParent }: PinOverlayProps) {
 export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef, setPinsParent }) => {
     const [pins, setPins] = useState<ImagePin[]>([]);
+
+    const [activePinId, setActivePinId] = useState<string | null>(null);
 
     const [Draggable, setDraggable] = useState<typeof import('react-draggable')['default'] | null>(null);
     // Dynamically import react-draggable to avoid SSR issues
@@ -87,6 +90,10 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
         setPinsParent(pins);
     }, [pins]);
 
+    const handleDragStart = (id: string) => {
+        setActivePinId(id);
+    };
+
     const handleDrag = (e: any, color:RGB, id:string) => {
         setPins(prevPins => prevPins.map(pin => {
             if (pin.id === id) {
@@ -98,6 +105,10 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
             return pin;
         }));
     };
+
+    const handleDragStop = () => {
+        setActivePinId(null);
+    }
     
     const generatePins = (amount:number) => {
         if (!canvasInstanceRef?.current) {
@@ -154,7 +165,9 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
                 {/* Overlay for pins - fills the same area as the image and sits on top */}
                 <div 
                 data-testid="pin-overlay-test"
-                style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 9998 }}>
+                //style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 9998 }}
+                className="pin-overlay"
+                >
                     {pins.map((pin, index) => {
                         return (
                             <Pin
@@ -162,7 +175,10 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
                                 Draggable={Draggable}
                                 canvasInstanceRef={canvasInstanceRef}
                                 pin={pin}
+                                onDragStart={() => handleDragStart(pin.id)}
                                 onDrag={(e: any, data: any) => handleDrag(e, data, pin.id)}
+                                onDragStop={handleDragStop}
+                                isActive={activePinId == null ? true : activePinId === pin.id}
                             />
                         );
                     })}

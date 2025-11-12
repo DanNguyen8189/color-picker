@@ -1,8 +1,4 @@
-import { useState } from 'react';
-
 function ImageUploader({ handlePickImage }: { handlePickImage: (image: File) => void }) {
-    // Define a state variable to store the selected image
-    const [selectedImage, setSelectedImage] = useState<File | null>(null);
 
     return (
         <div>

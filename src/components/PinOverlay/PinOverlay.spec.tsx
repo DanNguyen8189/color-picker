@@ -3,7 +3,6 @@ import { render, waitFor } from '@testing-library/react'
 import { PinOverlay } from './PinOverlay'
 import { Canvas } from '../../util/canvas';
 
-
 type RGBTestType = { r: number; g: number; b: number } | undefined; // RGB dupe for tests
 type ImagePinTestType = { id: string; color?: RGBTestType }; // ImagePin dupe for tests
 type PinDragTestType = (e: any, color: RGBTestType, id: string) => void; // Pin on drag handler test type
@@ -362,7 +361,6 @@ describe('PinOverlay Component', () => {
         canvasInstanceRef.current.getBounds = jest.fn(() => ({ width: 0, height: 0 }));
         const { getByTestId, queryAllByTestId } = render(
             <PinOverlay
-
                 count={5}
                 canvasInstanceRef={canvasInstanceRef}
                 setPinsParent={() => {}}
