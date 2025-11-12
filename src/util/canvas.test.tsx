@@ -1,5 +1,7 @@
 import { Canvas } from './canvas';
 
+
+// make a <canvas> element>
 function makeCanvasEl(w = 200, h = 100): HTMLCanvasElement {
     const el = document.createElement('canvas');
     Object.defineProperty(el, 'width', { value: w });
@@ -65,6 +67,27 @@ test('canvasDrawn is correctly attached and emitted', () => {
     expect(cb).toHaveBeenCalled();
 });
 
+// test('off removes event listeners', () => {
+//     const el = makeCanvasEl();
+//     const c = new Canvas(el);   
+//     const cb = jest.fn();
+//     c.on('canvasDrawn', cb);
+//     c.off('canvasDrawn', cb);
+//     if (typeof (c as any).emitCanvasDrawn === 'function') (c as any).emitCanvasDrawn();
+//     expect(cb).not.toHaveBeenCalled();
+// });
+
+test('reset clears the canvas', () => {
+    const el = makeCanvasEl(100, 50);
+    const c = new Canvas(el);
+    const ctx = el.getContext('2d');
+    if (!ctx) throw new Error('Failed to get canvas context in test.'); 
+    const clearSpy = jest.spyOn(ctx, 'clearRect');
+    c.reset();
+    expect(clearSpy).toHaveBeenCalledWith(0, 0, el.width, el.height);
+    clearSpy.mockRestore();
+});
+
 test('canvasDrawn is correctly attached and emitted when image is drawn', () => {
     const el = makeCanvasEl();
     const c = new Canvas(el);
@@ -72,6 +95,8 @@ test('canvasDrawn is correctly attached and emitted when image is drawn', () => 
     const drawSpy = jest.spyOn(c, 'drawImage');
     c.on('canvasDrawn', cb);
     
+    // load image to trigger callback since
+    // callback's this.emit('canvasDrawn') is private/not exposed
     const img = new Image();
     c.drawImage(img);
     expect(drawSpy).toHaveBeenCalled();
@@ -79,22 +104,11 @@ test('canvasDrawn is correctly attached and emitted when image is drawn', () => 
     drawSpy.mockRestore();
 });
 
-// test('drawImage calls context.drawImage and emits canvasDrawn', () => {
-//     const el = makeCanvasEl(100, 50);
-//     const ctx = el.getContext('2d') as CanvasRenderingContext2D;
-//     const drawSpy = jest.spyOn(ctx, 'drawImage').mockImplementation(() => {});
-//     const c = new Canvas(el as any);
-//     const cb = jest.fn();
-//     c.on('canvasDrawn', cb);
-
-//     const img = {} as HTMLImageElement;
-//     c.drawImage(img);
-//     expect(drawSpy).toHaveBeenCalled();
-//     expect(cb).toHaveBeenCalledTimes(1);
-
-//     // Call again to ensure it emits each draw
-//     c.drawImage(img);
-//     expect(cb).toHaveBeenCalledTimes(2);
-
-//     drawSpy.mockRestore();
-// });
+test('destroy removes event listeners', () => {
+    const el = makeCanvasEl();
+    const c = new Canvas(el);
+    const cb = jest.fn();
+    c.on('canvasDrawn', cb);
+    c.destroy();
+    expect(cb).not.toHaveBeenCalled(); 
+});

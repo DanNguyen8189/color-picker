@@ -12,10 +12,10 @@ export default defineConfig({
         // transformed to ESM-compatible code. Also ensure they are bundled for SSR/build
         // so the final output doesn't leak `require` into browser ESM modules.
         optimizeDeps: {
-            include: ['react-image-pin', 'react-draggable', 'react-xarrows'],
+            include: ['react-draggable'],
         },
         ssr: {
-            noExternal: ['react-image-pin', 'react-draggable', 'react-xarrows']
+            noExternal: ['react-draggable']
         },
         resolve: {
             alias: {
