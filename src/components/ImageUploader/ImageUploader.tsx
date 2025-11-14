@@ -1,4 +1,15 @@
-export function ImageUploader({ handlePickImage }: { handlePickImage: (image: File) => void }) {
+import React, { useRef, useState, useEffect } from 'react';
+import { useCanvas } from '../../util/';
+import { set } from 'astro:schema';
+// export function ImageUploader({ handlePickImage }: { handlePickImage: (image: File) => void }) {
+export const ImageUploader: React.FC = () => {
+    const { writeImage } = useCanvas();
+    //const [selectedImage, setSelectedImage] = useState<string>('');
+    const prevUrlRef = useRef<string | null>(null);
+
+    useEffect(() => () => {
+        if (prevUrlRef.current) URL.revokeObjectURL(prevUrlRef.current);
+    }, []);
 
     return (
         <div>
@@ -19,9 +30,16 @@ export function ImageUploader({ handlePickImage }: { handlePickImage: (image: Fi
             onChange={async(event) => {
                 if (!event.target.files) return;
                 let image = event.target.files[0]
-                console.log(image); // Log the selected file
+                //console.log(image); // Log the selected file
                 //setSelectedImage(image); // Update the state with the selected file
-                handlePickImage(image);
+                //handlePickImage(image);
+                const url = URL.createObjectURL(image);
+                if (prevUrlRef.current) URL.revokeObjectURL(prevUrlRef.current);
+                prevUrlRef.current = url;
+                //setSelectedImage(url);
+                //setImageUrl(url);
+                // defer until canvas element is mounted
+                requestAnimationFrame(() => writeImage(url));
             }}
         />
         </div>

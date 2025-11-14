@@ -176,9 +176,9 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
                                 key={pin.id ?? index}
                                 Draggable={Draggable}
                                 pin={pin}
-                                onDragStart={() => handleDragStart(pin.id)}
+                                onStart={() => handleDragStart(pin.id)}
                                 onDrag={(e: any, data: any) => handleDrag(e, data, pin.id)}
-                                onDragStop={handleDragStop}
+                                onStop={handleDragStop}
                                 isActive={activePinId == null ? true : activePinId === pin.id}
                             />
                         );

@@ -1,13 +1,14 @@
 // @refresh reset
 import React, { useState, createContext, useContext, useRef, useEffect, useCallback } from 'react';
 import { Canvas } from '../util';
+import { set } from 'astro:schema';
 
 type CanvasContextType = {
     canvasInstance: Canvas | null;
     imageElement: HTMLImageElement | null;
     setImageElement: (img: HTMLImageElement | null) => void;
-    zoomLevel: number;
-    setZoomLevel: (level: number) => void;
+    imageUrl: string | null;
+    setImageUrl: (url: string | null) => void;
     writeImage: (src: File | string | HTMLImageElement) => Promise<void>;
 };
 
@@ -24,7 +25,7 @@ export const CanvasProvider: React.FC<{
     children: React.ReactNode 
 }> = ({ canvasRef, children }) => {
     const [imageElement, setImageElement] = useState<HTMLImageElement | null>(null);
-    const [zoomLevel, setZoomLevel] = useState(1);
+    const [imageUrl, setImageUrl] = useState<string | null>(null);
     const canvasInstanceRef = useRef<Canvas | null>(null);
 
     useEffect(() => {
@@ -43,6 +44,10 @@ export const CanvasProvider: React.FC<{
             img.src = url;
         });
 
+    // useCallBack is used here so it maintains a stable ref across rerenders
+    // otherwise a new fn is created on every render/state change of CanvasProvider
+    // fn is created once and reused until canvasRef changes
+    // fns exposed outside through contect should always be memoized like this
     const writeImage = useCallback(async (src: File | string | HTMLImageElement) => {
         const canvasElement = canvasRef.current;
         if (!canvasElement) {
@@ -66,9 +71,12 @@ export const CanvasProvider: React.FC<{
             const objectUrl = URL.createObjectURL(src);
             revokeUrl = objectUrl;
             img = await loadImage(objectUrl);
+            //setImageUrl(objectUrl);
         }
 
         setImageElement(img);
+        setImageUrl(img.currentSrc || img.src);
+        
 
         canvas.reset();
         canvas.setDimensions(img.naturalWidth, img.naturalHeight);
@@ -84,8 +92,8 @@ export const CanvasProvider: React.FC<{
             canvasInstance: canvasInstanceRef.current,
             imageElement,
             setImageElement,
-            zoomLevel,
-            setZoomLevel,
+            imageUrl,
+            setImageUrl,
             writeImage
         }}>
             {children}

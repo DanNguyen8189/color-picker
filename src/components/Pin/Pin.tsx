@@ -2,21 +2,21 @@
 import React, { useEffect, useState } from 'react';
 import { Canvas, rgbToString } from '../../util';
 import type { ImagePin, RGB, Coordinates } from '../../util';
-import './Pin.scss';
 import { useCanvas } from '../../util/';
+import './Pin.scss';
 
 type PinProps = {
     //Draggable: any,  // for dynamic import of react-draggable. Didn't want to
     // import it directly in Pin component because we'd be running it for every Pin
     Draggable: typeof import('react-draggable')['default'] | null,
     pin: ImagePin,
-    onDragStart: () => void
+    onStart: () => void
     onDrag: (e: any, color: RGB, id:string) => void
-    onDragStop: () => void
+    onStop: () => void
     isActive: boolean
 }
 
-export const Pin: React.FC<PinProps> = ({ Draggable, pin, onDragStart, onDrag, onDragStop, isActive }) => {
+export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onStop, isActive }) => {
     // NodeRef required for react-draggable
     const [nodeRef, setNodeRef] = useState<React.RefObject<HTMLDivElement | null>>(React.createRef<HTMLDivElement>());
     //const [color, setColor] = useState<string>('red');
@@ -98,7 +98,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onDragStart, onDrag, o
     };
 
     const handleDragStop = (e: any) => {
-        onDragStop();
+        onStop();
     };
 
     if (!coordinates) return null;
@@ -125,7 +125,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onDragStart, onDrag, o
             bounds='parent'
             defaultPosition={{ x: coordinates.x, y: coordinates.y }}
             nodeRef={nodeRef}
-            onStart={onDragStart}
+            onStart={onStart}
             onDrag={handleDrag}
             onStop={handleDragStop}
         >
