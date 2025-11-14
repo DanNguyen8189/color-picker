@@ -1,4 +1,4 @@
-function ImageUploader({ handlePickImage }: { handlePickImage: (image: File) => void }) {
+export function ImageUploader({ handlePickImage }: { handlePickImage: (image: File) => void }) {
 
     return (
         <div>
@@ -30,4 +30,19 @@ function ImageUploader({ handlePickImage }: { handlePickImage: (image: File) => 
 };
 
 
-export default ImageUploader;
+// export default ImageUploader;
+
+// import React from 'react';
+// import { useCanvas } from '../../util/';
+
+// export const ImageUploader: React.FC = () => {
+//     const { writeImage } = useCanvas();
+
+//     const onFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
+//         const file = e.target.files?.[0];
+//         if (!file) return;
+//         await writeImage(file);
+//     };
+
+//     return <input type="file" accept="image/*" onChange={onFileChange} />;
+// };
