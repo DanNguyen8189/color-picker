@@ -4,15 +4,16 @@ import { Canvas } from '../../util';
 import type { RGB, ImagePin } from "../../util";
 import { set } from 'astro:schema';
 import './PinOverlay.scss';
+import { useCanvas } from '../../util';
 
 type PinOverlayProps = {
     count: number,
-    canvasInstanceRef: React.RefObject<Canvas | null>,
+
     setPinsParent: React.Dispatch<React.SetStateAction<ImagePin[]>>
 }
 
 // function PinOverlay({ count, canvasInstanceRef, setPinsParent }: PinOverlayProps) {
-export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef, setPinsParent }) => {
+export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) => {
     const [pins, setPins] = useState<ImagePin[]>([]);
 
     const [activePinId, setActivePinId] = useState<string | null>(null);
@@ -20,6 +21,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
     const [Draggable, setDraggable] = useState<typeof import('react-draggable')['default'] | null>(null);
     // Dynamically import react-draggable to avoid SSR issues
 
+    const { canvasInstance } = useCanvas();
     useEffect(() => {
         let mounted = true; // prevent calling setState on unmounted component
         import('react-draggable')
@@ -51,7 +53,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
 
     useEffect(() => {
         // attaches event listener 'canvasDrawn' once, when canvasInstanceRef.current becomes available
-        const canvas = canvasInstanceRef.current;
+        const canvas = canvasInstance;
         if (!canvas || typeof canvas.on !== 'function') return;
 
         const handleCanvasDrawn = () => {
@@ -76,7 +78,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
         return () => {
             canvas.off('canvasDrawn', handleCanvasDrawn);
         };
-    }, [canvasInstanceRef?.current, count]);
+    }, [canvasInstance, count]);
     /**
      * count is needed in deps; without it, number of pins appearing on canvas 
      * reverts to 1 on image switch. This is because the useEffect contains a 
@@ -111,7 +113,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
     }
     
     const generatePins = (amount:number) => {
-        if (!canvasInstanceRef?.current) {
+        if (!canvasInstance) {
             return;
         }
 
@@ -173,11 +175,10 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
                             <Pin
                                 key={pin.id ?? index}
                                 Draggable={Draggable}
-                                canvasInstanceRef={canvasInstanceRef}
                                 pin={pin}
-                                onDragStart={() => handleDragStart(pin.id)}
+                                onStart={() => handleDragStart(pin.id)}
                                 onDrag={(e: any, data: any) => handleDrag(e, data, pin.id)}
-                                onDragStop={handleDragStop}
+                                onStop={handleDragStop}
                                 isActive={activePinId == null ? true : activePinId === pin.id}
                             />
                         );
