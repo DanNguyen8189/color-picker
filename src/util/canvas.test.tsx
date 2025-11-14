@@ -1,4 +1,4 @@
-import { Canvas } from './canvas';
+import { Canvas } from './Canvas';
 
 
 // make a <canvas> element>

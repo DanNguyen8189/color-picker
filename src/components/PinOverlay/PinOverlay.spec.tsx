@@ -1,25 +1,33 @@
 import React, { act } from 'react'
 import { render, waitFor } from '@testing-library/react'
 import { PinOverlay } from './PinOverlay'
-import { Canvas } from '../../util/canvas';
-
+import { Canvas } from '../../util/Canvas';
 
 type RGBTestType = { r: number; g: number; b: number } | undefined; // RGB dupe for tests
 type ImagePinTestType = { id: string; color?: RGBTestType }; // ImagePin dupe for tests
 type PinDragTestType = (e: any, color: RGBTestType, id: string) => void; // Pin on drag handler test type
 
-// mock Canvas class for testing - a full actual canvas would be overkill/slower, 
-// brittle to canvas changes
-function mockCanvas(): React.RefObject<Partial<Canvas>> {
-    const mockCanvas = {
-        current: {
-            getBounds: jest.fn(() => ({ width: 300, height: 200 })),
-            on: jest.fn(),
-            off: jest.fn(),
-        }
-    } as React.RefObject<Partial<Canvas>>;
-    return mockCanvas
-}
+const mockCanvasInstance: any = {
+    getBounds: jest.fn(() => ({ width: 300, height: 200 })),
+    on: jest.fn(),
+    off: jest.fn(),
+    getPixelColor: jest.fn(),
+};
+// Mock the hook PinOverlay uses to access the context.
+jest.mock('../../util/', () => ({
+    useCanvas: () => ({
+        canvasInstance: mockCanvasInstance,
+        imageElement: null,
+        imageUrl: null,
+        setImageUrl: jest.fn(),
+        setImageElement: jest.fn(),
+        writeImage: jest.fn(),
+    }),
+}));
+beforeEach(() => {
+    jest.clearAllMocks();
+    (mockCanvasInstance.getBounds as jest.Mock).mockReset().mockReturnValue({ width: 300, height: 200 });
+});
 
 // Mock the Pin component to avoid using a full implementation
 // Jest hoists the mock before any imports run, so PinOverlay will use this mock instead of the real Pin
@@ -42,12 +50,9 @@ jest.mock('../Pin/Pin', () => ({
 describe('PinOverlay Component', () => {
     it('should render correctly', async () => {
 
-        const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;
-
         const { getByTestId } = render(
             <PinOverlay
                 count={5}
-                canvasInstanceRef={canvasInstanceRef}
                 setPinsParent={() => {}}
             />
         )
@@ -62,13 +67,11 @@ describe('PinOverlay Component', () => {
 
     it('should render correct number of pins', async () => {
 
-        const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;
         const pinCount = 7; // Example pin count
 
         const { getByTestId, getAllByTestId } = render(
             <PinOverlay
                 count={pinCount}
-                canvasInstanceRef={canvasInstanceRef}
                 setPinsParent={() => {}}
             />
         )           
@@ -82,13 +85,11 @@ describe('PinOverlay Component', () => {
     });
 
     it('should handle zero pins correctly', async () => {
-        const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;
         const setPinsParent = jest.fn();
         
         const { getByTestId, queryAllByTestId } = render(
             <PinOverlay
                 count={0}
-                canvasInstanceRef={canvasInstanceRef}
                 setPinsParent={setPinsParent}
             />
         );
@@ -105,13 +106,11 @@ describe('PinOverlay Component', () => {
 
     it('should update pins when count increases', async () => {
 
-        const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;
         let pinCount = 3;          
 
         const { getByTestId, getAllByTestId, rerender } = render(
             <PinOverlay
                 count={pinCount}
-                canvasInstanceRef={canvasInstanceRef}
                 setPinsParent={() => {}}
             />
         );  
@@ -127,7 +126,6 @@ describe('PinOverlay Component', () => {
         rerender(
             <PinOverlay
                 count={pinCount}
-                canvasInstanceRef={canvasInstanceRef}
                 setPinsParent={() => {}}
             />
         );
@@ -141,12 +139,10 @@ describe('PinOverlay Component', () => {
 
     it('should update pins when count decreases', async () => {
 
-        const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;
         let pinCount = 5;          
         const { getByTestId, getAllByTestId, rerender } = render(
             <PinOverlay
                 count={pinCount}
-                canvasInstanceRef={canvasInstanceRef}
                 setPinsParent={() => {}}
             />
         );  
@@ -162,7 +158,6 @@ describe('PinOverlay Component', () => {
         rerender(
             <PinOverlay
                 count={pinCount}
-                canvasInstanceRef={canvasInstanceRef}
                 setPinsParent={() => {}}
             />
         );
@@ -175,12 +170,11 @@ describe('PinOverlay Component', () => {
     });
 
     it('should handle rapid count changes correctly', async () => {
-        const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;
+        
         
         const { getAllByTestId, rerender } = render(
             <PinOverlay
                 count={3}
-                canvasInstanceRef={canvasInstanceRef}
                 setPinsParent={() => {}}
             />
         );
@@ -189,8 +183,8 @@ describe('PinOverlay Component', () => {
             expect(getAllByTestId('pin-with-draggable').length).toBe(3);
         });
         
-        rerender(<PinOverlay count={10} canvasInstanceRef={canvasInstanceRef} setPinsParent={() => {}} />);
-        rerender(<PinOverlay count={2} canvasInstanceRef={canvasInstanceRef} setPinsParent={() => {}} />);
+        rerender(<PinOverlay count={10} setPinsParent={() => {}} />);
+        rerender(<PinOverlay count={2} setPinsParent={() => {}} />);
         
         await waitFor(() => {
             expect(getAllByTestId('pin-with-draggable').length).toBe(2);
@@ -198,13 +192,12 @@ describe('PinOverlay Component', () => {
     });
 
     it('should have a new set of pins when image changes', async () => {
-        const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;
+       
         const setPinsParent = jest.fn();
         
         render(
             <PinOverlay
                 count={4}
-                canvasInstanceRef={canvasInstanceRef}
                 setPinsParent={setPinsParent}
             />
         );
@@ -222,7 +215,7 @@ describe('PinOverlay Component', () => {
         //  It's call is recorded as an array where element 0 is the event name
         //  and element 1 is the handler function. [ ['canvasDrawn', handler], ... ].
         
-        const canvasEventCalls = (canvasInstanceRef.current.on as jest.Mock).mock.calls;
+        const canvasEventCalls = (mockCanvasInstance.on as jest.Mock).mock.calls;
         // find the call for 'canvasDrawn'
         const canvasDrawnCall = canvasEventCalls.find(call => call[0] === 'canvasDrawn');
         expect(canvasDrawnCall).toBeDefined();
@@ -247,13 +240,11 @@ describe('PinOverlay Component', () => {
 
         pinOnDragHandlers.clear(); // Reset
 
-        const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;
         const setPinsParent = jest.fn();
 
         const { getAllByTestId } = render(
             <PinOverlay
                 count={2}
-                canvasInstanceRef={canvasInstanceRef}
                 setPinsParent={setPinsParent}
             />
         );
@@ -314,13 +305,11 @@ describe('PinOverlay Component', () => {
 
     it('should be able to update multiple pins independently', async () => {
         pinOnDragHandlers.clear(); // Reset on drag handlers for new pins
-        const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;
         const setPinsParent = jest.fn();
 
         const { getAllByTestId } = render(
             <PinOverlay
                 count={2}
-                canvasInstanceRef={canvasInstanceRef}
                 setPinsParent={setPinsParent}
             />
         )
@@ -358,13 +347,11 @@ describe('PinOverlay Component', () => {
 
     it('should not generate pins if canvas is not ready', async () => {
 
-        const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;  
-        canvasInstanceRef.current.getBounds = jest.fn(() => ({ width: 0, height: 0 }));
+
+        mockCanvasInstance.getBounds = jest.fn(() => ({ width: 0, height: 0 }));
         const { getByTestId, queryAllByTestId } = render(
             <PinOverlay
-
                 count={5}
-                canvasInstanceRef={canvasInstanceRef}
                 setPinsParent={() => {}}
             />
         )
@@ -377,19 +364,17 @@ describe('PinOverlay Component', () => {
     });
 
     it('should remove canvas event listener on unmount', async () => {
-        const canvasInstanceRef = mockCanvas() as React.RefObject<Canvas>;
-        const canvasOff = canvasInstanceRef.current.off as jest.Mock;
+        const canvasOff = mockCanvasInstance.off as jest.Mock;
         
         const { unmount } = render(
             <PinOverlay
                 count={3}
-                canvasInstanceRef={canvasInstanceRef}
                 setPinsParent={() => {}}
             />
         );
         
         await waitFor(() => {
-            expect(canvasInstanceRef.current.on).toHaveBeenCalledWith('canvasDrawn', expect.any(Function));
+            expect(mockCanvasInstance.on).toHaveBeenCalledWith('canvasDrawn', expect.any(Function));
         });
         
         unmount();

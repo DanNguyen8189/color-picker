@@ -5,6 +5,8 @@ const config: Config = {
     setupFilesAfterEnv: ['<rootDir>/test/setup.ts'],
     moduleNameMapper: {
         '^src/(.*)$': '<rootDir>/src/$1',
+        '\\.(css|less|sass|scss)$': '<rootDir>/test/styleMock.tsx',
+        // for mocking css imports while testing
     },
     coverageProvider: 'v8',
     // collectCoverageFrom: [

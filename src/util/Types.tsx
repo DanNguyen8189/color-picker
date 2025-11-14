@@ -7,6 +7,7 @@ export interface RGB {
 export interface ImagePin {
     id: string,
     color?: RGB,
+    coordinates?: Coordinates,
 }
 
 export interface Image {
