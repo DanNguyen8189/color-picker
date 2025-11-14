@@ -49,6 +49,9 @@ export const CanvasProvider: React.FC<{
     // fn is created once and reused until canvasRef changes
     // fns exposed outside through contect should always be memoized like this
     const writeImage = useCallback(async (src: File | string | HTMLImageElement) => {
+        // File: comes from <input type="file">
+        // string: already have a URL (blob/object URL, data URL, or remote URL)
+        // HTMLImageElement: already loaded image element
         const canvasElement = canvasRef.current;
         if (!canvasElement) {
             console.warn('⚠️ Canvas element not ready');
@@ -61,7 +64,7 @@ export const CanvasProvider: React.FC<{
         console.log('✅ Canvas instance ready');
 
         let img: HTMLImageElement;
-        let revokeUrl: string | undefined;
+        let revokeUrl: string | undefined; // for cleaning blob/object urls from inputs
 
         if (src instanceof HTMLImageElement) {
             img = src;
@@ -71,7 +74,6 @@ export const CanvasProvider: React.FC<{
             const objectUrl = URL.createObjectURL(src);
             revokeUrl = objectUrl;
             img = await loadImage(objectUrl);
-            //setImageUrl(objectUrl);
         }
 
         setImageElement(img);

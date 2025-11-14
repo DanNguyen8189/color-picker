@@ -25,19 +25,6 @@ function HomeContent({
 
     const handleSlide = (num: number) => setCount(num);
 
-    // const handlePickImage = (file: File) => {
-    //     // const url = URL.createObjectURL(file);
-    //     // if (prevUrlRef.current) URL.revokeObjectURL(prevUrlRef.current);
-    //     // prevUrlRef.current = url;
-    //     // setSelectedImage(url);
-    //     // // defer until canvas element is mounted
-    //     // requestAnimationFrame(() => writeImage(url));
-    // };
-
-    // useEffect(() => () => {
-    //     if (prevUrlRef.current) URL.revokeObjectURL(prevUrlRef.current);
-    // }, []);
-
     return (
         <div>
         {/* <ImageUploader handlePickImage={handlePickImage} /> */}
