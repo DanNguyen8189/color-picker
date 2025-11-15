@@ -1,99 +1,76 @@
-import React, { useState, useEffect, useRef, use } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Slider from './Slider/Slider';
-import ImageUploader from './ImageUploader/ImageUploader';
-
+import { ImageUploader } from './ImageUploader/ImageUploader';
 import type { ImagePin } from "../util/Types";
-
-// import { set } from 'astro:schema';
-
-import { writeImage } from '../hooks/writeImage';
 import { PinOverlay } from './PinOverlay/PinOverlay';
 import { Palette } from './Pallete/Pallete';
+import { useCanvas, CanvasProvider } from '../util';
 
-
-
-function Home(){
+// Separate component to use the canvas context: CanvasProvider
+// wraps around this. Before when we had 1 component, the context
+// was not available during initial render, causing errors.
+// "useCanvas must be used within CanvasProvider"
+// When you have a component that both provides and consumes a context,
+// React's rendering order causes problems. (in original attempt, useCanvas was 
+// called before <CanvasProvider>)
+function HomeContent({
+    canvasRef
+}: { canvasRef: React.RefObject<HTMLCanvasElement | null> }) {
+    const { imageUrl } = useCanvas();
     const [count, setCount] = useState(1);
-
-    const [selectedImage, setSelectedImage] = useState<string>('');
-    const prevUrlRef = useRef<string | null>(null);
-
+    //const [selectedImage, setSelectedImage] = useState<string>('');
+    //const prevUrlRef = useRef<string | null>(null);
     const [pins, setPins] = useState<ImagePin[]>([]);
+    const containerRef = useRef<HTMLDivElement | null>(null);
 
-    // reference to container div that holds both the image and the pins
-    const containerRef = useRef<HTMLDivElement | null>(null); // Ref for the image container
-
-    const canvasRef = useRef<HTMLCanvasElement| null>(null);
-
-    const canvasInstanceRef = writeImage(canvasRef, selectedImage);
-
-    // // map of node refs for each pin so react-draggable can use nodeRef per draggable
-    // const pinRefs = useRef<Record<string, React.RefObject<HTMLDivElement | null>>>({});
-
-    const handleSlide = (num:number) => {
-        setCount(num);
-    };
-
-
-    const handlePickImage = (image:File) => {
-        const url = URL.createObjectURL(image);
-        // URL.createObjectURL creates a new blob URL each time it's called,
-        // so we need to clean up the previous one.
-        if (prevUrlRef.current) {
-            URL.revokeObjectURL(prevUrlRef.current);
-        }
-        prevUrlRef.current = url;
-        setSelectedImage(url);
-    }
-
-
-    useEffect(() => {
-        // cleanup blob URL on unmount
-        return () => {
-            if (prevUrlRef.current) {
-            URL.revokeObjectURL(prevUrlRef.current);
-            }
-        };
-    }, []);
+    const handleSlide = (num: number) => setCount(num);
 
     return (
         <div>
-            <ImageUploader handlePickImage={handlePickImage}/>
-            {selectedImage && (
-                <Slider handleSlide={handleSlide} />
-            )}
-            {selectedImage && (
-            <div ref={containerRef} style={{ position: "relative", display: "inline-block", width:"50%" }}>
-                {/* <ImageColorPicker
-                    imgSrc={URL.createObjectURL(selectedImage)}
-                    onColorPick={ handleColorPick }
-                    zoom={1}
-                /> */}
-                <div style={{
+        {/* <ImageUploader handlePickImage={handlePickImage} /> */}
+        <ImageUploader />
+        {imageUrl && <Slider handleSlide={handleSlide} />}
+        {/* {imageUrl && ( */}
+        {/* trying to conditional render with jsx (imageUrl && ...) 
+        had a race condition where <canvas> might not have mounted before 
+        writeImage was called. So instead always render the canvas, 
+        but hide with css if there's no imageUrl
+        */}
+            <div style={{ display: imageUrl ? 'block' : 'none'}}>
+            <div
+            ref={containerRef}
+            style={{ position: 'relative', display: 'inline-block', width: '50%' }}
+            >
+            <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex' }}>
+                <canvas
+                ref={canvasRef}
+                style={{
                     position: 'relative',
-                    display: 'flex',
                     width: '100%',
                     height: '100%',
-                }}>
-                    <canvas 
-                        ref={canvasRef}
-                        style={{
-                            position: 'relative',
-                            width: '100%',
-                            height: '100%',
-                            top: 0,
-                            left: 0,
-                            zIndex: 1,
-                            touchAction: 'none',
-                            objectFit: 'cover',
-                        }}
-                        ></canvas>
-                </div>
-                <PinOverlay count={count} canvasInstanceRef={canvasInstanceRef} setPinsParent={setPins}/>
-                <Palette Pins={pins} />
+                    top: 0,
+                    left: 0,
+                    zIndex: 1,
+                    touchAction: 'none',
+                    objectFit: 'cover'
+                }}
+                />
             </div>
-            )}
+            <PinOverlay count={count} setPinsParent={setPins} />
+            </div>
+            <Palette Pins={pins} />
+            </div>
+        {/* )} */}
         </div>
-    )
+    );
 }
-export default Home;
+
+export default function Home() {
+    const canvasRef = useRef<HTMLCanvasElement | null>(null);
+    return (
+        // Provider component; creates context for child components to consume
+        <CanvasProvider canvasRef={canvasRef}>
+            <HomeContent canvasRef={canvasRef} />
+        </CanvasProvider>
+    );
+}

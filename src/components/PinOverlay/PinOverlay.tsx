@@ -3,20 +3,25 @@ import { Pin } from '../Pin/Pin';
 import { Canvas } from '../../util';
 import type { RGB, ImagePin } from "../../util";
 import { set } from 'astro:schema';
+import './PinOverlay.scss';
+import { useCanvas } from '../../util';
 
 type PinOverlayProps = {
     count: number,
-    canvasInstanceRef: React.RefObject<Canvas | null>,
+
     setPinsParent: React.Dispatch<React.SetStateAction<ImagePin[]>>
 }
 
 // function PinOverlay({ count, canvasInstanceRef, setPinsParent }: PinOverlayProps) {
-export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef, setPinsParent }) => {
+export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) => {
     const [pins, setPins] = useState<ImagePin[]>([]);
+
+    const [activePinId, setActivePinId] = useState<string | null>(null);
 
     const [Draggable, setDraggable] = useState<typeof import('react-draggable')['default'] | null>(null);
     // Dynamically import react-draggable to avoid SSR issues
 
+    const { canvasInstance } = useCanvas();
     useEffect(() => {
         let mounted = true; // prevent calling setState on unmounted component
         import('react-draggable')
@@ -48,7 +53,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
 
     useEffect(() => {
         // attaches event listener 'canvasDrawn' once, when canvasInstanceRef.current becomes available
-        const canvas = canvasInstanceRef.current;
+        const canvas = canvasInstance;
         if (!canvas || typeof canvas.on !== 'function') return;
 
         const handleCanvasDrawn = () => {
@@ -73,7 +78,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
         return () => {
             canvas.off('canvasDrawn', handleCanvasDrawn);
         };
-    }, [canvasInstanceRef?.current, count]);
+    }, [canvasInstance, count]);
     /**
      * count is needed in deps; without it, number of pins appearing on canvas 
      * reverts to 1 on image switch. This is because the useEffect contains a 
@@ -87,6 +92,10 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
         setPinsParent(pins);
     }, [pins]);
 
+    const handleDragStart = (id: string) => {
+        setActivePinId(id);
+    };
+
     const handleDrag = (e: any, color:RGB, id:string) => {
         setPins(prevPins => prevPins.map(pin => {
             if (pin.id === id) {
@@ -98,9 +107,13 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
             return pin;
         }));
     };
+
+    const handleDragStop = () => {
+        setActivePinId(null);
+    }
     
     const generatePins = (amount:number) => {
-        if (!canvasInstanceRef?.current) {
+        if (!canvasInstance) {
             return;
         }
 
@@ -154,15 +167,19 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, canvasInstanceRef
                 {/* Overlay for pins - fills the same area as the image and sits on top */}
                 <div 
                 data-testid="pin-overlay-test"
-                style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 9998 }}>
+                //style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 9998 }}
+                className="pin-overlay"
+                >
                     {pins.map((pin, index) => {
                         return (
                             <Pin
                                 key={pin.id ?? index}
                                 Draggable={Draggable}
-                                canvasInstanceRef={canvasInstanceRef}
                                 pin={pin}
+                                onStart={() => handleDragStart(pin.id)}
                                 onDrag={(e: any, data: any) => handleDrag(e, data, pin.id)}
+                                onStop={handleDragStop}
+                                isActive={activePinId == null ? true : activePinId === pin.id}
                             />
                         );
                     })}
