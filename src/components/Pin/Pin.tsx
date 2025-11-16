@@ -1,9 +1,11 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef, use } from 'react';
 import { Canvas, rgbToString } from '../../util';
 import type { ImagePin, RGB, Coordinates } from '../../util';
-import { useCanvas } from '../../util/';
+import { useCanvas } from '../../util/CanvasContext';
 import './Pin.scss';
+import { DraggableData } from 'react-draggable';
+import { read } from 'fs';
 
 type PinProps = {
     //Draggable: any,  // for dynamic import of react-draggable. Didn't want to
@@ -18,7 +20,8 @@ type PinProps = {
 
 export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onStop, isActive }) => {
     // NodeRef required for react-draggable
-    const [nodeRef, setNodeRef] = useState<React.RefObject<HTMLDivElement | null>>(React.createRef<HTMLDivElement>());
+    const nodeRef = useRef<HTMLDivElement | null>(null);
+
     //const [color, setColor] = useState<string>('red');
     const [color, setColor] = useState<RGB | null>(null);
     const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
@@ -49,16 +52,17 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
                 return;
             }
             
-            const canvas = canvasInstance;
-            const { width, height } = canvas.getBounds();
+            // const canvas = canvasInstance;
+            // const { width, height } = canvas.getBounds();
 
-            if (width === 0 || height === 0) return;
+            // if (width === 0 || height === 0) return;
 
-            const positionX = Math.random() * width;
-            const positionY = Math.random() * height;
-            setCoordinates({x: positionX, y: positionY});
+            // const positionX = Math.random() * width;
+            // const positionY = Math.random() * height;
+            // setCoordinates({x: positionX, y: positionY});
 
-            const color = readColorSafe(canvas, { x: positionX, y: positionY });
+            // const color = readColorSafe(canvas, { x: positionX, y: positionY });
+            const color = readColorSafe(canvasInstance, pin.coordinates);
 
             if (color){
                 setColor(color);
@@ -76,7 +80,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
             };
     }, [canvasInstance]);
 
-    const handleDrag = (e:any, data:Coordinates): void => {
+    const handleDrag = (e:any, data:DraggableData): void => {
         // update controlled position and color on drag
         if (!canvasInstance) return;
 
@@ -101,7 +105,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
         onStop();
     };
 
-    if (!coordinates) return null;
+    if (!pin.coordinates) return null;
 
     // Return static pin while Draggable is loading
     if (!Draggable) {
@@ -123,7 +127,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
             key={pin.id}
             axis='both'
             bounds='parent'
-            defaultPosition={{ x: coordinates.x, y: coordinates.y }}
+            defaultPosition={pin.coordinates}
             nodeRef={nodeRef}
             onStart={onStart}
             onDrag={handleDrag}

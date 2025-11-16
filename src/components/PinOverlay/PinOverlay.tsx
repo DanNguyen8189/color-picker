@@ -4,7 +4,7 @@ import { Canvas } from '../../util';
 import type { RGB, ImagePin } from "../../util";
 import { set } from 'astro:schema';
 import './PinOverlay.scss';
-import { useCanvas } from '../../util';
+import { useCanvas } from '../../util/CanvasContext';
 
 type PinOverlayProps = {
     count: number,
@@ -48,18 +48,14 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
     }, []);
 
 
-    // for use in useEffect below, to cover case where image is uploaded for the first time
-    //const attachedCanvasRef = useRef<Canvas | null>(null);
-
     useEffect(() => {
         // attaches event listener 'canvasDrawn' once, when canvasInstanceRef.current becomes available
-        const canvas = canvasInstance;
-        if (!canvas || typeof canvas.on !== 'function') return;
+        if (!canvasInstance || typeof canvasInstance.on !== 'function') return;
 
         const handleCanvasDrawn = () => {
             // regenerate pins now that new canvas/image has been drawn
             // w/o this, pins remain in old positions/colors on the previous image
-            generatePins(count);
+            generatePins(count, canvasInstance.getBounds().width, canvasInstance.getBounds().height);
         };
 
         // If this is a newly-created Canvas instance, call generatePins once
@@ -72,11 +68,12 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
         //generatePins(count);
 
         //generate pins when count changes (and canvas is ready)
-        if (canvas.getBounds().width > 0) generatePins(count);
-
-        canvas.on('canvasDrawn', handleCanvasDrawn);
+        if (canvasInstance.getBounds().width > 0) {
+            generatePins(count, canvasInstance.getBounds().width, canvasInstance.getBounds().height);
+        }
+        canvasInstance.on('canvasDrawn', handleCanvasDrawn);
         return () => {
-            canvas.off('canvasDrawn', handleCanvasDrawn);
+            canvasInstance.off('canvasDrawn', handleCanvasDrawn);
         };
     }, [canvasInstance, count]);
     /**
@@ -111,8 +108,8 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
     const handleDragStop = () => {
         setActivePinId(null);
     }
-    
-    const generatePins = (amount:number) => {
+
+    const generatePins = (amount:number, xBounds:number, yBounds:number) => {
         if (!canvasInstance) {
             return;
         }
@@ -132,10 +129,12 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
                     const id = crypto && typeof crypto.randomUUID === 'function'
                         ? crypto.randomUUID()
                         : String(Date.now()) + Math.random().toString(36).slice(2,7);
-
+                const positionX = Math.random() * xBounds;
+                const positionY = Math.random() * yBounds;
                     newPins.push({
                         id: id,
                         color: undefined,
+                        coordinates: {x: positionX, y: positionY}
                     });
                 }
                 //setPinsParent([...prev, ...newPins]);
@@ -149,9 +148,12 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
                     const id = crypto && typeof crypto.randomUUID === 'function'
                         ? crypto.randomUUID()
                         : String(Date.now()) + Math.random().toString(36).slice(2,7);
+                    const positionX = Math.random() * xBounds;
+                    const positionY = Math.random() * yBounds;
                     newPins.push({
                         id: id,
                         color: undefined,
+                        coordinates: {x: positionX, y: positionY}
                     });
                 }
                 //setPinsParent(newPins);
