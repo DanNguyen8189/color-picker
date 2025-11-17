@@ -52,8 +52,9 @@ const mockCanvasInstance: any = {
     getPixelColor: jest.fn((c: any) => colorPick(c)),
     getPixelColorRaw: jest.fn((c: any) => colorPick(c)),
 };
-// Mock the useCanvas hook that Pin uses to access the context.
-jest.mock('../../util/', () => ({
+// Mock the hook PinOverlay uses to access the context. Note: import must match exactly or
+// else it tries to use the real hook!
+jest.mock('../../util/CanvasContext', () => ({
     useCanvas: () => ({
         canvasInstance: mockCanvasInstance,
         imageElement: null,
@@ -98,7 +99,7 @@ describe('Pin Component', () => {
         const { getByTestId } = render(
             <Pin
                 Draggable={MockDraggable as any}
-                pin={{ id: 'test-pin'}}
+                pin={{ id: 'test-pin', coordinates: {x:50, y:50}}}
                 onStart={() => {}}
                 onDrag={() => {}}
                 onStop={() => {}}
@@ -118,7 +119,7 @@ describe('Pin Component', () => {
         const { getByTestId } = render(
             <Pin
                 Draggable={null}
-                pin={{ id: 'test-pin'}}
+                pin={{ id: 'test-pin', coordinates: {x:50, y:50}}}
                 onStart={() => {}}
                 onDrag={() => {}}
                 onStop={() => {}}
@@ -140,7 +141,7 @@ describe('Pin Component', () => {
         const { getByTestId } = render(
             <Pin
                 Draggable={DragToTR as any}
-                pin={{ id: 'test-pin'}}
+                pin={{ id: 'test-pin', coordinates: {x:250, y:50}}}
                 onStart={() => {}}
                 onDrag={onDragMock}
                 onStop={() => {}}
@@ -157,30 +158,30 @@ describe('Pin Component', () => {
             expect(pin.style.getPropertyValue('--pin-color')).toBe('rgb(0, 255, 0)');
         });
     })
+    // Don't need anymore; coordinates are always set only if canvas is ready in PinOverlay
+    // it("should not attempt to read color when coordinates are not set/canvas not laid out", async () => {
+    //     // Mock canvas with zero bounds (not laid out)
 
-    it("should not attempt to read color when coordinates are not set/canvas not laid out", async () => {
-        // Mock canvas with zero bounds (not laid out)
-
-        (mockCanvasInstance.getBounds as jest.Mock).mockReturnValue({ width: 0, height: 0 });
+    //     (mockCanvasInstance.getBounds as jest.Mock).mockReturnValue({ width: 0, height: 0 });
 
 
-        const { container } = render(
-            <Pin
-                Draggable={MockDraggable as any}
-                pin={{ id: 'test-pin' }}
-                onStart={() => {}}
-                onDrag={() => {}}
-                onStop={() => {}}
-                isActive={true}
-            />
-        );
+    //     const { container } = render(
+    //         <Pin
+    //             Draggable={MockDraggable as any}
+    //             pin={{ id: 'test-pin', coordinates: {x:50, y:50}}}
+    //             onStart={() => {}}
+    //             onDrag={() => {}}
+    //             onStop={() => {}}
+    //             isActive={true}
+    //         />
+    //     );
 
-        // Should return null (no coordinates set)
-        expect(container.firstChild).toBeNull();
+    //     // Should return null (no coordinates set)
+    //     expect(container.firstChild).toBeNull();
         
-        // Should never try to read pixels
-        expect(mockCanvasInstance.getPixelColor).not.toHaveBeenCalled();
-    })
+    //     // Should never try to read pixels
+    //     expect(mockCanvasInstance.getPixelColor).not.toHaveBeenCalled();
+    // })
 
     it('does not enter infinite loop on rapid drags', async () => {
 
@@ -189,7 +190,7 @@ describe('Pin Component', () => {
         const { getByTestId } = render(
             <Pin
                 Draggable={DragToSameSpot as any}
-                pin={{ id: 'test-pin'}}
+                pin={{ id: 'test-pin', coordinates: {x:50, y:50}}}
                 onStart={() => {}}
                 onDrag={onDragMock}
                 onStop={() => {}}
@@ -215,7 +216,7 @@ describe('Pin Component', () => {
         const { getByTestId } = render(
             <Pin
                 Draggable={DragToUndefinedColor as any}
-                pin={{ id: 'test-pin'}}
+                pin={{ id: 'test-pin', coordinates: {x:50, y:50}}}
                 onStart={() => {}}
                 onDrag={onDragMock}
                 onStop={() => {}}

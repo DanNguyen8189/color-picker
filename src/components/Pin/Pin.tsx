@@ -116,6 +116,8 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
                 ref={nodeRef}
                 style={{
                     '--pin-color': color ? rgbToString(color) : 'transparent',
+                    // Inline fallback so tests/SSR see correct color without SCSS
+                    backgroundColor: color ? rgbToString(color) : 'transparent',
                 } as React.CSSProperties}
             />
         );

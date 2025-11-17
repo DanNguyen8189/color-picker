@@ -13,8 +13,9 @@ const mockCanvasInstance: any = {
     off: jest.fn(),
     getPixelColor: jest.fn(),
 };
-// Mock the hook PinOverlay uses to access the context.
-jest.mock('../../util/', () => ({
+// Mock the hook PinOverlay uses to access the context. Note: import must match exactly or
+// else it tries to use the real hook!
+jest.mock('../../util/CanvasContext', () => ({
     useCanvas: () => ({
         canvasInstance: mockCanvasInstance,
         imageElement: null,
