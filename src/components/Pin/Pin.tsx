@@ -6,6 +6,7 @@ import { useCanvas } from '../../util/CanvasContext';
 import './Pin.scss';
 import { DraggableData } from 'react-draggable';
 import { read } from 'fs';
+import { on } from 'events';
 
 type PinProps = {
     //Draggable: any,  // for dynamic import of react-draggable. Didn't want to
@@ -13,7 +14,7 @@ type PinProps = {
     Draggable: typeof import('react-draggable')['default'] | null,
     pin: ImagePin,
     onStart: () => void
-    onDrag: (e: any, color: RGB, id:string) => void
+    onDrag: (e: any, pin: ImagePin) => void
     onStop: () => void
     isActive: boolean
 }
@@ -23,8 +24,10 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
     const nodeRef = useRef<HTMLDivElement | null>(null);
 
     //const [color, setColor] = useState<string>('red');
-    const [color, setColor] = useState<RGB | null>(null);
-    const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
+    // const [color, setColor] = useState<RGB | undefined>(undefined);
+    // const [coordinates, setCoordinates] = useState<Coordinates | null>(null);
+
+    //const [currentPin, setCurrentPin] = useState<ImagePin>(pin);
 
     const warnOnceRef = React.useRef(false); // per-pin instance ref that persists
     // across renders, to avoid spamming console with CORS warnings. 
@@ -46,39 +49,29 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
     };
 
     useEffect(() => {
-            if (!canvasInstance) {
-                // optional chaining operator ? checks both ref and current prop
-                // at same time
-                return;
-            }
-            
-            // const canvas = canvasInstance;
-            // const { width, height } = canvas.getBounds();
+        if (initializedRef.current || !canvasInstance || !pin.coordinates) {
+            return;
+        }
 
-            // if (width === 0 || height === 0) return;
+        const color = readColorSafe(canvasInstance, pin.coordinates);
 
-            // const positionX = Math.random() * width;
-            // const positionY = Math.random() * height;
-            // setCoordinates({x: positionX, y: positionY});
+        if (color){
+            //setColor(color);
+            //setCurrentPin({...pin, color: color});
+            //onDrag(undefined, color, pin.id);
+            // Defer notifying parent to avoid sync re-mount loops
+            //this ondrag call updates parent state, which remounts pin
+            // which reruns the effect, causing infinite loop
+            //requestAnimationFrame(() => onDrag(undefined, {...pin, color: color}));
+            onDrag(undefined, {...pin, color: color})
+        }
+        initializedRef.current = true;
 
-            // const color = readColorSafe(canvas, { x: positionX, y: positionY });
-            const color = readColorSafe(canvasInstance, pin.coordinates);
-
-            if (color){
-                setColor(color);
-                //onDrag(undefined, color, pin.id);
-               // Defer notifying parent to avoid sync re-mount loops
-               //this ondrag call updates parent state, which remounts pin
-               // which reruns the effect, causing infinite loop
-                requestAnimationFrame(() => onDrag(undefined, color, pin.id));
-            }
-            initializedRef.current = true;
-    
-            // cleanup function (runs when the component is unmounted)
-            return () => {
-                //console.log('Component is being destroyed!');
-            };
-    }, [canvasInstance]);
+        // cleanup function (runs when the component is unmounted)
+        return () => {
+            //console.log('Component is being destroyed!');
+        };
+    }, [canvasInstance, onDrag, pin.coordinates?.x, pin.coordinates?.y]);
 
     const handleDrag = (e:any, data:DraggableData): void => {
         // update controlled position and color on drag
@@ -87,17 +80,28 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
         //prevents updates that might cause rerender infinite loops in testing
         //setCoordinates -> rerenders Pin -> mock calls ondrag again -> setcoordinates called
         // again
+        const coordinates = pin.coordinates;
         if (coordinates && data.x === coordinates.x && data.y === coordinates.y) return;
         
         const canvas = canvasInstance;
         const newColor = readColorSafe(canvas, { x: data.x, y: data.y });;
-        setCoordinates({ x:data.x, y:data.y });
 
-        // Keep last known color if read fails
-        const next = newColor ?? color;
-        if (next) {
-            setColor(next);
-            onDrag(e, next, pin.id);
+        if (newColor && newColor !== pin.color){
+            const updatedPin: ImagePin = {
+                ...pin,
+                color: newColor,
+                coordinates:{x: data.x, y: data.y}
+            }
+            //setCurrentPin(updatedPin);
+            onDrag(e, updatedPin);
+        }
+        else {
+            const updatedPin: ImagePin = {
+                ...pin,
+                coordinates:{x: data.x, y: data.y}
+            }
+            //setCurrentPin(updatedPin);
+            onDrag(e, updatedPin);
         }
     };
 
@@ -115,9 +119,9 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
                 data-testid='pin-without-draggable'
                 ref={nodeRef}
                 style={{
-                    '--pin-color': color ? rgbToString(color) : 'transparent',
+                    '--pin-color': pin.color ? rgbToString(pin.color) : 'transparent',
                     // Inline fallback so tests/SSR see correct color without SCSS
-                    backgroundColor: color ? rgbToString(color) : 'transparent',
+                    backgroundColor: pin.color ? rgbToString(pin.color) : 'transparent',
                 } as React.CSSProperties}
             />
         );
@@ -140,8 +144,10 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
                 data-testid='pin-with-draggable'
                 ref={nodeRef}
                 style={{
-                    '--pin-color': color ? rgbToString(color) : 'transparent',
-                    '--pin-opacity': isActive ? 1 : 0.3
+                    '--pin-color': pin.color ? rgbToString(pin.color) : 'transparent',
+                    '--pin-opacity': isActive ? 1 : 0.3,
+                    backgroundColor: pin.color ? rgbToString(pin.color) : 'transparent',
+                    opacity: isActive ? 1 : 0.3,
                 } as React.CSSProperties}
             />
         </Draggable>

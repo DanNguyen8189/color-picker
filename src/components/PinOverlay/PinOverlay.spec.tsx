@@ -4,8 +4,8 @@ import { PinOverlay } from './PinOverlay'
 import { Canvas } from '../../util/Canvas';
 
 type RGBTestType = { r: number; g: number; b: number } | undefined; // RGB dupe for tests
-type ImagePinTestType = { id: string; color?: RGBTestType }; // ImagePin dupe for tests
-type PinDragTestType = (e: any, color: RGBTestType, id: string) => void; // Pin on drag handler test type
+type ImagePinTestType = { id: string; color?: RGBTestType; coordinates?: {x: number, y: number} }; // ImagePin dupe for tests
+type PinDragTestType = (e: any, pin: ImagePinTestType) => void; // Pin on drag handler test type
 
 const mockCanvasInstance: any = {
     getBounds: jest.fn(() => ({ width: 300, height: 200 })),
@@ -280,8 +280,9 @@ describe('PinOverlay Component', () => {
         act(() => {
             handleDrag(
                 {},           // event (not used)
-                newColor,     // picked color
-                firstPinId    // pin id
+                // newColor,     // picked color
+                // firstPinId    // pin id
+                {id: firstPinId, color: newColor, coordinates: {x:50, y:50}} // updated pin
             );
         });
 
@@ -326,11 +327,14 @@ describe('PinOverlay Component', () => {
         act(() => {
             // Drag first pin
             if (handleDrag1) {
-                handleDrag1({}, { r: 10, g: 20, b: 30 }, pin1.id);
+
+                //handleDrag1({}, { r: 10, g: 20, b: 30 }, pin1.id);
+                handleDrag1({}, {...pin1, color: { r: 10, g: 20, b: 30 }});
             }
             // Drag second pin
             if (handleDrag2) {
-                handleDrag2({}, { r: 200, g: 210, b: 220 }, pin2.id);
+                //handleDrag2({}, { r: 200, g: 210, b: 220 }, pin2.id);
+                handleDrag2({}, {...pin2, color: { r: 200, g: 210, b: 220 }});
             }
         });
 

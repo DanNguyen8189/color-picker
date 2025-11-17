@@ -5,6 +5,7 @@ import type { RGB, ImagePin, Image } from "../../util";
 import { set } from 'astro:schema';
 import './PinOverlay.scss';
 import { useCanvas } from '../../util/CanvasContext';
+import { sync } from 'astro';
 
 type PinOverlayProps = {
     count: number,
@@ -54,12 +55,25 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
         // attaches event listener 'canvasDrawn' once, when canvasInstanceRef.current becomes available
         if (!canvasInstance || typeof canvasInstance.on !== 'function') return;
 
+        const syncBounds = () => {
+            setBounds(prev =>{
+                const canvasBounds = canvasInstance.getBounds();
+                if (prev.width == canvasBounds.width && prev.height == canvasBounds.height){
+                    return prev;
+                }
+                else{
+                    return canvasBounds
+                }
+            })
+        };
         const handleCanvasDrawn = () => {
             // regenerate pins now that new canvas/image has been drawn
             // w/o this, pins remain in old positions/colors on the previous image
-            setBounds(canvasInstance.getBounds());
+
+            syncBounds();
             generatePins(count);
         };
+
 
         // If this is a newly-created Canvas instance, call generatePins once
         // covers case where any image is uploaded for the first time. 
@@ -72,7 +86,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
 
         //generate pins when count changes (and canvas is ready)
         if (canvasInstance.getBounds().width > 0) {
-            setBounds(canvasInstance.getBounds());
+            syncBounds();
             generatePins(count);
         }
         canvasInstance.on('canvasDrawn', handleCanvasDrawn);
@@ -80,6 +94,12 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
             canvasInstance.off('canvasDrawn', handleCanvasDrawn);
         };
     }, [canvasInstance, count]);
+
+    useEffect(() => {
+        if (bounds.width > 0 && bounds.height > 0) {
+            console.log('Bounds changed in PinOverlay:', bounds);
+        }
+    }, [bounds]);
 
     /**
      * count is needed in deps; without it, number of pins appearing on canvas 
@@ -98,16 +118,19 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
         setActivePinId(id);
     };
 
-    const handleDrag = (e: any, color:RGB, id:string) => {
-        setPins(prevPins => prevPins.map(pin => {
-            if (pin.id === id) {
-                return {
-                    ...pin,
-                    color: color,
-                };
-            }
-            return pin;
-        }));
+    // const handleDrag = (e: any, color:RGB, id:string) => {
+    //     setPins(prevPins => prevPins.map(pin => {
+    //         if (pin.id === id) {
+    //             return {
+    //                 ...pin,
+    //                 color: color,
+    //             };
+    //         }
+    //         return pin;
+    //     }));
+    // };
+    const handleDrag = (e: any, pin: ImagePin) => {
+        setPins(prevPins => prevPins.map(p => p.id === pin.id ? pin : p));
     };
 
     const handleDragStop = () => {
@@ -178,7 +201,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
                                 Draggable={Draggable}
                                 pin={pin}
                                 onStart={() => handleDragStart(pin.id)}
-                                onDrag={(e: any, data: any) => handleDrag(e, data, pin.id)}
+                                onDrag={(e: any, updatedPin: ImagePin) => handleDrag(e, updatedPin)}
                                 onStop={handleDragStop}
                                 isActive={activePinId == null ? true : activePinId === pin.id}
                             />
