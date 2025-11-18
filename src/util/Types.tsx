@@ -7,7 +7,8 @@ export interface RGB {
 export interface ImagePin {
     id: string,
     color?: RGB,
-    coordinates?: Coordinates,
+    coordinates: Coordinates, // right now, these are initial random coords. Dragging
+    // doesn't change these, but we can change that if needed.
 }
 
 export interface Image {

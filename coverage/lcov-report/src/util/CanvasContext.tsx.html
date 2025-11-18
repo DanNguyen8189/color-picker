@@ -23,9 +23,9 @@
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">23.52% </span>
+                <span class="strong">23.07% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>24/102</span>
+                <span class='fraction'>24/104</span>
             </div>
         
             
@@ -44,9 +44,9 @@
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">23.52% </span>
+                <span class="strong">23.07% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>24/102</span>
+                <span class='fraction'>24/104</span>
             </div>
         
             
@@ -164,7 +164,9 @@
 <a name='L99'></a><a href='#L99'>99</a>
 <a name='L100'></a><a href='#L100'>100</a>
 <a name='L101'></a><a href='#L101'>101</a>
-<a name='L102'></a><a href='#L102'>102</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
+<a name='L102'></a><a href='#L102'>102</a>
+<a name='L103'></a><a href='#L103'>103</a>
+<a name='L104'></a><a href='#L104'>104</a></td><td class="line-coverage quiet"><span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
@@ -180,9 +182,9 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">34x</span>
+<span class="cline-any cline-yes">34x</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-yes">1x</span>
@@ -190,6 +192,8 @@
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
 <span class="cline-any cline-yes">1x</span>
+<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-no">&nbsp;</span>
@@ -316,6 +320,9 @@ export const CanvasProvider: React.FC&lt;{
 <span class="cstat-no" title="statement not covered" >    // fn is created once and reused until canvasRef changes</span>
 <span class="cstat-no" title="statement not covered" >    // fns exposed outside through contect should always be memoized like this</span>
 <span class="cstat-no" title="statement not covered" >    const writeImage = useCallback(async (src: File | string | HTMLImageElement) =&gt; {</span>
+<span class="cstat-no" title="statement not covered" >        // File: comes from &lt;input type="file"&gt;</span>
+<span class="cstat-no" title="statement not covered" >        // string: already have a URL (blob/object URL, data URL, or remote URL)</span>
+<span class="cstat-no" title="statement not covered" >        // HTMLImageElement: already loaded image element</span>
 <span class="cstat-no" title="statement not covered" >        const canvasElement = canvasRef.current;</span>
 <span class="cstat-no" title="statement not covered" >        if (!canvasElement) {</span>
 <span class="cstat-no" title="statement not covered" >            console.warn('⚠️ Canvas element not ready');</span>
@@ -328,7 +335,7 @@ export const CanvasProvider: React.FC&lt;{
 <span class="cstat-no" title="statement not covered" >        console.log('✅ Canvas instance ready');</span>
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >        let img: HTMLImageElement;</span>
-<span class="cstat-no" title="statement not covered" >        let revokeUrl: string | undefined;</span>
+<span class="cstat-no" title="statement not covered" >        let revokeUrl: string | undefined; // for cleaning blob/object urls from inputs</span>
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >        if (src instanceof HTMLImageElement) {</span>
 <span class="cstat-no" title="statement not covered" >            img = src;</span>
@@ -338,7 +345,6 @@ export const CanvasProvider: React.FC&lt;{
 <span class="cstat-no" title="statement not covered" >            const objectUrl = URL.createObjectURL(src);</span>
 <span class="cstat-no" title="statement not covered" >            revokeUrl = objectUrl;</span>
 <span class="cstat-no" title="statement not covered" >            img = await loadImage(objectUrl);</span>
-<span class="cstat-no" title="statement not covered" >            //setImageUrl(objectUrl);</span>
 <span class="cstat-no" title="statement not covered" >        }</span>
 <span class="cstat-no" title="statement not covered" ></span>
 <span class="cstat-no" title="statement not covered" >        setImageElement(img);</span>
@@ -373,7 +379,7 @@ export const CanvasProvider: React.FC&lt;{
             <div class='footer quiet pad2 space-top1 center small'>
                 Code coverage generated by
                 <a href="https://istanbul.js.org/" target="_blank" rel="noopener noreferrer">istanbul</a>
-                at 2025-11-14T22:49:34.304Z
+                at 2025-11-17T18:10:49.518Z
             </div>
         <script src="../../prettify.js"></script>
         <script>
