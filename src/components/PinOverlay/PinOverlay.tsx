@@ -61,7 +61,6 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
         if (!canvasInstance || typeof canvasInstance.on !== 'function') return;
 
         const syncBounds = () => {
-            //setOldBounds(bounds);
             setBounds(prev =>{
                 const canvasBounds = canvasInstance.getBounds();
                 if (prev.width == canvasBounds.width && prev.height == canvasBounds.height){
@@ -107,31 +106,18 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
             canvasInstance.off('canvasDrawn', handleCanvasDrawn);
             window.removeEventListener('resize', handleResize);
         };
-    }, [canvasInstance]);
-
-    useEffect(() =>{
-        if (bounds.width > 0 && bounds.height > 0) {
-            generatePins(count);
-        }
-    }, [count]);
+    // count is needed here as a deps to ensure pins are regenerated.
+    // without it, when a new image comes into play, the handleCanvasDrawn handler calls 
+    // generatePins with a stale closure - in our case, whatever value count had when the 
+    // effect first ran (1), every single time. So basically every time
+    // we uploaded a new image, we'd start again with one pin until we dragged the count slider.
+    // There was also a case where generatePins wouldn't get called at all and
+    // pins from the previous image would persist on the new image
+    }, [canvasInstance, count]);
 
     useEffect(() => {
-        setOldBounds(bounds);
-        console.log("shoulda been called", bounds, oldBounds);
-        if (!canvasInstance) return;
-        if (oldBounds.width <= 0 || oldBounds.height <= 0) return;
-        if (bounds.width <= 0 || bounds.height <= 0) return;
         shiftPinPositions();
-        console.log("pins shifted", pins.map(p => p.coordinates));
     }, [bounds]);
-
-    /**
-     * count is needed in deps; without it, number of pins appearing on canvas 
-     * reverts to 1 on image switch. This is because the useEffect contains a 
-     * closure over the count variable in the handleCanvasDrawn function,
-     * which keeps the value of count at the time the effect was created (1). 
-     * Adding count here ensures the effect is re-run whenever count changes,
-    */
 
     useEffect(() => {
         //if (pins.length) setPinsParent(pins);
@@ -162,9 +148,8 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
     }
 
     const generatePins = (amount:number) => {
-        if (!canvasInstance) {
-            return;
-        }
+        if (!canvasInstance) return;
+        if (bounds.width <= 0 || bounds.height <= 0) return;
 
         setPins(prev => {
             // remove extra pins
@@ -209,11 +194,17 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
     }
 
     const shiftPinPositions = () => {
-        if (bounds.width === 0 || bounds.height === 0) return;
-        if (oldBounds.width === 0 || oldBounds.height === 0) return;
+        if (!canvasInstance) return;
+        setOldBounds(bounds);
+        // if (bounds.width === 0 || bounds.height === 0) return;
+        // if (oldBounds.width === 0 || oldBounds.height === 0) return;
+        // if (oldBounds.width === bounds.width && oldBounds.height === bounds.height) return;
+
+        if ((bounds.width === 0 || bounds.height === 0) ||
+            (oldBounds.width === 0 || oldBounds.height === 0) || 
+            (oldBounds.width === bounds.width && oldBounds.height === bounds.height)) return;
         const xRatio = bounds.width / oldBounds.width;
         const yRatio = bounds.height / oldBounds.height;
-        if (xRatio === 1 && yRatio === 1) return; // no change
         setPins(prev =>prev.map(pin => {
             return{
                 ...pin,
@@ -247,6 +238,5 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
                 </div>
         </div>
     );
-    
 }
 // export default PinOverlay;
