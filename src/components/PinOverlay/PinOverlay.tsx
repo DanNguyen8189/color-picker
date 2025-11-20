@@ -1,11 +1,8 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Pin } from '../Pin/Pin';
-import { Canvas } from '../../util';
 import type { RGB, ImagePin, Image } from "../../util";
-import { set } from 'astro:schema';
 import './PinOverlay.scss';
 import { useCanvas } from '../../util/CanvasContext';
-import { sync } from 'astro';
 
 type PinOverlayProps = {
     count: number,
@@ -19,7 +16,8 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
     // using canvasInstance.getBounds() directly in useEffect would cause it to fire on every render
     // size that technically would also track the getBounds() fn object
     const [bounds, setBounds] = useState<{width:number, height:number}>({width:0, height:0});
-    // for finding the ratio of canvas size changes
+    // for finding the ratio of canvas size changes. Needs to be usesState
+    // so it can properly trigger its useEffect when changed
     const [oldBounds, setOldBounds] = useState<{width:number, height:number}>({width:0, height:0});
     
     const [pins, setPins] = useState<ImagePin[]>([]);
@@ -67,7 +65,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
                     return prev;
                 }
                 else{
-                    console.log('PinOverlay syncBounds set:', canvasBounds);
+                    //console.log('PinOverlay syncBounds set:', canvasBounds);
                     return canvasBounds
                 }
             })
@@ -216,26 +214,26 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
 
     return (
         <div>
-                {/* Overlay for pins - fills the same area as the image and sits on top */}
-                <div 
-                data-testid="pin-overlay-test"
-                //style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 9998 }}
-                className="pin-overlay"
-                >
-                    {pins.map((pin, index) => {
-                        return (
-                            <Pin
-                                key={pin.id ?? index}
-                                Draggable={Draggable}
-                                pin={pin}
-                                onStart={() => handleDragStart(pin.id)}
-                                onDrag={(e: any, updatedPin: ImagePin) => handleDrag(e, updatedPin)}
-                                onStop={handleDragStop}
-                                isActive={activePinId == null ? true : activePinId === pin.id}
-                            />
-                        );
-                    })}
-                </div>
+            {/* Overlay for pins - fills the same area as the image and sits on top */}
+            <div 
+            data-testid="pin-overlay-test"
+            //style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 9998 }}
+            className="pin-overlay"
+            >
+                {pins.map((pin, index) => {
+                    return (
+                        <Pin
+                            key={pin.id ?? index}
+                            Draggable={Draggable}
+                            pin={pin}
+                            onStart={() => handleDragStart(pin.id)}
+                            onDrag={(e: any, updatedPin: ImagePin) => handleDrag(e, updatedPin)}
+                            onStop={handleDragStop}
+                            isActive={activePinId == null ? true : activePinId === pin.id}
+                        />
+                    );
+                })}
+            </div>
         </div>
     );
 }

@@ -1,4 +1,4 @@
-// blank mock export for testing with SCSS/CSS imports
+// blank mock export for Jest testing with SCSS/CSS imports
 // The problem is that Jest is hitting CSS imports and 
 // trying to parse them as if they were JavaScript.,
 // we get error of SyntaxError: Unexpected token .,

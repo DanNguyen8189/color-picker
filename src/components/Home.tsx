@@ -16,7 +16,7 @@ import { useCanvas, CanvasProvider } from '../util';
 function HomeContent({
     canvasRef
 }: { canvasRef: React.RefObject<HTMLCanvasElement | null> }) {
-    const { imageUrl } = useCanvas();
+    const { imageObjectUrlRef } = useCanvas();
     const [count, setCount] = useState(1);
     //const [selectedImage, setSelectedImage] = useState<string>('');
     //const prevUrlRef = useRef<string | null>(null);
@@ -29,14 +29,14 @@ function HomeContent({
         <div>
         {/* <ImageUploader handlePickImage={handlePickImage} /> */}
         <ImageUploader />
-        {imageUrl && <Slider handleSlide={handleSlide} />}
-        {/* {imageUrl && ( */}
-        {/* trying to conditional render with jsx (imageUrl && ...) 
+        {imageObjectUrlRef.current && <Slider handleSlide={handleSlide} />}
+        {/* {imageObjectUrlRef.current && ( */}
+        {/* trying to conditional render with jsx (imageObjectUrlRef.current && ...) 
         had a race condition where <canvas> might not have mounted before 
         writeImage was called. So instead always render the canvas, 
         but hide with css if there's no imageUrl
         */}
-            <div style={{ display: imageUrl ? 'block' : 'none'}}>
+            <div style={{ display: imageObjectUrlRef.current ? 'block' : 'none'}}>
             <div
             ref={containerRef}
             style={{ position: 'relative', display: 'inline-block', width: '50%' }}
