@@ -1,33 +1,23 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useCanvas } from '../../util/';
-import { set } from 'astro:schema';
 // export function ImageUploader({ handlePickImage }: { handlePickImage: (image: File) => void }) {
 export const ImageUploader: React.FC = () => {
     const { writeImage } = useCanvas();
-
     return (
         <div>
-        {/* Header */}
-        {/* <h1>Upload and Display Image</h1>
-        <h3>using React Hooks</h3> */}
-
-        {/* Conditionally render the selected image if it exists */}
-        {/* <Image/> */}
-        <br />
-
-        {/* Input element to select an image file */}
-        <input
-            type="file"
-            name="myImage"
-            accept="image/*"
-            // Event handler to capture file selection and update the state
-            onChange={async(event) => {
-                if (!event.target.files) return;
-                let image = event.target.files[0]
-                // defer until canvas element is mounted
-                requestAnimationFrame(() => writeImage(image));
-            }}
-        />
+            <label htmlFor="file">Choose Image</label>
+            <input
+                type="file"
+                name="myImage"
+                accept="image/*"
+                // Event handler to capture file selection and update the state
+                onChange={async(event) => {
+                    if (!event.target.files) return;
+                    let image = event.target.files[0]
+                    // defer until canvas element is mounted
+                    requestAnimationFrame(() => writeImage(image));
+                }}
+            />
         </div>
     );
 

@@ -1,14 +1,12 @@
 // @refresh reset
 import React, { useState, createContext, useContext, useRef, useEffect, useCallback } from 'react';
 import { Canvas } from '../util';
-import { set } from 'astro:schema';
 
 type CanvasContextType = {
     canvasInstance: Canvas | null;
     imageElement: HTMLImageElement | null;
+    imageObjectUrlRef: React.RefObject<string | null>;
     setImageElement: (img: HTMLImageElement | null) => void;
-    imageUrl: string | null;
-    setImageUrl: (url: string | null) => void;
     writeImage: (src: File | string | HTMLImageElement) => Promise<void>;
 };
 
@@ -25,8 +23,8 @@ export const CanvasProvider: React.FC<{
     children: React.ReactNode 
 }> = ({ canvasRef, children }) => {
     const [imageElement, setImageElement] = useState<HTMLImageElement | null>(null);
-    const [imageUrl, setImageUrl] = useState<string | null>(null);
     const canvasInstanceRef = useRef<Canvas | null>(null);
+    const imageObjectUrlRef = useRef<string | null>(null);
 
     useEffect(() => {
         const canvasElement = canvasRef.current;
@@ -34,6 +32,16 @@ export const CanvasProvider: React.FC<{
             canvasInstanceRef.current = new Canvas(canvasElement);
         }
     }, [canvasRef]);
+
+    useEffect(()=>{
+        return () => {
+            // revoke the last object url on unmount
+            if (imageObjectUrlRef.current) {
+                URL.revokeObjectURL(imageObjectUrlRef.current);
+                imageObjectUrlRef.current = null;
+            }
+        }
+    }, []);
 
     const loadImage = (url: string) =>
         new Promise<HTMLImageElement>((resolve, reject) => {
@@ -64,21 +72,25 @@ export const CanvasProvider: React.FC<{
         console.log('✅ Canvas instance ready');
 
         let img: HTMLImageElement;
-        let revokeUrl: string | undefined; // for cleaning blob/object urls from inputs
 
         if (src instanceof HTMLImageElement) {
             img = src;
         } else if (typeof src === 'string') {
             img = await loadImage(src);
+        } else if (src instanceof File) {
+            if (imageObjectUrlRef.current){
+                URL.revokeObjectURL(imageObjectUrlRef.current);
+                imageObjectUrlRef.current = null;
+            }
+            imageObjectUrlRef.current = URL.createObjectURL(src);
+
+            img = await loadImage(imageObjectUrlRef.current);
         } else {
-            const objectUrl = URL.createObjectURL(src);
-            revokeUrl = objectUrl;
-            img = await loadImage(objectUrl);
+            console.error('❌ Unsupported image source type');
+            return;
         }
 
-        setImageElement(img);
-        setImageUrl(img.currentSrc || img.src);
-        
+        setImageElement(img); 
 
         canvas.reset();
         canvas.setDimensions(img.naturalWidth, img.naturalHeight);
@@ -86,16 +98,14 @@ export const CanvasProvider: React.FC<{
 
         console.log('✅ Image drawn:', img.naturalWidth, 'x', img.naturalHeight);
 
-        if (revokeUrl) URL.revokeObjectURL(revokeUrl);
     }, [canvasRef]);
 
     return (
         <CanvasContext.Provider value={{ 
             canvasInstance: canvasInstanceRef.current,
             imageElement,
+            imageObjectUrlRef,
             setImageElement,
-            imageUrl,
-            setImageUrl,
             writeImage
         }}>
             {children}
