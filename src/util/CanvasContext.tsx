@@ -77,7 +77,7 @@ export const CanvasProvider: React.FC<{
             img = src;
         } else if (typeof src === 'string') {
             img = await loadImage(src);
-        } else {
+        } else if (src instanceof File) {
             if (imageObjectUrlRef.current){
                 URL.revokeObjectURL(imageObjectUrlRef.current);
                 imageObjectUrlRef.current = null;
@@ -85,6 +85,9 @@ export const CanvasProvider: React.FC<{
             imageObjectUrlRef.current = URL.createObjectURL(src);
 
             img = await loadImage(imageObjectUrlRef.current);
+        } else {
+            console.error('❌ Unsupported image source type');
+            return;
         }
 
         setImageElement(img); 

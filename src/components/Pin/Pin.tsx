@@ -87,7 +87,6 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
         if (initializedRef.current || !canvasInstance || !pin.coordinates) {
             return;
         }
-
         const color = readColorSafe(canvasInstance, pin.coordinates);
 
         if (color){
@@ -197,14 +196,11 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
                 data-testid='pin-with-draggable'
                 ref={nodeRef}
                 style={{
-
-                    // '--pin-color': pin.color ? rgbToString(pin.color) : 'transparent',
-                    // '--pin-opacity': isActive ? 1 : 0.3,
-                    // When pin is stationary, show just color. when dragging, show zoomed image
                     width: getPinSize(),
                     height: getPinSize(),
                     backgroundColor: !isDragging && pin.color ? rgbToString(pin.color) : 'transparent',
                     opacity: isActive ? 1 : 0.3,
+                    // When pin is stationary, show just color. when dragging, show zoomed image
                     ...(isDragging && pin.coordinates ? getZoomStyle(pin.coordinates) : {}),
                 } as React.CSSProperties}
             />

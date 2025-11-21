@@ -4,22 +4,30 @@
     border-radius: 50%;
     z-index: 9999;
     pointer-events: auto;
-    // background-color: var(--pin-color, transparent);
-    // //transform: translate(-50%, -50%); // Center the pin on its coordinates
-    // opacity: var(--pin-opacity, 1);
+    cursor: grab;
+    box-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
 }
 
-// .pin-zoom-preview-container{
-//     position: absolute;
-//     top: 10px;
-//     left: 10px;
-//     display: flex;
-//     align-items: center;
-//     flex-direction: column;
-//     z-index: 100;
-// }
-
 .pin.pin-active {
-    box-shadow: 0 0 6px rgba(0,0,0,.35);
-    background-clip: padding-box;
+    cursor: none;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+
+    // Center marker
+    &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 5px;
+        height: 5px;
+        border: none;
+        background: transparent;
+        border-radius: 50%;
+        box-shadow:
+        // white border for visibility on dark colors
+        // black border for visibility on light colors
+            0 0 0 0.5px white,
+            0 0 0 1px black,
+    }
 }
