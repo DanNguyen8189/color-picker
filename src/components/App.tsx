@@ -3,8 +3,9 @@ import Slider from './Slider/Slider';
 import { ImageUploader } from './ImageUploader/ImageUploader';
 import type { ImagePin } from "../util/Types";
 import { PinOverlay } from './PinOverlay/PinOverlay';
-import { Palette } from './Pallete/Pallete';
+import { Palette } from './Palette/Palette';
 import { useCanvas, CanvasProvider } from '../util';
+import './App.scss';
 
 // Separate component to use the canvas context: CanvasProvider
 // wraps around this. Before when we had 1 component, the context
@@ -13,7 +14,7 @@ import { useCanvas, CanvasProvider } from '../util';
 // When you have a component that both provides and consumes a context,
 // React's rendering order causes problems. (in original attempt, useCanvas was 
 // called before <CanvasProvider>)
-function HomeContent({
+function AppContent({
     canvasRef
 }: { canvasRef: React.RefObject<HTMLCanvasElement | null> }) {
     const { imageObjectUrlRef } = useCanvas();
@@ -26,51 +27,47 @@ function HomeContent({
     const handleSlide = (num: number) => setCount(num);
 
     return (
-        <div>
-        {/* <ImageUploader handlePickImage={handlePickImage} /> */}
-        <ImageUploader />
-        {imageObjectUrlRef.current && <Slider handleSlide={handleSlide} />}
-        {/* {imageObjectUrlRef.current && ( */}
-        {/* trying to conditional render with jsx (imageObjectUrlRef.current && ...) 
-        had a race condition where <canvas> might not have mounted before 
-        writeImage was called. So instead always render the canvas, 
-        but hide with css if there's no imageUrl
-        */}
-            <div style={{ display: imageObjectUrlRef.current ? 'block' : 'none'}}>
-            <div
-            ref={containerRef}
-            style={{ position: 'relative', display: 'inline-block', width: '50%' }}
+        <div className="app">
+            <h1>Colorsmosis</h1>
+            <section className="canvas-panel">
+            <ImageUploader />
+            {imageObjectUrlRef.current && <Slider handleSlide={handleSlide} />}
+            {/* {imageObjectUrlRef.current && ( */}
+            {/* trying to conditional render with jsx (imageObjectUrlRef.current && ...) 
+            had a race condition where <canvas> might not have mounted before 
+            writeImage was called. So instead always render the canvas, 
+            but hide with css if there's no imageUrl
+            */}
+            {/* <div style={{ display: imageObjectUrlRef.current ? 'block' : 'none'}}> */}
+            <div 
+                ref={containerRef}
+                className="canvas-container"
+                style={{ display: imageObjectUrlRef.current ? 'block' : 'none'}}
             >
-            <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex' }}>
+                {/* <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex' }}> */}
                 <canvas
-                ref={canvasRef}
-                style={{
-                    position: 'relative',
-                    width: '100%',
-                    height: '100%',
-                    top: 0,
-                    left: 0,
-                    zIndex: 1,
-                    touchAction: 'none',
-                    objectFit: 'cover'
-                }}
+                    className='canvas'
+                    ref={canvasRef}
                 />
-            </div>
+                {/* </div> */}
             <PinOverlay count={count} setPinsParent={setPins} />
             </div>
+            </section>
+            <section className="palette-panel">
             <Palette Pins={pins} />
-            </div>
+            </section>
+            {/* </div> */}
         {/* )} */}
         </div>
     );
 }
 
-export default function Home() {
+export default function App() {
     const canvasRef = useRef<HTMLCanvasElement | null>(null);
     return (
         // Provider component; creates context for child components to consume
         <CanvasProvider canvasRef={canvasRef}>
-            <HomeContent canvasRef={canvasRef} />
+            <AppContent canvasRef={canvasRef} />
         </CanvasProvider>
     );
 }

@@ -1,6 +1,7 @@
 import React from 'react';
 import type { ImagePin } from '../../util/Types';
 import { rgbToString, rgbToHex, type RGB } from '../../util/Types';
+import './Palette.scss';
 
 type PaletteProps = {
     Pins: ImagePin[]
@@ -18,12 +19,14 @@ export const Palette: React.FC<PaletteProps> = ({ Pins }) => {
         <div>
             <p>Open your pallete in Coolors!</p>
             <p><a href={getCoolorsUrl(Pins)} target="_blank" rel="noopener noreferrer">View Palette</a></p>
+            <div className="palette-grid">
             {Pins.map((pin) => (
-                <div key={pin.id} style={{ backgroundColor: rgbToString(pin.color), width: '100px', height: '100px', margin: '5px' }}>
+                <div key={pin.id} className="swatch" style={{ backgroundColor: rgbToString(pin.color), width: '100px', height: '100px', margin: '5px' }}>
                     <p>{rgbToString(pin.color)}</p>
                     <p>{rgbToHex(pin.color)}</p>
                 </div>
             ))}
+            </div>
         </div>
     );
 }

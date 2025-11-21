@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
-// function Slider({sendData}: {sendData: (value:number) => void}) {
+import  { useState } from 'react';
+import './Slider.scss';
 function Slider({handleSlide}: {handleSlide: (value:number) => void}) {
     const [value, setValue] = useState(1);
 
     return (
-        <div>
+        <div className='slider-container'>
            {/* <input
                type="range"
                min="1"
@@ -12,6 +12,7 @@ function Slider({handleSlide}: {handleSlide: (value:number) => void}) {
                value={value}
                onChange={(e) => setValue(+e.target.value)}
            />  */}
+            <label>Color Count: </label>
             <input 
                 type="range"
                 min="1"
@@ -23,8 +24,7 @@ function Slider({handleSlide}: {handleSlide: (value:number) => void}) {
                 }
                 }
             />
-            <p>Color count: {value}</p>
-
+            <label>{value}</label>
     </div>
    );
 }
