@@ -14,10 +14,10 @@ type PinProps = {
     onStart: () => void
     onDrag: (e: any, pin: ImagePin) => void
     onStop: () => void
-    isActive: boolean
+    isDimmed: boolean
 }
 
-export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onStop, isActive }) => {
+export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onStop, isDimmed }) => {
     // NodeRef required for react-draggable
     const nodeRef = useRef<HTMLDivElement | null>(null);
 
@@ -179,18 +179,6 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
             onDrag={handleDrag}
             onStop={handleDragStop}
         >
-            {/* <div
-                className={`pin ${isDragging ? 'pin-active' : ''}`}
-                data-testid='pin-with-draggable'
-                ref={nodeRef}
-                style={{
-                    '--pin-color': pin.color ? rgbToString(pin.color) : 'transparent',
-                    '--pin-opacity': isActive ? 1 : 0.3,
-                    backgroundColor: pin.color ? rgbToString(pin.color) : 'transparent',
-                    opacity: isActive ? 1 : 0.3,
-                    backgroundImage: isDragging ? `url(${imageObjectUrlRef.current})` : 'none',
-                } as React.CSSProperties}
-            /> */}
             <div
                 className={`pin ${isDragging ? 'pin-active' : ''}`}
                 data-testid='pin-with-draggable'
@@ -199,7 +187,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
                     width: getPinSize(),
                     height: getPinSize(),
                     backgroundColor: !isDragging && pin.color ? rgbToString(pin.color) : 'transparent',
-                    opacity: isActive ? 1 : 0.3,
+                    opacity: isDimmed ? 0.3 : 1,
                     // When pin is stationary, show just color. when dragging, show zoomed image
                     ...(isDragging && pin.coordinates ? getZoomStyle(pin.coordinates) : {}),
                 } as React.CSSProperties}

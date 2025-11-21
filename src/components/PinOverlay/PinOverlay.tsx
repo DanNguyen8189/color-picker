@@ -229,7 +229,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
                             onStart={() => handleDragStart(pin.id)}
                             onDrag={(e: any, updatedPin: ImagePin) => handleDrag(e, updatedPin)}
                             onStop={handleDragStop}
-                            isActive={activePinId == null ? true : activePinId === pin.id}
+                            isDimmed={activePinId == null ? false : !(activePinId === pin.id)}
                         />
                     );
                 })}

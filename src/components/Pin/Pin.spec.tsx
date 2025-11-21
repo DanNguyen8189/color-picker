@@ -103,7 +103,7 @@ describe('Pin Component', () => {
                 onStart={() => {}}
                 onDrag={() => {}}
                 onStop={() => {}}
-                isActive={true}
+                isDimmed={false}
             />
         )
 
@@ -123,7 +123,7 @@ describe('Pin Component', () => {
                 onStart={() => {}}
                 onDrag={() => {}}
                 onStop={() => {}}
-                isActive={true}
+                isDimmed={false}
             />
         )
 
@@ -152,7 +152,7 @@ describe('Pin Component', () => {
                 onStart={() => {}}
                 onDrag={handleDrag}
                 onStop={() => {}}
-                isActive={true}
+                isDimmed={false}
             />
         );
     };
@@ -178,7 +178,7 @@ describe('Pin Component', () => {
     //             onStart={() => {}}
     //             onDrag={() => {}}
     //             onStop={() => {}}
-    //             isActive={true}
+    //             isDimmed={false}
     //         />
     //     );
 
@@ -200,7 +200,7 @@ describe('Pin Component', () => {
                 onStart={() => {}}
                 onDrag={onDragMock}
                 onStop={() => {}}
-                isActive={true}
+                isDimmed={false}
             />
         )
         await waitFor(() => {
@@ -226,7 +226,7 @@ describe('Pin Component', () => {
                 onStart={() => {}}
                 onDrag={onDragMock}
                 onStop={() => {}}
-                isActive={true}
+                isDimmed={false}
             />
         )
 
