@@ -208,8 +208,6 @@ describe('PinOverlay Component', () => {
             // once when mounted, then once after pins are generated
         });
 
-
-        
         //  Trigger the 'canvasDrawn' event to simulate an image change.
         //  Find the registered 'canvasDrawn' event handler and call it to simulate the event.
         //  Since we mocked the 'on' method, we can inspect its calls to find our handler.

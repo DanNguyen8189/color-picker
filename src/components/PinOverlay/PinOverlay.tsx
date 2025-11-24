@@ -25,7 +25,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
     const [Draggable, setDraggable] = useState<typeof import('react-draggable')['default'] | null>(null);
     // Dynamically import react-draggable to avoid SSR issues
 
-    const { canvasInstance, imageElement } = useCanvas();
+    const { canvasInstance } = useCanvas();
     useEffect(() => {
         let mounted = true; // prevent calling setState on unmounted component
         import('react-draggable')
@@ -95,12 +95,6 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
             window.removeEventListener('resize', handleResize);
         };
     }, [canvasInstance, count]);
-
-    // useEffect(() =>{
-    //     if (bounds.width > 0 && bounds.height > 0) {
-    //         generatePins(count);
-    //     }
-    // }, [count]);
 
     useEffect(() => {
         shiftPinPositions();
