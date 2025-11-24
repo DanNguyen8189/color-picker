@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Pin } from '../Pin/Pin';
-import type { RGB, ImagePin, Image } from "../../util";
+import type { RGB, ImagePin, Image, Coordinates } from "../../util";
 import './PinOverlay.scss';
 import { useCanvas } from '../../util/CanvasContext';
 
@@ -27,7 +27,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
     const [Draggable, setDraggable] = useState<typeof import('react-draggable')['default'] | null>(null);
     // Dynamically import react-draggable to avoid SSR issues
 
-    const { canvasInstance } = useCanvas();
+    const { canvasInstance, imageElement } = useCanvas();
     useEffect(() => {
         let mounted = true; // prevent calling setState on unmounted component
         import('react-draggable')
@@ -54,18 +54,129 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
     }, []);
 
 
+    // useEffect(() => {
+    //     // attaches event listener 'canvasDrawn' once, when canvasInstanceRef.current becomes available
+    //     if (!canvasInstance || typeof canvasInstance.on !== 'function') return;
+
+    //     const syncBounds = () => {
+    //         setBounds(prev =>{
+    //             const canvasBounds = canvasInstance.getBounds();
+    //             if (prev.width == canvasBounds.width && prev.height == canvasBounds.height){
+    //                 return prev;
+    //             }
+    //             else{
+    //                 //console.log('PinOverlay syncBounds set:', canvasBounds);
+    //                 return canvasBounds
+    //             }
+    //         })
+    //     };
+    //     const handleCanvasDrawn = () => {
+    //         // regenerate pins now that new canvas/image has been drawn
+    //         // w/o this, pins remain in old positions/colors on the previous image
+
+    //         syncBounds();
+    //         generatePins(count);
+    //     };
+
+    //     // Listen for window resize
+    //     const handleResize = () => {
+    //         syncBounds();
+    //     };
+
+
+    //     // If this is a newly-created Canvas instance, call generatePins once
+    //     // covers case where any image is uploaded for the first time. 
+    //     // since we also want to generate pins the same time we attach the handler
+    //     // if (attachedCanvasRef.current !== canvas) {
+    //     //     attachedCanvasRef.current = canvas;
+    //     //     generatePins(count);
+    //     // }
+    //     //generatePins(count);
+
+    //     //generate pins when canvas is ready
+    //     if (canvasInstance.getBounds().width > 0) {
+    //         syncBounds();
+    //         generatePins(count);
+    //     }
+    //     canvasInstance.on('canvasDrawn', handleCanvasDrawn);
+    //     window.addEventListener('resize', handleResize);
+    //     return () => {
+    //         canvasInstance.off('canvasDrawn', handleCanvasDrawn);
+    //         window.removeEventListener('resize', handleResize);
+    //     };
+    // // count is needed here as a deps to ensure pins are regenerated.
+    // // without it, when a new image comes into play, the handleCanvasDrawn handler calls 
+    // // generatePins with a stale closure - in our case, whatever value count had when the 
+    // // effect first ran (1), every single time. So basically every time
+    // // we uploaded a new image, we'd start again with one pin until we dragged the count slider.
+    // // There was also a case where generatePins wouldn't get called at all and
+    // // pins from the previous image would persist on the new image
+    // }, [canvasInstance, count]);
+
+//    useEffect(() => {
+//         if (!canvasInstance) return;
+//         const handleResize = () => {
+//             const canvasBounds = canvasInstance.getBounds();
+//             setBounds(prev => 
+//                 prev.width === canvasBounds.width && prev.height === canvasBounds.height
+//                     ? prev
+//                     : canvasBounds
+//             );
+//         };
+//         const handleCanvasDrawn = () => {
+//             // regenerate pins now that new canvas/image has been drawn
+//             // w/o this, pins remain in old positions/colors on the previous image
+
+//             generatePins(count);
+//         };
+//         window.addEventListener('resize', handleResize);
+//         canvasInstance.on('canvasDrawn', handleCanvasDrawn);
+//         return () => {
+//             canvasInstance.off('canvasDrawn', handleCanvasDrawn);
+//             window.removeEventListener('resize', handleResize)
+//         };
+//    }, [canvasInstance, count]);
+
+//     useEffect(() => {
+//         if (!imageElement) return;
+//         if (imageElement.naturalWidth > 0 && imageElement.naturalHeight > 0) {
+//             setBounds({
+//                 width: imageElement.naturalWidth,
+//                 height: imageElement.naturalHeight
+//             });
+//         }
+//     }, [imageElement]);
+
+//     // // If bounds got set from imageElement and no pins yet, generate them
+//     // useEffect(() => {
+//     //     if (bounds.width > 0 && bounds.height > 0 && canvasInstance) {
+//     //         generatePins(count);
+//     //     }
+//     // }, [bounds, canvasInstance, count]);
+//     // If bounds got set from imageElement and no pins yet, generate them
+//     // useEffect(() => {
+//     //     if (bounds.width > 0 && bounds.height > 0 && canvasInstance) {
+//     //         generatePins(count);
+//     //     }
+//     // }, [canvasInstance, count]);
+
+//     useEffect(() => {
+//         shiftPinPositions();
+//     }, [bounds]);
+
     useEffect(() => {
         // attaches event listener 'canvasDrawn' once, when canvasInstanceRef.current becomes available
         if (!canvasInstance || typeof canvasInstance.on !== 'function') return;
 
         const syncBounds = () => {
+            //setOldBounds(bounds);
             setBounds(prev =>{
                 const canvasBounds = canvasInstance.getBounds();
                 if (prev.width == canvasBounds.width && prev.height == canvasBounds.height){
                     return prev;
                 }
                 else{
-                    //console.log('PinOverlay syncBounds set:', canvasBounds);
+                    console.log('PinOverlay syncBounds set:', canvasBounds);
                     return canvasBounds
                 }
             })
@@ -75,6 +186,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
             // w/o this, pins remain in old positions/colors on the previous image
 
             syncBounds();
+            //console.log("generating pins on canvas drawn, count:", count);
             generatePins(count);
         };
 
@@ -83,19 +195,10 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
             syncBounds();
         };
 
-
-        // If this is a newly-created Canvas instance, call generatePins once
-        // covers case where any image is uploaded for the first time. 
-        // since we also want to generate pins the same time we attach the handler
-        // if (attachedCanvasRef.current !== canvas) {
-        //     attachedCanvasRef.current = canvas;
-        //     generatePins(count);
-        // }
-        //generatePins(count);
-
         //generate pins when canvas is ready
         if (canvasInstance.getBounds().width > 0) {
             syncBounds();
+            console.log("generating pins on canvas ready, count:", count);
             generatePins(count);
         }
         canvasInstance.on('canvasDrawn', handleCanvasDrawn);
@@ -104,41 +207,63 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
             canvasInstance.off('canvasDrawn', handleCanvasDrawn);
             window.removeEventListener('resize', handleResize);
         };
-    // count is needed here as a deps to ensure pins are regenerated.
-    // without it, when a new image comes into play, the handleCanvasDrawn handler calls 
-    // generatePins with a stale closure - in our case, whatever value count had when the 
-    // effect first ran (1), every single time. So basically every time
-    // we uploaded a new image, we'd start again with one pin until we dragged the count slider.
-    // There was also a case where generatePins wouldn't get called at all and
-    // pins from the previous image would persist on the new image
     }, [canvasInstance, count]);
 
-    useEffect(() => {
-        shiftPinPositions();
-    }, [bounds]);
+    // useEffect(() =>{
+    //     if (bounds.width > 0 && bounds.height > 0) {
+    //         generatePins(count);
+    //     }
+    // }, [count]);
+
+    // useEffect(() => {
+    //     shiftPinPositions();
+    //     console.log("pins shifted", pins.map(p => p.coordinates));
+    // }, [bounds]);
 
     useEffect(() => {
         //if (pins.length) setPinsParent(pins);
         setPinsParent(pins);
+        console.log("canvas size in pinoverlay", bounds);
+        console.log("pins in pinoverlay", pins);
     }, [pins]);
 
     const handleDragStart = (id: string) => {
         setActivePinId(id);
     };
 
-    // const handleDrag = (e: any, color:RGB, id:string) => {
-    //     setPins(prevPins => prevPins.map(pin => {
-    //         if (pin.id === id) {
-    //             return {
-    //                 ...pin,
-    //                 color: color,
-    //             };
-    //         }
-    //         return pin;
-    //     }));
-    // };
+    const warnOnceRef = React.useRef(false); // per-pin instance ref that persists
+    // across renders, to avoid spamming console with CORS warnings. 
+    // A reg boolean would rerender the component every time
+    const readColorSafe = (coords: Coordinates): RGB | undefined => {
+        if (!canvasInstance) return undefined;
+        try {
+            return canvasInstance.getPixelColor(coords);
+        } catch (e) {
+            if (!warnOnceRef.current) {
+                console.warn('Pixel read failed (canvas possibly not ready or CORS-related).', e);
+                warnOnceRef.current = true;
+            }
+            return undefined;
+        }
+    };
     const handleDrag = (e: any, pin: ImagePin) => {
-        setPins(prevPins => prevPins.map(p => p.id === pin.id ? pin : p));
+        // update controlled position and color on drag
+        if (!canvasInstance) return;
+
+        //prevents updates that might cause rerender infinite loops in testing
+        //setCoordinates -> rerenders Pin -> mock calls ondrag again -> setcoordinates called
+        // again
+        const coordinates = pin.coordinates;
+        
+        const newColor = readColorSafe(coordinates);;
+
+        if (newColor && newColor !== pin.color){
+            const updatedPin: ImagePin = {
+                ...pin,
+                color: newColor,
+            }
+            setPins(prevPins => prevPins.map(p => p.id === pin.id ? updatedPin : p));
+        }
     };
 
     const handleDragStop = () => {
@@ -146,8 +271,10 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
     }
 
     const generatePins = (amount:number) => {
+        console.log("generating pins:", amount);
         if (!canvasInstance) return;
-        if (bounds.width <= 0 || bounds.height <= 0) return;
+        //if (bounds.width <= 0 || bounds.height <= 0) return;
+        if (canvasInstance.getBounds().width <= 0 || canvasInstance.getBounds().height <= 0) return;
 
         setPins(prev => {
             // remove extra pins
@@ -172,20 +299,21 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
                 }
                 return newPins;
             }
-
             return prev;
         });
     }
 
     const createPin = (): ImagePin => {
+        if (!canvasInstance) throw new Error("Canvas instance not available when creating pin.");
         const id = crypto && typeof crypto.randomUUID === 'function'
             ? crypto.randomUUID()
             : String(Date.now()) + Math.random().toString(36).slice(2,7);
-        const positionX = Math.random() * bounds.width;
-        const positionY = Math.random() * bounds.height;
+        const positionX = Math.random() * canvasInstance.getBounds().width;
+        const positionY = Math.random() * canvasInstance.getBounds().height;
+        const color = readColorSafe( {x: positionX, y: positionY} );
         const newPin: ImagePin = {
             id: id,
-            color: undefined,
+            color: color,
             coordinates: {x: positionX, y: positionY}
         };
         return newPin;

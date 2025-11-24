@@ -28,7 +28,7 @@ function AppContent({
 
     return (
         <div className="app">
-            <h1>Colorsmosis</h1>
+            <h1 className="title">Colorsmosis</h1>
             <section className="canvas-panel">
             <ImageUploader />
             {imageObjectUrlRef.current && <Slider handleSlide={handleSlide} />}
