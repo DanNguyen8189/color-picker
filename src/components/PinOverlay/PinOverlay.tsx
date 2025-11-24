@@ -215,10 +215,10 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
     //     }
     // }, [count]);
 
-    // useEffect(() => {
-    //     shiftPinPositions();
-    //     console.log("pins shifted", pins.map(p => p.coordinates));
-    // }, [bounds]);
+    useEffect(() => {
+        shiftPinPositions();
+        //console.log("pins shifted", pins.map(p => p.coordinates));
+    }, [bounds]);
 
     useEffect(() => {
         //if (pins.length) setPinsParent(pins);
