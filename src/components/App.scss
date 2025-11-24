@@ -39,8 +39,8 @@ section {
     position: relative;
     display: inline-block;
     width: 100%;
-    border: 1px solid $border;
-    border-radius: 6px;
+    //border: 1px solid $border;
+    //border-radius: 6px;
     //overflow: hidden;
 }
 
@@ -49,6 +49,9 @@ section {
     width: 100%;
     height: auto;
     object-fit: cover;
+    border: 1px solid $border;
+    border-radius: 6px;
+    display: block;
     // top: 0;
     // left: 0;
     // touch-action: none;

@@ -24,24 +24,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
     const [isDragging, setIsDragging] = useState<boolean>(false);
     const [lastColor, setLastColor] = useState<RGB | undefined>(pin.color);
 
-    const warnOnceRef = React.useRef(false); // per-pin instance ref that persists
-    // across renders, to avoid spamming console with CORS warnings. 
-    // A reg boolean would rerender the component every time
-
     const { canvasInstance, imageObjectUrlRef } = useCanvas();
-    const initializedRef = React.useRef(false);
-    
-    // const readColorSafe = (canvas: Canvas, coords: Coordinates): RGB | undefined => {
-    //     try {
-    //         return canvas.getPixelColor(coords);
-    //     } catch (e) {
-    //         if (!warnOnceRef.current) {
-    //             console.warn('Pixel read failed (canvas possibly not ready or CORS-related).', e);
-    //             warnOnceRef.current = true;
-    //         }
-    //         return undefined;
-    //     }
-    // };
 
     const getBounds = (): { left: number; right: number; top: number; bottom: number } => {
         if (!canvasInstance) return { left: 0, right: 0, top: 0, bottom: 0 };
@@ -83,61 +66,11 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
         };
     };
 
-    // useEffect(() => {
-    //     if (initializedRef.current || !canvasInstance || !pin.coordinates) {
-    //         return;
-    //     }
-    //     const color = readColorSafe(canvasInstance, pin.coordinates);
-
-    //     if (color){
-    //         onDrag(undefined, {...pin, color: color})
-    //         setLastColor(color);
-    //     }
-    //     initializedRef.current = true;
-
-    //     // cleanup function (runs when the component is unmounted)
-    //     return () => {
-    //     };
-    // }, [canvasInstance, pin.coordinates.x, pin.coordinates.y]);
-
-
     const handleDragStart = (e: any) => {
         console.log("image:", imageObjectUrlRef.current);
         setIsDragging(true);
         onStart();
     }
-
-    //const handleDrag = (e:any, data:DraggableData): void => {
-        // // update controlled position and color on drag
-        // if (!canvasInstance) return;
-
-        // //prevents updates that might cause rerender infinite loops in testing
-        // //setCoordinates -> rerenders Pin -> mock calls ondrag again -> setcoordinates called
-        // // again
-        // const coordinates = pin.coordinates;
-        // if (coordinates && data.x === coordinates.x && data.y === coordinates.y) return;
-        
-        // const canvas = canvasInstance;
-        // const newColor = readColorSafe(canvas, { x: data.x, y: data.y });;
-
-        // if (newColor && newColor !== pin.color){
-        //     const updatedPin: ImagePin = {
-        //         ...pin,
-        //         color: newColor,
-        //         coordinates:{x: data.x, y: data.y}
-        //     }
-
-        //     onDrag(e, updatedPin);
-        // }
-        // else {
-        //     const updatedPin: ImagePin = {
-        //         ...pin,
-        //         coordinates:{x: data.x, y: data.y}
-        //     }
-
-        //     onDrag(e, updatedPin);
-        // }
-    //};
 
     const handleDrag = (e:any, data:DraggableData): void => {
         if (pin.coordinates && data.x === pin.coordinates.x && data.y === pin.coordinates.y) return;

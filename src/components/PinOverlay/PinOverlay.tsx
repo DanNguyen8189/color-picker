@@ -6,11 +6,9 @@ import { useCanvas } from '../../util/CanvasContext';
 
 type PinOverlayProps = {
     count: number,
-
     setPinsParent: React.Dispatch<React.SetStateAction<ImagePin[]>>
 }
 
-// function PinOverlay({ count, canvasInstanceRef, setPinsParent }: PinOverlayProps) {
 export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) => {
     // for keeping track of current canvas size for pin repositioning. Needed state to put in useEffect deps;
     // using canvasInstance.getBounds() directly in useEffect would cause it to fire on every render
@@ -52,117 +50,6 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
             });
         return () => { mounted = false; };
     }, []);
-
-
-    // useEffect(() => {
-    //     // attaches event listener 'canvasDrawn' once, when canvasInstanceRef.current becomes available
-    //     if (!canvasInstance || typeof canvasInstance.on !== 'function') return;
-
-    //     const syncBounds = () => {
-    //         setBounds(prev =>{
-    //             const canvasBounds = canvasInstance.getBounds();
-    //             if (prev.width == canvasBounds.width && prev.height == canvasBounds.height){
-    //                 return prev;
-    //             }
-    //             else{
-    //                 //console.log('PinOverlay syncBounds set:', canvasBounds);
-    //                 return canvasBounds
-    //             }
-    //         })
-    //     };
-    //     const handleCanvasDrawn = () => {
-    //         // regenerate pins now that new canvas/image has been drawn
-    //         // w/o this, pins remain in old positions/colors on the previous image
-
-    //         syncBounds();
-    //         generatePins(count);
-    //     };
-
-    //     // Listen for window resize
-    //     const handleResize = () => {
-    //         syncBounds();
-    //     };
-
-
-    //     // If this is a newly-created Canvas instance, call generatePins once
-    //     // covers case where any image is uploaded for the first time. 
-    //     // since we also want to generate pins the same time we attach the handler
-    //     // if (attachedCanvasRef.current !== canvas) {
-    //     //     attachedCanvasRef.current = canvas;
-    //     //     generatePins(count);
-    //     // }
-    //     //generatePins(count);
-
-    //     //generate pins when canvas is ready
-    //     if (canvasInstance.getBounds().width > 0) {
-    //         syncBounds();
-    //         generatePins(count);
-    //     }
-    //     canvasInstance.on('canvasDrawn', handleCanvasDrawn);
-    //     window.addEventListener('resize', handleResize);
-    //     return () => {
-    //         canvasInstance.off('canvasDrawn', handleCanvasDrawn);
-    //         window.removeEventListener('resize', handleResize);
-    //     };
-    // // count is needed here as a deps to ensure pins are regenerated.
-    // // without it, when a new image comes into play, the handleCanvasDrawn handler calls 
-    // // generatePins with a stale closure - in our case, whatever value count had when the 
-    // // effect first ran (1), every single time. So basically every time
-    // // we uploaded a new image, we'd start again with one pin until we dragged the count slider.
-    // // There was also a case where generatePins wouldn't get called at all and
-    // // pins from the previous image would persist on the new image
-    // }, [canvasInstance, count]);
-
-//    useEffect(() => {
-//         if (!canvasInstance) return;
-//         const handleResize = () => {
-//             const canvasBounds = canvasInstance.getBounds();
-//             setBounds(prev => 
-//                 prev.width === canvasBounds.width && prev.height === canvasBounds.height
-//                     ? prev
-//                     : canvasBounds
-//             );
-//         };
-//         const handleCanvasDrawn = () => {
-//             // regenerate pins now that new canvas/image has been drawn
-//             // w/o this, pins remain in old positions/colors on the previous image
-
-//             generatePins(count);
-//         };
-//         window.addEventListener('resize', handleResize);
-//         canvasInstance.on('canvasDrawn', handleCanvasDrawn);
-//         return () => {
-//             canvasInstance.off('canvasDrawn', handleCanvasDrawn);
-//             window.removeEventListener('resize', handleResize)
-//         };
-//    }, [canvasInstance, count]);
-
-//     useEffect(() => {
-//         if (!imageElement) return;
-//         if (imageElement.naturalWidth > 0 && imageElement.naturalHeight > 0) {
-//             setBounds({
-//                 width: imageElement.naturalWidth,
-//                 height: imageElement.naturalHeight
-//             });
-//         }
-//     }, [imageElement]);
-
-//     // // If bounds got set from imageElement and no pins yet, generate them
-//     // useEffect(() => {
-//     //     if (bounds.width > 0 && bounds.height > 0 && canvasInstance) {
-//     //         generatePins(count);
-//     //     }
-//     // }, [bounds, canvasInstance, count]);
-//     // If bounds got set from imageElement and no pins yet, generate them
-//     // useEffect(() => {
-//     //     if (bounds.width > 0 && bounds.height > 0 && canvasInstance) {
-//     //         generatePins(count);
-//     //     }
-//     // }, [canvasInstance, count]);
-
-//     useEffect(() => {
-//         shiftPinPositions();
-//     }, [bounds]);
 
     useEffect(() => {
         // attaches event listener 'canvasDrawn' once, when canvasInstanceRef.current becomes available
@@ -322,9 +209,6 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
     const shiftPinPositions = () => {
         if (!canvasInstance) return;
         setOldBounds(bounds);
-        // if (bounds.width === 0 || bounds.height === 0) return;
-        // if (oldBounds.width === 0 || oldBounds.height === 0) return;
-        // if (oldBounds.width === bounds.width && oldBounds.height === bounds.height) return;
 
         if ((bounds.width === 0 || bounds.height === 0) ||
             (oldBounds.width === 0 || oldBounds.height === 0) || 
@@ -365,4 +249,3 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
         </div>
     );
 }
-// export default PinOverlay;
