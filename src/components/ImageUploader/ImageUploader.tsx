@@ -4,7 +4,7 @@ import { useCanvas } from '../../util/';
 export const ImageUploader: React.FC = () => {
     const { writeImage } = useCanvas();
     return (
-        <div>
+        <div className='image-uploader'>
             <label htmlFor="file">Choose Image</label>
             <input
                 type="file"

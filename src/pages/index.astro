@@ -2,9 +2,7 @@
 import Welcome from '../components/Welcome.astro';
 import Layout from '../layouts/Layout.astro';
 // import ImageUploader from '../components/ImageUploader.astro';
-import ImageUploader from '../components/ImageUploader/ImageUploader';
-import Slider from '../components/Slider/Slider';
-import Home from '../components/Home';
+import App from '../components/App';
 
 
 // Welcome to Astro! Wondering what to do next? Check out the Astro documentation at https://docs.astro.build
@@ -14,17 +12,17 @@ import Home from '../components/Home';
 <Layout>
 	<!-- <Welcome /> -->
 	<section>
-		<h1>Colorsmosis</h1>
+		<!-- <h1>Colorsmosis</h1> -->
 		<!-- <ImageUploader client:load/> -->
 		<!-- <Slider client:load/> -->
 		<!-- <ImageUploader client:load/> -->
-		<Home client:load/>
+		<App client:load/>
 		<!-- <Buttonclicktest client:load> -->
 	</section>
 </Layout>
 
 <style is:global>
-	html {
+	/* html {
 		font-family: Arial, sans-serif;
 		background-color: #f0f0f0;
 	}
@@ -69,5 +67,5 @@ import Home from '../components/Home';
 		padding: 0;
 		margin: 0;
 		list-style-type: none;
-	}
+	} */
 </style>
