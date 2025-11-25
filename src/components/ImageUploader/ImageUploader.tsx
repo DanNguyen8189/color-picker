@@ -1,11 +1,12 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useCanvas } from '../../util/';
+import './ImageUploader.scss';
 // export function ImageUploader({ handlePickImage }: { handlePickImage: (image: File) => void }) {
 export const ImageUploader: React.FC = () => {
     const { writeImage } = useCanvas();
     return (
         <div className='image-uploader'>
-            <label htmlFor="file">Choose Image</label>
+            <label className="choose-image-txt"htmlFor="file">Choose Image</label>
             <input
                 type="file"
                 name="myImage"

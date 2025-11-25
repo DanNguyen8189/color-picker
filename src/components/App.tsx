@@ -54,7 +54,7 @@ function AppContent({
             </div>
             </section>
             <section className="palette-panel">
-            <Palette Pins={pins} />
+                <Palette Pins={pins} />
             </section>
             {/* </div> */}
         {/* )} */}
