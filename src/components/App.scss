@@ -8,19 +8,58 @@ $border: #262626;
 body, html, .app {
     background-color: $app-bg;
     font-family: Arial, sans-serif;
-    color: blue;
+    color: white;
     height: 100vh;
     width: 100vw;
     display: flex;
     flex-direction: column;
     align-items: center;
+    justify-content: center;
+    padding-top: 1rem;
     //justify-content: center;
 }
+
 
 .title{
     margin: 1rem 0 0.5rem 0;
     font-size: 2rem;
     color: $accent;
+    padding-bottom: 1rem;
+}
+
+.body {
+    font-family: Arial, sans-serif;
+    color: white;
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    justify-content: center;
+    gap: 2rem;
+    padding-top: 1rem;
+}
+.controls-wrapper {
+    //stacks controlls vertically
+    width: 100%;
+    //display: grid;
+    //grid-template-columns: auto 1fr auto; // label | input | value
+    //align-items: center;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem 1rem; // row-gap column-gap
+    padding: 1rem;
+    background: $panel-bg;
+    border-bottom: 1px solid $border;
+}
+
+.control-row {
+    // creates 3 column grid
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 1rem;
+    align-items: center;
 }
 
 section {
@@ -35,12 +74,13 @@ section {
     border: 2px solid $border;
 }
 
+
 .canvas-container {
     position: relative;
     display: inline-block;
     width: 100%;
-    border: 1px solid $border;
-    border-radius: 6px;
+    //border: 1px solid $border;
+    //border-radius: 6px;
     //overflow: hidden;
 }
 
@@ -49,6 +89,9 @@ section {
     width: 100%;
     height: auto;
     object-fit: cover;
+    border: 1px solid $border;
+    border-radius: 6px;
+    display: block;
     // top: 0;
     // left: 0;
     // touch-action: none;

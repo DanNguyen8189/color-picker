@@ -29,9 +29,16 @@ function AppContent({
     return (
         <div className="app">
             <h1 className="title">Colorsmosis</h1>
+            <div className="body">
             <section className="canvas-panel">
+            <div className='controls-wrapper'>
+                <div className="control-row">
             <ImageUploader />
+            </div>
+            <div className="control-row">
             {imageObjectUrlRef.current && <Slider handleSlide={handleSlide} />}
+            </div>
+            </div>
             {/* {imageObjectUrlRef.current && ( */}
             {/* trying to conditional render with jsx (imageObjectUrlRef.current && ...) 
             had a race condition where <canvas> might not have mounted before 
@@ -54,10 +61,11 @@ function AppContent({
             </div>
             </section>
             <section className="palette-panel">
-            <Palette Pins={pins} />
+                <Palette Pins={pins} />
             </section>
             {/* </div> */}
         {/* )} */}
+        </div>
         </div>
     );
 }
