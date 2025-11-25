@@ -1,23 +1,21 @@
 .slider-container {
-    width: 100%;
+    // width: 100%;
+    // display: flex;
+    // align-items: center;
+    // justify-content: center;
+    // gap: 0.75rem;
+    // //font-size: 0.85rem;
+    // padding: 10px;
+    display: contents; // participates in parent grid (.control-row)
 }
 
-// input[type=file] {
-//     max-width: 100%;
-//     color: #444;
-//     padding: 5px;
-//     // background: #fff;
-//     border-radius: 10px;
-//     border: 1px solid #555;
-// }
+.slider-text{
+    font-size: 1rem;
+    color: #ccc
+}
 
-// input[type=file]::file-selector-button {
-//     margin-right: 20px;
-//     border: none;
-//     // background: #084cdf;
-//     padding: 10px 20px;
-//     border-radius: 10px;
-//     // color: #fff;
-//     cursor: pointer;
-//     transition: background .2s ease-in-out;
-// }
+.slider-input {
+    //max-width: 100%;
+    width: 100%;
+    //width: 60%;
+}

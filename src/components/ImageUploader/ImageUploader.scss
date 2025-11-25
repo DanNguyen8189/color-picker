@@ -3,12 +3,14 @@ $accent: #ffce4a;
 $border: #2a2a2a;
 $hover: #1d1d1d;
 .image-uploader {
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.75rem;
-    font-size: 0.85rem;
+    // width: 100%;
+    // display: flex;
+    // align-items: center;
+    // justify-content: center;
+    // gap: 0.75rem;
+    // font-size: 0.85rem;
+    // padding: 5px;
+    display:contents; // participates in parent grid (.control-row)
 }
 
 .choose-image-txt {
@@ -23,7 +25,7 @@ $hover: #1d1d1d;
 input[type=file] {
     max-width: 100%;
     color: #444;
-    padding: 5px;
+    //padding: 5px;
     // background: #fff;
     border-radius: 10px;
     border: 1px solid #555;
