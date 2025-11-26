@@ -17,15 +17,16 @@ export const Palette: React.FC<PaletteProps> = ({ Pins }) => {
 
     return (
         <div className="palette-container">
-            <p className="palette-text">Open your pallete in Coolors!</p>
+            <p className="palette-text">Open your palette in Coolors!</p>
             <p className="palette-text"><a href={getCoolorsUrl(Pins)} target="_blank" rel="noopener noreferrer">View Palette</a></p>
             <div className="palette-grid">
             {Pins.map((pin) => (
                 <div key={pin.id} className="swatch" style={{ width: '100px', height: '100px', margin: '5px' }}>
-                    <div className="swatch-color" style={{ backgroundColor: rgbToString(pin.color) }}></div>
+                    <div className="swatch-color" style={{ backgroundColor: rgbToString(pin.color) }}>
+                    </div>
                     <div className="swatch-label">
-                    <p>{rgbToString(pin.color)}</p>
-                    <p>{rgbToHex(pin.color)}</p>
+                        {/* {rgbToString(pin.color)} */}
+                        {rgbToHex(pin.color)}
                     </div>
                 </div>
             ))}
