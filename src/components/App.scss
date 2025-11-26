@@ -14,13 +14,13 @@ body, html, .app {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;
     padding-top: 1rem;
     //justify-content: center;
 }
 
 
-.title{
+.title {
     margin: 1rem 0 0.5rem 0;
     font-size: 2rem;
     color: $accent;
@@ -39,13 +39,9 @@ body, html, .app {
     gap: 2rem;
     padding-top: 1rem;
 }
-.controls-wrapper {
-    //stacks controlls vertically
-    width: 100%;
-    //display: grid;
-    //grid-template-columns: auto 1fr auto; // label | input | value
-    //align-items: center;
 
+.controls-wrapper {
+    width: 100%;
     display: flex;
     flex-direction: column;
     gap: 0.75rem 1rem; // row-gap column-gap
@@ -55,7 +51,7 @@ body, html, .app {
 }
 
 .control-row {
-    // creates 3 column grid
+    // create 3 column grid
     display: grid;
     grid-template-columns: auto 1fr auto;
     gap: 1rem;
@@ -68,8 +64,9 @@ section {
     display: flex;
     flex-direction: column;
     align-items: center;
-    // width: 100%;
-    width: 500px;
+    width: 95%;
+    max-width: 500px;
+    //width: 500px;
     background-color: $panel-bg;    
     border: 2px solid $border;
 }
@@ -77,13 +74,6 @@ section {
 
 .canvas-container {
     position: relative;
-    // display: inline-block;
-    // width: 100%;
-    // width: fit-content;
-    // height: fit-content;
-    //border: 1px solid $border;
-    //border-radius: 6px;
-    //overflow: hidden;
 }
 
 .canvas {
@@ -91,14 +81,15 @@ section {
     position: relative;
     width: 100%;
     height: auto;
-    object-fit: cover;
     border: 1px solid $border;
-    // border: 2px solid red;
     border-radius: 6px;
     display: block;
-    // top: 0;
-    // left: 0;
-    // touch-action: none;
 }
-//.pin-overlay { border: 2px solid blue; }
 
+@media (max-width: 800px) {
+    .body {
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+    }
+}

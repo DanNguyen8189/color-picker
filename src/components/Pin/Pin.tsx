@@ -33,7 +33,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
     };
 
     const zoomedPinSize = 60;
-    const defaultPinSize = 15;
+    const defaultPinSize = 20;
     const getPinSize = ():number => (isDragging ? zoomedPinSize : defaultPinSize);
 
     // Pin is enlarged and shows a zoomed in version of the canvas image when being
