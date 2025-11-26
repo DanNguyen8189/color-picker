@@ -4,10 +4,10 @@
     //align-items: flex-end;
     // justify-content: flex-start;
     display: grid;
-    grid-template-rows: auto 1fr;
-    justify-items: end; // right align first row
+    //grid-template-rows: auto auto;
+    //justify-items: end; // right align first row
     align-items: start;
-    justify-items: stretch;
+    //justify-items: stretch;
     width: 100%;
     padding: 1rem;
 }
@@ -16,6 +16,7 @@
     justify-self: end;
     font-size: 1rem;
     color: #ccc;
+    //text-transform: uppercase;
     //margin: 1rem 0;
     a {
         color: #66aaff;
@@ -29,26 +30,35 @@
 .palette-grid {
     width: 100%;
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    //grid-template-rows: auto;
+    //grid-auto-rows: 140px;
+    //grid-auto-rows: min-content;
+    //grid-auto-rows: auto;
+    align-items: start;
     gap: 0.65rem;
 }
 
 .palette-grid .swatch {
     display: flex;
     flex-direction: column;
-    border: none;
-    border-radius: 8px;
-    overflow: hidden;
+    //border: none;
+    //border-radius: 8px;
+    //height: 100%;
+    //overflow: visible;
     cursor: pointer;
-    background: transparent;
+    //height: 200px;
+    //background: transparent;
     transition: transform .12s ease, box-shadow .12s ease;
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
 .palette-grid .swatch-color {
-    aspect-ratio: 1 / 1;
+    //aspect-ratio: 1 / 1;
+    flex: 1 1 auto;
     background: var(--swatch-color, #222);
     border-radius: 8px 8px 0 0;
+    //overflow: hidden;
 }
 
 .palette-grid .swatch-label {
@@ -67,13 +77,4 @@
     border-top: 1px solid #282828;
 }
 
-// .palette-grid .swatch:hover{
-//     transform: translateY(-2px);
-//     box-shadow: 0 4px 12px rgba(0,0,0,0.5);
-// }
-
-// .palette-grid .swatch:active{
-//     transform: translateY(0);
-//     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-// }
 

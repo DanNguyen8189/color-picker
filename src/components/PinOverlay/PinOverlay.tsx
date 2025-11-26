@@ -72,7 +72,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
             // regenerate pins now that new canvas/image has been drawn
             // w/o this, pins remain in old positions/colors on the previous image
 
-            syncBounds();
+            //syncBounds();
             //console.log("generating pins on canvas drawn, count:", count);
             generatePins(count);
         };
@@ -84,9 +84,13 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
 
         //generate pins when canvas is ready
         if (canvasInstance.getBounds().width > 0) {
-            syncBounds();
+            //syncBounds(); // calling this here was interfering with pin placement on image upload
+            // relook at this later? TODO
             console.log("generating pins on canvas ready, count:", count);
             generatePins(count);
+            // requestAnimationFrame(() => {
+            //     generatePins(count);
+            // });
         }
         canvasInstance.on('canvasDrawn', handleCanvasDrawn);
         window.addEventListener('resize', handleResize);
@@ -104,8 +108,8 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
     useEffect(() => {
         //if (pins.length) setPinsParent(pins);
         setPinsParent(pins);
-        console.log("canvas size in pinoverlay", bounds);
-        console.log("pins in pinoverlay", pins);
+        // console.log("canvas size in pinoverlay", bounds);
+        // console.log("pins in pinoverlay", pins);
     }, [pins]);
 
     const handleDragStart = (id: string) => {
@@ -153,6 +157,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
 
     const generatePins = (amount:number) => {
         console.log("generating pins:", amount);
+        console.log("canvas bounds:", canvasInstance?.getBounds());
         if (!canvasInstance) return;
         //if (bounds.width <= 0 || bounds.height <= 0) return;
         if (canvasInstance.getBounds().width <= 0 || canvasInstance.getBounds().height <= 0) return;
@@ -178,6 +183,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
                 for (let i = 0; i < amount; i++) {
                     newPins.push( createPin() );
                 }
+                console.log("newPins generated:", newPins);
                 return newPins;
             }
             return prev;
