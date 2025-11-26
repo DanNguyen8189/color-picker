@@ -12,9 +12,9 @@ function Slider({handleSlide}: {handleSlide: (value:number) => void}) {
                value={value}
                onChange={(e) => setValue(+e.target.value)}
            />  */}
-            <label className='slider-text'>Color Count: </label>
+            <label className="slider-text">Color Count: </label>
             <input 
-                className='slider-input'
+                className="slider-input"
                 type="range"
                 min="1"
                 max="10"
@@ -25,7 +25,7 @@ function Slider({handleSlide}: {handleSlide: (value:number) => void}) {
                 }
                 }
             />
-            <label>{value}</label>
+            <label className="slider-value">{value}</label>
     </div>
    );
 }

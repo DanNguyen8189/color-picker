@@ -88,9 +88,6 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
             // relook at this later? TODO
             console.log("generating pins on canvas ready, count:", count);
             generatePins(count);
-            // requestAnimationFrame(() => {
-            //     generatePins(count);
-            // });
         }
         canvasInstance.on('canvasDrawn', handleCanvasDrawn);
         window.addEventListener('resize', handleResize);

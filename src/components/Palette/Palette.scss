@@ -1,23 +1,17 @@
 .palette-container {
-    //display: flex;
-    //flex-direction: column;
-    //align-items: flex-end;
-    // justify-content: flex-start;
-    display: grid;
-    //grid-template-rows: auto auto;
-    //justify-items: end; // right align first row
-    align-items: start;
-    //justify-items: stretch;
+    display: flex;
+    flex-direction: column;
+    align-items: end;
     width: 100%;
     padding: 1rem;
+    gap: 1rem;
 }
 
 .palette-text {
-    justify-self: end;
+    //justify-self: flex-end;
     font-size: 1rem;
     color: #ccc;
-    //text-transform: uppercase;
-    //margin: 1rem 0;
+    margin: 0;
     a {
         color: #66aaff;
         text-decoration: none;
@@ -39,29 +33,22 @@
     gap: 0.65rem;
 }
 
-.palette-grid .swatch {
+.swatch {
     display: flex;
     flex-direction: column;
-    //border: none;
-    //border-radius: 8px;
-    //height: 100%;
-    //overflow: visible;
     cursor: pointer;
-    //height: 200px;
-    //background: transparent;
     transition: transform .12s ease, box-shadow .12s ease;
     box-shadow: 0 2px 4px rgba(0,0,0,0.3);
 }
 
-.palette-grid .swatch-color {
+.swatch-color {
     //aspect-ratio: 1 / 1;
     flex: 1 1 auto;
     background: var(--swatch-color, #222);
     border-radius: 8px 8px 0 0;
-    //overflow: hidden;
 }
 
-.palette-grid .swatch-label {
+.swatch-label {
     background: #1a1a1a;
     color: #bbb;
     font-size: 0.7rem;
