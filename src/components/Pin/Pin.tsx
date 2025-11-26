@@ -32,7 +32,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
         return { left: 0, right: width, top: 0, bottom: height };
     };
 
-    const zoomedPinSize = 60;
+    const zoomedPinSize = 80;
     const defaultPinSize = 20;
     const getPinSize = ():number => (isDragging ? zoomedPinSize : defaultPinSize);
 

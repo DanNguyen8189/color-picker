@@ -1,11 +1,11 @@
 .pin {
     position: absolute;
-    border: 2px solid white;
+    border: 3px solid white;
     border-radius: 50%;
     z-index: 9999;
     pointer-events: auto;
     cursor: grab;
-    box-shadow: 0 0 2px rgba(0, 0, 0, 0.8);
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
 }
 
 .pin.pin-active {
