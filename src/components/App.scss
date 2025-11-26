@@ -30,8 +30,9 @@ body, html, .app {
 .body {
     font-family: Arial, sans-serif;
     color: white;
-    height: 100vh;
+    // height: 100vh; // don't have this, let the body grow naturally
     width: 100vw;
+    flex: 1 1 auto;
     display: flex;
     flex-direction: row;
     align-items: flex-start;
@@ -84,6 +85,21 @@ section {
     border: 1px solid $border;
     border-radius: 6px;
     display: block;
+}
+
+.about-section {
+    margin-top: auto;
+    font-size: 0.9rem;
+    color: #aaa;
+    padding: 1rem;
+    max-width: 500px;
+    a {
+        color: #66aaff;
+        text-decoration: none;
+        &:hover {
+            text-decoration: underline;
+        }
+    }
 }
 
 @media (max-width: 800px) {
