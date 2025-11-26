@@ -6,6 +6,7 @@
     pointer-events: auto;
     cursor: grab;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+    touch-action: none;
 }
 
 .pin.pin-active {

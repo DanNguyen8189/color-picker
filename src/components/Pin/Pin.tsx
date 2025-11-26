@@ -73,6 +73,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
     }
 
     const handleDrag = (e:any, data:DraggableData): void => {
+        e.preventDefault();
         if (pin.coordinates && data.x === pin.coordinates.x && data.y === pin.coordinates.y) return;
         const updatedPin: ImagePin = {
             ...pin,
