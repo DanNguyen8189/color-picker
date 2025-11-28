@@ -32,3 +32,20 @@
             0 0 0 1px black,
     }
 }
+
+.come-in {
+    opacity: 0;
+    //transform: scale(0.8);
+    animation: comeIn 0.5s ease-out forwards;
+}
+
+@keyframes comeIn {
+    0% {
+        opacity: 0;
+        //transform: scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        //transform: scale(1);
+    }
+}

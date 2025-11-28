@@ -21,7 +21,7 @@ export const Palette: React.FC<PaletteProps> = ({ Pins }) => {
             <p className="palette-text"><a href={getCoolorsUrl(Pins)} target="_blank" rel="noopener noreferrer">View Palette</a></p>
             {Pins.length > 0 &&<div className="palette-grid">
             {Pins.map((pin) => (
-                <div key={pin.id} className="swatch" style={{ width: '100px', height: '100px', margin: '5px' }}>
+                <div key={pin.id} className="swatch fade-in fade-out">
                     <div className="swatch-color" style={{ backgroundColor: rgbToString(pin.color) }}>
                     </div>
                     <div className="swatch-label">

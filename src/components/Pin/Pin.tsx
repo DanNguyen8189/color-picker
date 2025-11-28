@@ -50,8 +50,8 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
         //account for pin sizes
         const x = -(zoomedX - zoomedPinSize / 2);
         const y = -(zoomedY - zoomedPinSize / 2);
-        const topBorderColor = lastColor ? rgbToString(lastColor) : 'white';
-        const bottomBorderColor = pin.color ? rgbToString(pin.color) : 'white';
+        const topBorderColor = lastColor ? rgbToString(pin.color) : 'white';
+        const bottomBorderColor = pin.color ? rgbToString(lastColor) : 'white';
         return {
             width: zoomedPinSize,
             height: zoomedPinSize,
@@ -94,7 +94,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
     if (!Draggable) {
         return (
             <div
-                className="pin"
+                className="pin fade-in"
                 data-testid='pin-without-draggable'
                 ref={nodeRef}
                 style={{
@@ -123,7 +123,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
             onStop={handleDragStop}
         >
             <div
-                className={`pin ${isDragging ? 'pin-active' : ''}`}
+                className={`pin ${isDragging ? 'pin-active' : ''} come-in`}
                 data-testid='pin-with-draggable'
                 ref={nodeRef}
                 style={{
