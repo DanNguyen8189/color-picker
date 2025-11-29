@@ -17,7 +17,7 @@ function Slider({handleSlide}: {handleSlide: (value:number) => void}) {
                 className="slider-input"
                 type="range"
                 min="1"
-                max="20"
+                max="10"
                 value={value}
                 onChange={(e) => {
                     setValue(+e.target.value)

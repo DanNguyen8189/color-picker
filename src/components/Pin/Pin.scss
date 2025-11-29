@@ -13,13 +13,13 @@
     // transition: all 0.25s ease-in-out;
     // transition:
     //     //transform 0.25s ease-in-out,
-    //     // box-shadow 0.2s ease-in-out,
-    //     // border-width 0.2s ease-in-out,
-    //     // outline 0.2s ease-in-out
+    //     box-shadow 0.2s ease-in-out,
+    //     border-width 0.2s ease-in-out,
+    //     outline 0.2s ease-in-out
     //     // margin-top 0.1s ease-in-out,
     //     // margin-left 0.1s ease-in-out,
-    //     height 0.1s ease-in-out,
-    //     width 0.1s ease-in-out,
+    //     // height 0.1s ease-in-out,
+    //     // width 0.1s ease-in-out,
     //     //transform 0.2s cubic-bezier(.6,-0.28,.74,.05)
         
 }
@@ -32,11 +32,11 @@
     // border-style: solid;
 
     //transform: scale(1.5);
-    // transition:
-    //     //transform 0.25s ease-in-out,
-    //     box-shadow 0.25s ease-in-out,
-    //     border-width 0.25s ease-in-out,
-    //     outline 0.25s ease-in-out;
+    transition:
+        //transform 0.25s ease-in-out,
+        box-shadow 0.1s ease-in-out,
+        border-width 0.1s ease-in-out,
+        outline 0.1s ease-in-out;
 
     // Center marker
     &::before {
