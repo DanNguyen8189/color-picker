@@ -36,32 +36,33 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
     const defaultPinSize = 20;
     const getPinSize = ():number => (isDragging ? zoomedPinSize : defaultPinSize);
 
+    const defaultPinBorder = 3;
+    const zoomedPinBorder = 7;
+    const getPinBorderWidth = ():number => (isDragging ? zoomedPinBorder : defaultPinBorder);
+
     // Pin is enlarged and shows a zoomed in version of the canvas image when being
     // dragged; this returns css for it
     const getZoomStyle = (coords: Coordinates): React.CSSProperties => {
         if (!canvasInstance || !imageObjectUrlRef.current) return {};
         const { width, height } = canvasInstance.getBounds();
         if (width <= 0 || height <= 0) return {};
-        const zoom = 4;           
+        const zoom = 6;           
         const zoomedBGWidth = width * zoom; 
         const zoomedBGHeight = height * zoom;
         const zoomedX = coords.x * zoom;
         const zoomedY = coords.y * zoom;
         //account for pin sizes
-        const x = -(zoomedX - zoomedPinSize / 2);
-        const y = -(zoomedY - zoomedPinSize / 2);
-        const topBorderColor = lastColor ? rgbToString(lastColor) : 'white';
-        const bottomBorderColor = pin.color ? rgbToString(pin.color) : 'white';
+        //TODO harded 6px for accuracy, find source of offset later?
+        const x = -(zoomedX - zoomedPinSize / 2) - 6;
+        const y = -(zoomedY - zoomedPinSize / 2) - 6;
+        const topBorderColor = lastColor ? rgbToString(pin.color) : 'white';
+        const bottomBorderColor = pin.color ? rgbToString(lastColor) : 'white';
         return {
             width: zoomedPinSize,
             height: zoomedPinSize,
             backgroundImage: `url(${imageObjectUrlRef.current})`,
             backgroundSize: `${zoomedBGWidth}px ${zoomedBGHeight}px`,
             backgroundPosition: `${x}px ${y}px`,
-            backgroundRepeat: 'no-repeat',
-            outline: `4px solid white`,
-            borderWidth: '7px',
-            borderStyle: 'solid',
             borderColor: `${topBorderColor} ${bottomBorderColor} ${bottomBorderColor} ${topBorderColor}`,
         };
     };
@@ -94,7 +95,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
     if (!Draggable) {
         return (
             <div
-                className="pin"
+                className="pin pin-fade-in"
                 data-testid='pin-without-draggable'
                 ref={nodeRef}
                 style={{
@@ -116,21 +117,24 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
             //defaultPosition={pin.coordinates}
             position={pin.coordinates}
             //so that data.x and data.y are relative to the pin's center vs default top left
-            positionOffset={{ x: -getPinSize() / 2, y: -getPinSize() / 2 }}
+            positionOffset={{ x: -getPinSize()/2, y: -getPinSize()/2}}
             nodeRef={nodeRef}
             onStart={handleDragStart}
             onDrag={handleDrag}
             onStop={handleDragStop}
         >
             <div
-                className={`pin ${isDragging ? 'pin-active' : ''}`}
+                className={`pin ${isDragging ? 'pin-active' : ''} pin-fade-in`}
                 data-testid='pin-with-draggable'
                 ref={nodeRef}
                 style={{
                     width: getPinSize(),
                     height: getPinSize(),
+                    // marginLeft: -getPinSize() / 2,
+                    // marginTop: -getPinSize() / 2,
                     backgroundColor: !isDragging && pin.color ? rgbToString(pin.color) : 'transparent',
                     opacity: isDimmed ? 0.3 : 1,
+                    borderWidth: getPinBorderWidth(),
                     // When pin is stationary, show just color. when dragging, show zoomed image
                     ...(isDragging && pin.coordinates ? getZoomStyle(pin.coordinates) : {}),
                 } as React.CSSProperties}

@@ -1,17 +1,42 @@
 .pin {
     position: absolute;
-    border: 3px solid white;
+    //border: 1px solid white;
+    border-style: solid;
+    border-color: white;
     border-radius: 50%;
     z-index: 9999;
     pointer-events: auto;
     cursor: grab;
     box-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
     touch-action: none;
+    //transition: transform 0.2s cubic-bezier(.6,-0.28,.74,.05);
+    // transition: all 0.25s ease-in-out;
+    // transition:
+    //     //transform 0.25s ease-in-out,
+    //     // box-shadow 0.2s ease-in-out,
+    //     // border-width 0.2s ease-in-out,
+    //     // outline 0.2s ease-in-out
+    //     // margin-top 0.1s ease-in-out,
+    //     // margin-left 0.1s ease-in-out,
+    //     height 0.1s ease-in-out,
+    //     width 0.1s ease-in-out,
+    //     //transform 0.2s cubic-bezier(.6,-0.28,.74,.05)
+        
 }
 
 .pin.pin-active {
     cursor: none;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+    outline: 4px solid white;
+    // border-width: 7px;
+    // border-style: solid;
+
+    //transform: scale(1.5);
+    // transition:
+    //     //transform 0.25s ease-in-out,
+    //     box-shadow 0.25s ease-in-out,
+    //     border-width 0.25s ease-in-out,
+    //     outline 0.25s ease-in-out;
 
     // Center marker
     &::before {
@@ -30,5 +55,36 @@
         // black border for visibility on light colors
             0 0 0 0.5px white,
             0 0 0 1px black,
+    }
+}
+
+// .pin-grow {
+//     transform: scale(0.5);
+//     //animation: pinGrow 0.2s ease-out forwards;
+// }
+
+// @keyframes pinGrow {
+//     0% {
+//         transform: scale(0.5);
+//     }
+//     100% {
+//         transform: scale(1);
+//     }
+// }
+
+.pin-fade-in {
+    opacity: 0;
+    //transform: scale(0.8);
+    animation: pinFadeIn 0.5s ease-out forwards;
+}
+
+@keyframes pinFadeIn {
+    0% {
+        opacity: 0;
+        //transform: scale(0.8);
+    }
+    100% {
+        opacity: 1;
+        //transform: scale(1);
     }
 }
