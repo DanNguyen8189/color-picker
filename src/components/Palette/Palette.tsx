@@ -20,7 +20,7 @@ export const Palette: React.FC<PaletteProps> = ({ Pins }) => {
         const hexColors = pins.map(pin => rgbToHex(pin.color));
         const textToCopy = hexColors.join('\n');
         navigator.clipboard.writeText(textToCopy);
-        showNotificationBar('Hexcodes copied to clipboard!');
+        showNotificationBar('Hexcodes copied!');
     }
 
     function showNotificationBar(message: string): void {

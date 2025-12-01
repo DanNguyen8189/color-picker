@@ -68,7 +68,7 @@ function AppContent({
         </div>
         <div className="about-section">
             <h4>About Colorsmosis</h4>
-            <p>Colorsmosis is a palette exploration tool that you can use make color palettes from
+            <p>Colorsmosis is a color exploration tool that you can use to make color palettes from
                 your images. Made with React + Astro, and <a href="https://github.com/react-grid-layout/react-draggable">React-Draggable</a>. Hosted on Netlify. 
                 View the source code on <a href="https://github.com/DanNguyen8189/color-picker">GitHub</a>.
             </p>

@@ -1,0 +1,53 @@
+.zoom-preview {
+    // position: fixed;
+    // left: 1rem;
+    // bottom: 1rem;
+    //position: absolute;
+    position: relative;
+    margin: 20px auto;
+    // text-align: center;
+    // margin-left: 16px;
+    // margin-top: 30px;
+    width: 120px;
+    height: 120px;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    background: #222;
+
+    border: 6px solid white;
+    //outline: 2px solid white;
+    // border-style: solid;
+    // border-color: white;
+    border-radius: 50%;
+    z-index: 9998;
+    pointer-events: auto;
+    box-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
+    //touch-action: none;
+
+    // //transform: scale(1.5);
+    // transition:
+    //     //transform 0.25s ease-in-out,
+    //     box-shadow 0.1s ease-in-out,
+    //     border-width 0.1s ease-in-out,
+    //     outline 0.1s ease-in-out;
+
+    // Center marker
+    &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 5px;
+        height: 5px;
+        border: none;
+        background: transparent;
+        border-radius: 50%;
+        box-shadow:
+        // white border for visibility on dark colors
+        // black border for visibility on light colors
+            0 0 0 0.5px white,
+            0 0 0 1px black,
+    }
+    
+}

@@ -5,6 +5,7 @@ import type { ImagePin, RGB, Coordinates } from '../../util';
 import { useCanvas } from '../../util/CanvasContext';
 import './Pin.scss';
 import { DraggableData } from 'react-draggable';
+import { getZoomStyle } from '../ZoomPreview/ZoomPreview';
 
 type PinProps = {
     //Draggable: any,  // for dynamic import of react-draggable. Didn't want to
@@ -40,32 +41,32 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
     const zoomedPinBorder = 7;
     const getPinBorderWidth = ():number => (isDragging ? zoomedPinBorder : defaultPinBorder);
 
-    // Pin is enlarged and shows a zoomed in version of the canvas image when being
-    // dragged; this returns css for it
-    const getZoomStyle = (coords: Coordinates): React.CSSProperties => {
-        if (!canvasInstance || !imageObjectUrlRef.current) return {};
-        const { width, height } = canvasInstance.getBounds();
-        if (width <= 0 || height <= 0) return {};
-        const zoom = 6;           
-        const zoomedBGWidth = width * zoom; 
-        const zoomedBGHeight = height * zoom;
-        const zoomedX = coords.x * zoom;
-        const zoomedY = coords.y * zoom;
-        //account for pin sizes
-        //TODO harded 6px for accuracy, find source of offset later?
-        const x = -(zoomedX - zoomedPinSize / 2) - 6;
-        const y = -(zoomedY - zoomedPinSize / 2) - 6;
-        const topBorderColor = lastColor ? rgbToString(pin.color) : 'white';
-        const bottomBorderColor = pin.color ? rgbToString(lastColor) : 'white';
-        return {
-            width: zoomedPinSize,
-            height: zoomedPinSize,
-            backgroundImage: `url(${imageObjectUrlRef.current})`,
-            backgroundSize: `${zoomedBGWidth}px ${zoomedBGHeight}px`,
-            backgroundPosition: `${x}px ${y}px`,
-            borderColor: `${topBorderColor} ${bottomBorderColor} ${bottomBorderColor} ${topBorderColor}`,
-        };
-    };
+    // // Pin is enlarged and shows a zoomed in version of the canvas image when being
+    // // dragged; this returns css for it
+    // const getZoomStyle = (coords: Coordinates): React.CSSProperties => {
+    //     if (!canvasInstance || !imageObjectUrlRef.current) return {};
+    //     const { width, height } = canvasInstance.getBounds();
+    //     if (width <= 0 || height <= 0) return {};
+    //     const zoom = 6;           
+    //     const zoomedBGWidth = width * zoom; 
+    //     const zoomedBGHeight = height * zoom;
+    //     const zoomedX = coords.x * zoom;
+    //     const zoomedY = coords.y * zoom;
+    //     //account for pin sizes
+    //     //TODO harded 6px for accuracy, find source of offset later?
+    //     const x = -(zoomedX - zoomedPinSize / 2) - 6;
+    //     const y = -(zoomedY - zoomedPinSize / 2) - 6;
+    //     const topBorderColor = lastColor ? rgbToString(pin.color) : 'white';
+    //     const bottomBorderColor = pin.color ? rgbToString(lastColor) : 'white';
+    //     return {
+    //         width: zoomedPinSize,
+    //         height: zoomedPinSize,
+    //         backgroundImage: `url(${imageObjectUrlRef.current})`,
+    //         backgroundSize: `${zoomedBGWidth}px ${zoomedBGHeight}px`,
+    //         backgroundPosition: `${x}px ${y}px`,
+    //         borderColor: `${topBorderColor} ${bottomBorderColor} ${bottomBorderColor} ${topBorderColor}`,
+    //     };
+    // };
 
     const handleDragStart = (e: any) => {
         console.log("image:", imageObjectUrlRef.current);
@@ -136,7 +137,8 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
                     opacity: isDimmed ? 0.3 : 1,
                     borderWidth: getPinBorderWidth(),
                     // When pin is stationary, show just color. when dragging, show zoomed image
-                    ...(isDragging && pin.coordinates ? getZoomStyle(pin.coordinates) : {}),
+                    //...(isDragging && pin.coordinates ? getZoomStyle(pin.coordinates) : {}),
+                    ...(isDragging ? getZoomStyle(pin, lastColor, canvasInstance, imageObjectUrlRef) : {}),
                 } as React.CSSProperties}
             />
         </Draggable>
