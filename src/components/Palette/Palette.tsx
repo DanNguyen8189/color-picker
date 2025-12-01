@@ -25,7 +25,7 @@ export const Palette: React.FC<PaletteProps> = ({ Pins }) => {
 
     function showNotificationBar(message: string): void {
         const notificationBar = document.createElement('div');
-        notificationBar.className = 'snackbar';
+        notificationBar.className = 'notification-bar';
         notificationBar.textContent = message;
         document.body.appendChild(notificationBar);
         notificationBar.classList.add('show');
