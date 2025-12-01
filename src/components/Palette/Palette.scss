@@ -1,3 +1,4 @@
+$link-color: #66aaff;
 .palette-container {
     display: flex;
     flex-direction: column;
@@ -14,7 +15,7 @@
     color: #ccc;
     margin: 0;
     a {
-        color: #66aaff;
+        color: $link-color;
         text-decoration: none;
         &:hover {
             text-decoration: underline;
@@ -118,3 +119,91 @@
 //         &:hover { background: #2e2e2e; }
 //     }
 // }
+
+button {
+    padding: 3px 0;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    //color:$link-color;
+    //font-family: 'Arial', sans-serif;
+    //font-size: 16px;
+    transition: all 0.3s ease; /* Smooth transition for hover effects */
+}
+
+button .palette-text{
+    color: $link-color
+}
+
+.notification-bar {
+    position: absolute;
+    top: 0;
+    visibility: hidden; // avoid momentarilty showing before .show is applied, and after .show is removed
+    font-size: .8rem;
+    color: #fff;
+    background-color: $link-color;
+    width: 100%;
+    border-radius: 2px;
+    padding: 10px;
+    text-align: center;
+    z-index: 9999;
+    position: fixed;
+    // -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
+    // animation: fadein 0.5s, fadeout 0.5s 2.5s;
+}
+
+.notification-bar.show {
+    visibility: visible;
+    // -webkit-animation: fadein 0.1s, fadeout 0.5s 2.5s;
+    // animation: fadein 0.1s, fadeout 0.5s 2.5s;
+    -webkit-animation: fadeout 0.5s 2.5s;
+    animation: fadeout 0.5s 2.5s;
+}
+
+@-webkit-keyframes fadein {
+    from {
+        //bottom: 0;
+        opacity: 0;
+    }
+
+    to {
+        //bottom: 30px;
+        opacity: 1;
+    }
+}
+
+@keyframes fadein {
+    from {
+        //bottom: 0;
+        opacity: 0;
+    }
+
+    to {
+        //bottom: 30px;
+        opacity: 1;
+    }
+}
+
+@-webkit-keyframes fadeout {
+    from {
+        //bottom: 30px;
+        opacity: 1;
+    }
+
+    to {
+        //bottom: 0;
+        opacity: 0;
+    }
+}
+
+@keyframes fadeout {
+    from {
+        //bottom: 30px;
+        opacity: 1;
+    }
+
+    to {
+        //bottom: 0;
+        opacity: 0;
+    }
+}

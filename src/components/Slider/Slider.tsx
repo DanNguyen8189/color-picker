@@ -1,7 +1,7 @@
 import  { useState } from 'react';
 import './Slider.scss';
 function Slider({handleSlide}: {handleSlide: (value:number) => void}) {
-    const [value, setValue] = useState(1);
+    const [value, setValue] = useState(4);
 
     return (
         <div className='slider-container'>
@@ -17,7 +17,7 @@ function Slider({handleSlide}: {handleSlide: (value:number) => void}) {
                 className="slider-input"
                 type="range"
                 min="1"
-                max="20"
+                max="10"
                 value={value}
                 onChange={(e) => {
                     setValue(+e.target.value)
