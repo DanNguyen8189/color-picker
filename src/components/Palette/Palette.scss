@@ -146,7 +146,7 @@ button .palette-text{
     border-radius: 2px;
     padding: 10px;
     text-align: center;
-    z-index: 1;
+    z-index: 9999;
     position: fixed;
     // -webkit-animation: fadein 0.5s, fadeout 0.5s 2.5s;
     // animation: fadein 0.5s, fadeout 0.5s 2.5s;

@@ -1,7 +1,7 @@
 import  { useState } from 'react';
 import './Slider.scss';
 function Slider({handleSlide}: {handleSlide: (value:number) => void}) {
-    const [value, setValue] = useState(1);
+    const [value, setValue] = useState(4);
 
     return (
         <div className='slider-container'>

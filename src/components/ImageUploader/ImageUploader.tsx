@@ -1,9 +1,26 @@
 import React, { useRef, useState, useEffect } from 'react';
 import { useCanvas } from '../../util/';
 import './ImageUploader.scss';
+import defaultImage from '../../assets/Nightshade.png';
+
 // export function ImageUploader({ handlePickImage }: { handlePickImage: (image: File) => void }) {
 export const ImageUploader: React.FC = () => {
-    const { writeImage } = useCanvas();
+    const { writeImage, canvasInstance } = useCanvas();
+    useEffect(() => {
+        async function setDefaultImage() {
+            // fetch image, create a File object from the data
+            // When you use a relative path (like defaultImage) in a fetch request,
+            // the server tries to load it from the server relative to the current URL
+            // which can fail in React apps. Use defaultImageUrl, which is Url string
+            // pointing to built asset, instead.
+            const defaultImageUrl = (typeof defaultImage === 'string') ? defaultImage : (defaultImage.src ?? '');
+            const response = await fetch(defaultImageUrl);
+            const blob = await response.blob();
+            const file = new File([blob], "Nightshade.png", { type: blob.type });
+            writeImage(file);
+        }
+        setDefaultImage();
+    }, [canvasInstance]);
     return (
         <div className='image-uploader'>
             <label className="choose-image-txt"htmlFor="file">Choose Image</label>

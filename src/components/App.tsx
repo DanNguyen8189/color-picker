@@ -18,7 +18,7 @@ function AppContent({
     canvasRef
 }: { canvasRef: React.RefObject<HTMLCanvasElement | null> }) {
     const { imageObjectUrlRef } = useCanvas();
-    const [count, setCount] = useState(1);
+    const [count, setCount] = useState(4);
     //const [selectedImage, setSelectedImage] = useState<string>('');
     //const prevUrlRef = useRef<string | null>(null);
     const [pins, setPins] = useState<ImagePin[]>([]);
