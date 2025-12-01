@@ -135,7 +135,7 @@ button .palette-text{
     color: $link-color
 }
 
-.snackbar {
+.notification-bar {
     position: absolute;
     top: 0;
     visibility: hidden; // avoid momentarilty showing before .show is applied, and after .show is removed
@@ -152,7 +152,7 @@ button .palette-text{
     // animation: fadein 0.5s, fadeout 0.5s 2.5s;
 }
 
-.snackbar.show {
+.notification-bar.show {
     visibility: visible;
     // -webkit-animation: fadein 0.1s, fadeout 0.5s 2.5s;
     // animation: fadein 0.1s, fadeout 0.5s 2.5s;

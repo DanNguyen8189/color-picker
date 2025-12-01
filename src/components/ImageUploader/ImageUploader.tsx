@@ -9,7 +9,7 @@ export const ImageUploader: React.FC = () => {
     useEffect(() => {
         async function setDefaultImage() {
             // fetch image, create a File object from the data
-            // When you use a relative path (like defaultImage) in a fetch request,
+            // When using a relative path (like defaultImage) in a fetch request,
             // the server tries to load it from the server relative to the current URL
             // which can fail in React apps. Use defaultImageUrl, which is Url string
             // pointing to built asset, instead.

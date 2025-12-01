@@ -20,20 +20,20 @@ export const Palette: React.FC<PaletteProps> = ({ Pins }) => {
         const hexColors = pins.map(pin => rgbToHex(pin.color));
         const textToCopy = hexColors.join('\n');
         navigator.clipboard.writeText(textToCopy);
-        showSnackBar('Hexcodes copied to clipboard!');
+        showNotificationBar('Hexcodes copied to clipboard!');
     }
 
-    function showSnackBar(message: string): void {
-        const snackBar = document.createElement('div');
-        snackBar.className = 'snackbar';
-        snackBar.textContent = message;
-        document.body.appendChild(snackBar);
-        snackBar.classList.add('show');
+    function showNotificationBar(message: string): void {
+        const notificationBar = document.createElement('div');
+        notificationBar.className = 'snackbar';
+        notificationBar.textContent = message;
+        document.body.appendChild(notificationBar);
+        notificationBar.classList.add('show');
         setTimeout(() => {  
-            snackBar.classList.remove('show');
+            notificationBar.classList.remove('show');
         }, 2700);
         setTimeout(() => {  
-            document.body.removeChild(snackBar);
+            document.body.removeChild(notificationBar);
             // remove from DOM after .show class is removed,
             // to allow .show's exit animation to play out
         }, 3000);
