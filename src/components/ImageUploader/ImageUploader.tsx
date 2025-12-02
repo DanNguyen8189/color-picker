@@ -24,9 +24,9 @@ export const ImageUploader: React.FC = () => {
     }, [canvasInstance]);
     return (
         <div className='image-uploader'>
-            <label className="choose-image-txt"htmlFor="file">Choose Image</label>
             <input
                 type="file"
+                id="file-upload"
                 name="myImage"
                 accept="image/*"
                 // Event handler to capture file selection and update the state
@@ -37,6 +37,8 @@ export const ImageUploader: React.FC = () => {
                     requestAnimationFrame(() => writeImage(image));
                 }}
             />
+            {/* <label className="choose-image-txt"htmlFor="file-upload">Choose Image:</label> */}
+            {/* <span id="file-name">No file selected</span> */}
         </div>
     );
 

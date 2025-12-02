@@ -5,31 +5,18 @@
     //position: absolute;
     position: relative;
     margin: 20px auto;
-    // text-align: center;
-    // margin-left: 16px;
-    // margin-top: 30px;
-    width: 120px;
-    height: 120px;
+
+    // width: 200px;
+    // height: 200px;
     border-radius: 12px;
-    //box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+
     background: #222;
 
     border: 6px solid white;
-    //outline: 2px solid white;
-    // border-style: solid;
-    // border-color: white;
+
     border-radius: 50%;
     z-index: 9998;
     pointer-events: auto;
-    //touch-action: none;
-
-    // //transform: scale(1.5);
-    // transition:
-    //     //transform 0.25s ease-in-out,
-    //     box-shadow 0.1s ease-in-out,
-    //     border-width 0.1s ease-in-out,
-    //     outline 0.1s ease-in-out;
-
     // Center marker
     &::before {
         content: '';

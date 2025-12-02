@@ -16,11 +16,17 @@ export const Palette: React.FC<PaletteProps> = ({ Pins }) => {
         return `${baseUrl}${hexColors.join('-')}`;
     }
 
-    function copyToClipboard(pins: ImagePin[]): void {
+    function copyAllToClipboard(pins: ImagePin[]): void {
         const hexColors = pins.map(pin => rgbToHex(pin.color));
         const textToCopy = hexColors.join('\n');
         navigator.clipboard.writeText(textToCopy);
-        showNotificationBar('Hexcodes copied!');
+        showNotificationBar('Palette copied to clipboard!');
+    }
+
+    function copyToClipboard(pin: ImagePin): void {
+        const hexColor = rgbToHex(pin.color);
+        navigator.clipboard.writeText(hexColor);
+        showNotificationBar(`Color copied to clipboard!`);
     }
 
     function showNotificationBar(message: string): void {
@@ -41,13 +47,13 @@ export const Palette: React.FC<PaletteProps> = ({ Pins }) => {
 
     return (
         <div className="palette-container">
-            <button onClick={() => copyToClipboard(Pins)}><p className="palette-text">Copy to clipboard</p></button>
+            <button onClick={() => copyAllToClipboard(Pins)}><p className="palette-text">Copy all to clipboard</p></button>
             <p className="palette-text">Open your palette in <a href={getCoolorsUrl(Pins)} target="_blank" rel="noopener noreferrer">Coolors.co</a></p>
             {/* <p className="palette-text" >Copy to clipboard</p> */}
             {/* <button onClick={() => copyToClipboard(Pins)}><p className="palette-text">Copy to clipboard</p></button> */}
             {Pins.length > 0 &&<div className="palette-grid">
             {Pins.map((pin) => (
-                <div key={pin.id} className="swatch fade-in fade-out">
+                <div key={pin.id} onClick={() => copyToClipboard(pin)} className="swatch fade-in fade-out">
                     <div className="swatch-color" style={{ backgroundColor: rgbToString(pin.color) }}>
                     </div>
                     <div className="swatch-label">

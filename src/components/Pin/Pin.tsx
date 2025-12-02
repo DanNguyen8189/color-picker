@@ -34,7 +34,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
     };
 
     const zoomedPinSize = 80;
-    const defaultPinSize = 20;
+    const defaultPinSize = 22;
     const getPinSize = ():number => (isDragging ? zoomedPinSize : defaultPinSize);
 
     const defaultPinBorder = 3;
@@ -109,7 +109,7 @@ export const Pin: React.FC<PinProps> = ({ Draggable, pin, onStart, onDrag, onSto
                     borderWidth: getPinBorderWidth(),
                     // When pin is stationary, show just color. when dragging, show zoomed image
                     //...(isDragging && pin.coordinates ? getZoomStyle(pin.coordinates) : {}),
-                    ...(isDragging ? getZoomStyle(pin, lastColor, canvasInstance, imageObjectUrlRef) : {}),
+                    ...(isDragging ? getZoomStyle(zoomedPinSize,pin, lastColor, canvasInstance, imageObjectUrlRef) : {}),
                 } as React.CSSProperties}
             />
         </Draggable>

@@ -8,9 +8,9 @@ export interface ZoomPreviewProps {
     pin: ImagePin;
 }
 
-export const getZoomStyle = (pin: ImagePin, lastColor: RGB | undefined, canvasInstance: any, imageObjectUrlRef: React.RefObject<string | null>): React.CSSProperties => {
+export const getZoomStyle = (windowSize: number, pin: ImagePin, lastColor: RGB | undefined, canvasInstance: any, imageObjectUrlRef: React.RefObject<string | null>): React.CSSProperties => {
     if (!canvasInstance || !imageObjectUrlRef.current) return {};
-    const zoomedPinSize = 80;
+    //const windowSize = 80;
     const { width, height } = canvasInstance.getBounds();
     if (width <= 0 || height <= 0) return {};
     const zoom = 6;           
@@ -20,13 +20,13 @@ export const getZoomStyle = (pin: ImagePin, lastColor: RGB | undefined, canvasIn
     const zoomedY = pin.coordinates.y * zoom;
     //account for pin sizes
     //TODO harded 6px for accuracy, find source of offset later?
-    const x = -(zoomedX - zoomedPinSize / 2) - 6;
-    const y = -(zoomedY - zoomedPinSize / 2) - 6;
+    const x = -(zoomedX - windowSize / 2) - 6;
+    const y = -(zoomedY - windowSize / 2) - 6;
     const topBorderColor = lastColor ? rgbToString(pin.color) : 'white';
     const bottomBorderColor = pin.color ? rgbToString(lastColor) : 'white';
     return {
-        width: zoomedPinSize,
-        height: zoomedPinSize,
+        width: windowSize,
+        height: windowSize,
         backgroundImage: `url(${imageObjectUrlRef.current})`,
         backgroundSize: `${zoomedBGWidth}px ${zoomedBGHeight}px`,
         backgroundPosition: `${x}px ${y}px`,
@@ -37,10 +37,10 @@ export const getZoomStyle = (pin: ImagePin, lastColor: RGB | undefined, canvasIn
 export const ZoomPreview: React.FC<ZoomPreviewProps> = ({pin}) => {
     if (!pin) return <div></div>;
     const { canvasInstance, imageObjectUrlRef } = useCanvas();
-    const [lastColor, setLastColor] = useState<RGB | undefined>(pin.color);
+    //const [lastColor, setLastColor] = useState<RGB | undefined>(pin.color);
 
     return (
         // <div className="zoom-preview" style={getZoomStyle(pin.coordinates)}></div>
-<div className="zoom-preview" style={getZoomStyle(pin, pin.color, canvasInstance, imageObjectUrlRef)}></div>
+<div className="zoom-preview" style={getZoomStyle(100, pin, pin.color, canvasInstance, imageObjectUrlRef)}></div>
     );
 }
