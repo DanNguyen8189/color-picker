@@ -11,7 +11,7 @@
     width: 120px;
     height: 120px;
     border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    //box-shadow: 0 2px 8px rgba(0,0,0,0.5);
     background: #222;
 
     border: 6px solid white;
@@ -21,7 +21,6 @@
     border-radius: 50%;
     z-index: 9998;
     pointer-events: auto;
-    box-shadow: 0 0 4px rgba(0, 0, 0, 0.8);
     //touch-action: none;
 
     // //transform: scale(1.5);

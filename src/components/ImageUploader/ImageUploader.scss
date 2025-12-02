@@ -1,5 +1,4 @@
-$bg: #151515;
-$accent: #ffce4a;
+$button-bg: #151515;
 $border: #2a2a2a;
 $hover: #1d1d1d;
 .image-uploader {
@@ -24,7 +23,7 @@ input[type=file] {
 }
 
 input[type=file]::file-selector-button {
-    background: $bg;
+    background: $button-bg;
     border: 1px solid $border;
     padding: .5rem 1rem;
     font-size: 0.8rem;

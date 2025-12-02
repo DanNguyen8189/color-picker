@@ -41,9 +41,10 @@ export const Palette: React.FC<PaletteProps> = ({ Pins }) => {
 
     return (
         <div className="palette-container">
+            <button onClick={() => copyToClipboard(Pins)}><p className="palette-text">Copy to clipboard</p></button>
             <p className="palette-text">Open your palette in <a href={getCoolorsUrl(Pins)} target="_blank" rel="noopener noreferrer">Coolors.co</a></p>
             {/* <p className="palette-text" >Copy to clipboard</p> */}
-            <button onClick={() => copyToClipboard(Pins)}><p className="palette-text">Copy to clipboard</p></button>
+            {/* <button onClick={() => copyToClipboard(Pins)}><p className="palette-text">Copy to clipboard</p></button> */}
             {Pins.length > 0 &&<div className="palette-grid">
             {Pins.map((pin) => (
                 <div key={pin.id} className="swatch fade-in fade-out">

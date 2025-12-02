@@ -157,7 +157,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
 
     const generatePins = (amount:number) => {
         console.log("generating pins:", amount);
-        console.log("canvas bounds:", canvasInstance?.getBounds());
+        //console.log("canvas bounds:", canvasInstance?.getBounds());
         if (!canvasInstance) return;
         //if (bounds.width <= 0 || bounds.height <= 0) return;
         if (canvasInstance.getBounds().width <= 0 || canvasInstance.getBounds().height <= 0) return;
@@ -183,7 +183,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
                 for (let i = 0; i < amount; i++) {
                     newPins.push( createPin() );
                 }
-                console.log("newPins generated:", newPins);
+                //console.log("newPins generated:", newPins);
                 return newPins;
             }
             return prev;

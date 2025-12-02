@@ -18,6 +18,7 @@ export const ImageUploader: React.FC = () => {
             const blob = await response.blob();
             const file = new File([blob], "Nightshade.png", { type: blob.type });
             writeImage(file);
+            console.log("useEffect running, default image set");
         }
         setDefaultImage();
     }, [canvasInstance]);
