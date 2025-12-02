@@ -1,0 +1,39 @@
+.zoom-preview {
+    // position: fixed;
+    // left: 1rem;
+    // bottom: 1rem;
+    //position: absolute;
+    position: relative;
+    margin: 20px auto;
+
+    // width: 200px;
+    // height: 200px;
+    border-radius: 12px;
+
+    background: #222;
+
+    border: 6px solid white;
+
+    border-radius: 50%;
+    z-index: 9998;
+    pointer-events: auto;
+    // Center marker
+    &::before {
+        content: '';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 5px;
+        height: 5px;
+        border: none;
+        background: transparent;
+        border-radius: 50%;
+        box-shadow:
+        // white border for visibility on dark colors
+        // black border for visibility on light colors
+            0 0 0 0.5px white,
+            0 0 0 1px black,
+    }
+    
+}

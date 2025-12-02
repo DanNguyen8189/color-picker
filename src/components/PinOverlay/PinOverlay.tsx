@@ -3,6 +3,7 @@ import { Pin } from '../Pin/Pin';
 import type { RGB, ImagePin, Image, Coordinates } from "../../util";
 import './PinOverlay.scss';
 import { useCanvas } from '../../util/CanvasContext';
+import { ZoomPreview } from '../ZoomPreview/ZoomPreview';
 
 type PinOverlayProps = {
     count: number,
@@ -21,6 +22,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
     const [pins, setPins] = useState<ImagePin[]>([]);
 
     const [activePinId, setActivePinId] = useState<string | null>(null);
+    const [lastActivePinId, setLastActivePinId] = useState<string | null>(null);
 
     const [Draggable, setDraggable] = useState<typeof import('react-draggable')['default'] | null>(null);
     // Dynamically import react-draggable to avoid SSR issues
@@ -86,7 +88,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
         if (canvasInstance.getBounds().width > 0) {
             //syncBounds(); // calling this here was interfering with pin placement on image upload
             // relook at this later? TODO
-            console.log("generating pins on canvas ready, count:", count);
+            //console.log("generating pins on canvas ready, count:", count);
             generatePins(count);
         }
         canvasInstance.on('canvasDrawn', handleCanvasDrawn);
@@ -111,6 +113,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
 
     const handleDragStart = (id: string) => {
         setActivePinId(id);
+        setLastActivePinId(id);
     };
 
     const warnOnceRef = React.useRef(false); // per-pin instance ref that persists
@@ -154,7 +157,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
 
     const generatePins = (amount:number) => {
         console.log("generating pins:", amount);
-        console.log("canvas bounds:", canvasInstance?.getBounds());
+        //console.log("canvas bounds:", canvasInstance?.getBounds());
         if (!canvasInstance) return;
         //if (bounds.width <= 0 || bounds.height <= 0) return;
         if (canvasInstance.getBounds().width <= 0 || canvasInstance.getBounds().height <= 0) return;
@@ -180,7 +183,7 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
                 for (let i = 0; i < amount; i++) {
                     newPins.push( createPin() );
                 }
-                console.log("newPins generated:", newPins);
+                //console.log("newPins generated:", newPins);
                 return newPins;
             }
             return prev;
@@ -243,6 +246,11 @@ export const PinOverlay: React.FC<PinOverlayProps> = ({ count, setPinsParent }) 
                     );
                 })}
             </div>
+            <ZoomPreview pin={
+                lastActivePinId ? 
+                    // default to 0th pin if last active pin not found
+                    (pins.find(p => p.id === lastActivePinId) ?? pins[0]) : pins[0]
+            } />
         </div>
     );
 }

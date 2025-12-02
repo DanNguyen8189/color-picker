@@ -13,6 +13,8 @@
   },
   "dependencies": {
     "@astrojs/react": "^4.4.0",
+    "@fontsource-variable/edu-qld-hand": "^5.2.3",
+    "@fontsource-variable/expletus-sans": "^5.2.8",
     "@types/react": "^19.1.17",
     "@types/react-dom": "^19.1.11",
     "astro": "^5.14.1",

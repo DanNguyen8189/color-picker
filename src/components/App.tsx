@@ -30,48 +30,37 @@ function AppContent({
         <div className="app">
             <h1 className="title">Colorsmosis</h1>
             <div className="body">
-            <section className="canvas-panel">
-            <div className='controls-wrapper'>
+                <section className="panel canvas-panel">
+                <div className='controls-wrapper'>
+                    <div className="control-row">
+                <ImageUploader />
+                </div>
                 <div className="control-row">
-            <ImageUploader />
+                {imageObjectUrlRef.current && <Slider handleSlide={handleSlide} />}
+                </div>
+                </div>
+                <div 
+                    ref={containerRef}
+                    className="canvas-container"
+                    style={{ display: imageObjectUrlRef.current ? 'block' : 'none'}}
+                >
+                    <canvas
+                        className='canvas'
+                        ref={canvasRef}
+                    />
+                <PinOverlay count={count} setPinsParent={setPins} />
+                </div>
+                </section>
+                <section className="panel palette-panel">
+                    <Palette Pins={pins} />
+                </section>
             </div>
-            <div className="control-row">
-            {imageObjectUrlRef.current && <Slider handleSlide={handleSlide} />}
-            </div>
-            </div>
-            {/* {imageObjectUrlRef.current && ( */}
-            {/* trying to conditional render with jsx (imageObjectUrlRef.current && ...) 
-            had a race condition where <canvas> might not have mounted before 
-            writeImage was called. So instead always render the canvas, 
-            but hide with css if there's no imageUrl
-            */}
-            {/* <div style={{ display: imageObjectUrlRef.current ? 'block' : 'none'}}> */}
-            <div 
-                ref={containerRef}
-                className="canvas-container"
-                style={{ display: imageObjectUrlRef.current ? 'block' : 'none'}}
-            >
-                {/* <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex' }}> */}
-                <canvas
-                    className='canvas'
-                    ref={canvasRef}
-                />
-                {/* </div> */}
-            <PinOverlay count={count} setPinsParent={setPins} />
-            </div>
-            </section>
-            <section className="palette-panel">
-                <Palette Pins={pins} />
-            </section>
-            {/* </div> */}
-        {/* )} */}
-        </div>
-        <div className="about-section">
-            <h4>About Colorsmosis</h4>
-            <p>Colorsmosis is a palette exploration tool that you can use make color palettes from
-                your images. Made with React + Astro, and <a href="https://github.com/react-grid-layout/react-draggable">React-Draggable</a>. Hosted on Netlify. 
-                View the source code on <a href="https://github.com/DanNguyen8189/color-picker">GitHub</a>.
-            </p>
+            <div className="about-section">
+                <h4>About Colorsmosis</h4>
+                <p>Colorsmosis is a color exploration tool that you can use to make color palettes from
+                    your images. Made with React + Astro, and <a href="https://github.com/react-grid-layout/react-draggable">React-Draggable</a>. Hosted on Netlify. 
+                    View the source code on <a href="https://github.com/DanNguyen8189/color-picker">GitHub</a>.
+                </p>
             </div>
         </div>
     );
