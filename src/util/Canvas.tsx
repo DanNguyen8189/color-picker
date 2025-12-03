@@ -81,7 +81,8 @@ export class Canvas {
         coordinates: Coordinates
     ): RGB | undefined => {
         const canvasCoords = this.getCanvasCoordinates(coordinates);
-
+    
+        
         if (!canvasCoords) return undefined;
         return this.getPixelColorRaw(canvasCoords);
     }
