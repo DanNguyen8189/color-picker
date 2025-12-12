@@ -1,6 +1,7 @@
 import React from 'react'
 import { render, waitFor } from '@testing-library/react'
 import { Pin } from './Pin'
+import { Canvas } from '../../util';
 /**
  * Pin Component Tests
  * Checks for:
@@ -34,7 +35,9 @@ import { Pin } from './Pin'
 //     return mockCanvas
 // }
 
-const colorPick = (c: any) => {
+type RGBTestType = { r: number; g: number; b: number }; // RGB dupe for tests
+type CoordinatesTestType = { x: number; y: number };
+const colorPick = (c: CoordinatesTestType) => {
     const { x, y } = c;
     if (x < 150 && y < 100) return { r: 255, g: 0, b: 0 };
     if (x >= 150 && y < 100) return { r: 0, g: 255, b: 0 };
@@ -42,11 +45,11 @@ const colorPick = (c: any) => {
     return { r: 255, g: 255, b: 0 };
 };
 
-const mockCanvasInstance: any = {
+const mockCanvasInstance: Partial<Canvas> = {
     getBounds: jest.fn(() => ({ width: 300, height: 200 })),
     on: jest.fn(),
     off: jest.fn(),
-    getPixelColor: jest.fn((c: any) => colorPick(c)),
+    getPixelColor: jest.fn((c: CoordinatesTestType) => colorPick(c)),
 };
 // Mock the hook PinOverlay uses to access the context. Note: import must match exactly or
 // else it tries to use the real hook!
@@ -60,28 +63,29 @@ jest.mock('../../util/CanvasContext', () => ({
         setImageElement: jest.fn(),
         writeImage: jest.fn(),
     }),
-    rgbToString: (rgb: {r:number, g:number, b:number}) => `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`,
+    rgbToString: (rgb: RGBTestType) => `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`,
 }));
 beforeEach(() => {
     jest.clearAllMocks();
     (mockCanvasInstance.getBounds as jest.Mock).mockReset().mockReturnValue({ width: 300, height: 200 });
 });
 
-// Mock Draggable component
-const MockDraggable: React.FC<any> = ({ 
-    children, 
-    nodeRef, 
-    defaultPosition,
-    bounds,
-    onDrag,
-    onStart,
-    onStop,
-    ...props }) => {
-    return <div ref={nodeRef} data-testid="draggable-mock" {...props}>{children}</div>;
-};
+type DraggableProps = { 
+    children: React.ReactNode;
+    nodeRef?: React.RefObject<HTMLDivElement>;
+    defaultPosition?: { x: number; y: number };
+    bounds?: { left: number; top: number; right: number; bottom: number };
+    onDrag?: (e: any, data: { x: number; y: number }) => void;
+    onStart?: (e: any, data: { x: number; y: number }) => void;
+    onStop?: (e: any, data: { x: number; y: number }) => void;
+}
 
-// Factory that simulates a drag to specific coordinates
-const makeDraggableThatDragsTo = (x: number, y: number): React.FC<any> =>
+const MockDraggable: React.FC<DraggableProps> = ({ children, nodeRef }) => (
+  <div ref={nodeRef} data-testid="draggable-mock">{children}</div>
+);
+
+// Factory that simulates a drag to specific coordinates on Draggable Component
+const makeDraggableThatDragsTo = (x: number, y: number): React.FC<DraggableProps> =>
     (props) => {
         React.useLayoutEffect(() => {
             const mockEvent = { preventDefault: jest.fn() };
@@ -92,8 +96,6 @@ const makeDraggableThatDragsTo = (x: number, y: number): React.FC<any> =>
 
 describe('Pin Component', () => {
     it('with Draggable should be able to render correctly', async () => {
-
-
         const { getByTestId } = render(
             <Pin
                 Draggable={MockDraggable as any}
@@ -104,7 +106,6 @@ describe('Pin Component', () => {
                 isDimmed={false}
             />
         )
-
         // Wait for the useEffect to initialize coordinates
         await waitFor(() => {
             const pin = getByTestId('pin-with-draggable');

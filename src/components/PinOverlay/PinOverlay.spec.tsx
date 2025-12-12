@@ -7,12 +7,13 @@ type RGBTestType = { r: number; g: number; b: number } | undefined; // RGB dupe 
 type ImagePinTestType = { id: string; color?: RGBTestType; coordinates?: {x: number, y: number} }; // ImagePin dupe for tests
 type PinDragTestType = (e: any, pin: ImagePinTestType) => void; // Pin on drag handler test type
 
-const mockCanvasInstance: any = {
+const mockCanvasInstance: Partial<Canvas> = {
     getBounds: jest.fn(() => ({ width: 300, height: 200 })),
     on: jest.fn(),
     off: jest.fn(),
     getPixelColor: jest.fn(),
-};
+}
+
 // Mock the hook PinOverlay uses to access the context. Note: import must match exactly or
 // else it tries to use the real hook!
 jest.mock('../../util/CanvasContext', () => ({
@@ -34,7 +35,7 @@ beforeEach(() => {
 // Jest hoists the mock before any imports run, so PinOverlay will use this mock instead of the real Pin
 let pinOnDragHandlers: Map<string, PinDragTestType> = new Map(); // on drag handlers; one for each pin
 jest.mock('../Pin/Pin', () => ({
-    Pin: ({ pin, onDrag }: any) => {
+    Pin: ({ pin, onDrag }: { pin: ImagePinTestType; onDrag?: PinDragTestType }) => {
     //Pin: ({ pin }: any) => {
         // Store onDrag handler
         if (onDrag) {
@@ -232,8 +233,8 @@ describe('PinOverlay Component', () => {
         });
     });
 
-    // this test was written when the pins themselves were responsible for picking  and passing upcolor.
-    // this version of the test does not apply to the current implementation
+    // // this test was written when the pins themselves were responsible for picking  and passing upcolor.
+    // // this version of the test does not apply to the current implementation
     // it('should update correct pin color when a pin is dragged', async () => {
     //     // in this case, we can find out what pin was dragged/what color it was set to
     //     // by viewing the calls to setPinsParent. Each time a pin is dragged, PinOverlay calls setPinsParent
