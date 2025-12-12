@@ -9,7 +9,7 @@ export interface ZoomPreviewProps {
 }
 
 export const getZoomStyle = (windowSize: number, pin: ImagePin, lastColor: RGB | undefined, canvasInstance: any, imageObjectUrlRef: React.RefObject<string | null>): React.CSSProperties => {
-    if (!canvasInstance || !imageObjectUrlRef.current) return {};
+    if (!canvasInstance || !imageObjectUrlRef || !imageObjectUrlRef.current) return {};
     //const windowSize = 80;
     const { width, height } = canvasInstance.getBounds();
     if (width <= 0 || height <= 0) return {};

@@ -84,7 +84,8 @@ const MockDraggable: React.FC<any> = ({
 const makeDraggableThatDragsTo = (x: number, y: number): React.FC<any> =>
     (props) => {
         React.useLayoutEffect(() => {
-            props.onDrag?.({}, { x, y });
+            const mockEvent = { preventDefault: jest.fn() };
+            props.onDrag?.(mockEvent, { x, y });
         }, [props.onDrag]);
         return <MockDraggable {...props} />;
     };
@@ -187,7 +188,7 @@ describe('Pin Component', () => {
     // })
 
     it('does not enter infinite loop on rapid drags', async () => {
-
+        //const mockEvent = { preventDefault: jest.fn() };
         const onDragMock = jest.fn();
         const DragToSameSpot = makeDraggableThatDragsTo(100, 50); // top-left quadrant          
         const { getByTestId } = render(
