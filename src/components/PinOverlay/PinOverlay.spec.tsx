@@ -7,12 +7,13 @@ type RGBTestType = { r: number; g: number; b: number } | undefined; // RGB dupe 
 type ImagePinTestType = { id: string; color?: RGBTestType; coordinates?: {x: number, y: number} }; // ImagePin dupe for tests
 type PinDragTestType = (e: any, pin: ImagePinTestType) => void; // Pin on drag handler test type
 
-const mockCanvasInstance: any = {
+const mockCanvasInstance: Partial<Canvas> = {
     getBounds: jest.fn(() => ({ width: 300, height: 200 })),
     on: jest.fn(),
     off: jest.fn(),
     getPixelColor: jest.fn(),
-};
+}
+
 // Mock the hook PinOverlay uses to access the context. Note: import must match exactly or
 // else it tries to use the real hook!
 jest.mock('../../util/CanvasContext', () => ({
@@ -34,7 +35,7 @@ beforeEach(() => {
 // Jest hoists the mock before any imports run, so PinOverlay will use this mock instead of the real Pin
 let pinOnDragHandlers: Map<string, PinDragTestType> = new Map(); // on drag handlers; one for each pin
 jest.mock('../Pin/Pin', () => ({
-    Pin: ({ pin, onDrag }: any) => {
+    Pin: ({ pin, onDrag }: { pin: ImagePinTestType; onDrag?: PinDragTestType }) => {
     //Pin: ({ pin }: any) => {
         // Store onDrag handler
         if (onDrag) {
@@ -232,121 +233,125 @@ describe('PinOverlay Component', () => {
         });
     });
 
-    it('should update correct pin color when a pin is dragged', async () => {
-        // in this case, we can find out what pin was dragged/what color it was set to
-        // by viewing the calls to setPinsParent. Each time a pin is dragged, PinOverlay calls setPinsParent
-        // with the updated pins array that we can look at to verify
+    // // this test was written when the pins themselves were responsible for picking  and passing upcolor.
+    // // this version of the test does not apply to the current implementation
+    // it('should update correct pin color when a pin is dragged', async () => {
+    //     // in this case, we can find out what pin was dragged/what color it was set to
+    //     // by viewing the calls to setPinsParent. Each time a pin is dragged, PinOverlay calls setPinsParent
+    //     // with the updated pins array that we can look at to verify
 
-        pinOnDragHandlers.clear(); // Reset
+    //     pinOnDragHandlers.clear(); // Reset
 
-        const setPinsParent = jest.fn();
+    //     const setPinsParent = jest.fn();
 
-        const { getAllByTestId } = render(
-            <PinOverlay
-                count={2}
-                setPinsParent={setPinsParent}
-            />
-        );
+    //     const { getAllByTestId } = render(
+    //         <PinOverlay
+    //             count={2}
+    //             setPinsParent={setPinsParent}
+    //         />
+    //     );
 
-        // Wait for pins to render
-        await waitFor(() => {
-            expect(getAllByTestId('pin-with-draggable').length).toBe(2);
-            expect(setPinsParent).toHaveBeenCalled();
-        });
+    //     // Wait for pins to render
+    //     await waitFor(() => {
+    //         expect(getAllByTestId('pin-with-draggable').length).toBe(2);
+    //         expect(setPinsParent).toHaveBeenCalled();
+    //     });
 
-        // amount of times setPinsParent was called (our implementation starts with 2)
-        const initialCallCount = setPinsParent.mock.calls.length;
+    //     // amount of times setPinsParent was called (our implementation starts with 2)
+    //     const initialCallCount = setPinsParent.mock.calls.length;
 
-        // get initial pins array
-        // setPinsParent.mock.calls is an array of all calls to setParent that have happened
-        // so far; each call is stored as an array of arguments
-        // [ [arg1, arg2, ...], [arg1, arg2, ...], ... ]
-        // our case: we only pass one argument (the pins array), so we access index 0
-        const initialPins = setPinsParent.mock.calls.at(-1)?.[0] as ImagePinTestType[];
-        expect(Array.isArray(initialPins)).toBe(true);
-        const firstPinId = initialPins[0].id;
+    //     // get initial pins array
+    //     // setPinsParent.mock.calls is an array of all calls to setParent that have happened
+    //     // so far; each call is stored as an array of arguments
+    //     // [ [arg1, arg2, ...], [arg1, arg2, ...], ... ]
+    //     // our case: we only pass one argument (the pins array), so we access index 0
+    //     const initialPins = setPinsParent.mock.calls.at(-1)?.[0] as ImagePinTestType[];
+    //     expect(Array.isArray(initialPins)).toBe(true);
+    //     const firstPinId = initialPins[0].id;
 
-        // Get the handleDrag callback for the first pin
-        const handleDrag = pinOnDragHandlers.get(firstPinId);
-        expect(handleDrag).toBeDefined();
+    //     // Get the handleDrag callback for the first pin
+    //     const handleDrag = pinOnDragHandlers.get(firstPinId);
+    //     expect(handleDrag).toBeDefined();
 
-        // Simulate a drag event with a new color
-        const newColor = { r: 255, g: 128, b: 64 };
-        if (!handleDrag) {
-            throw new Error('handleDrag is undefined');
-        }
-        act(() => {
-            handleDrag(
-                {},           // event (not used)
-                // newColor,     // picked color
-                // firstPinId    // pin id
-                {id: firstPinId, color: newColor, coordinates: {x:50, y:50}} // updated pin
-            );
-        });
+    //     // Simulate a drag event with a new color
+    //     const newColor = { r: 255, g: 128, b: 64 };
+    //     if (!handleDrag) {
+    //         throw new Error('handleDrag is undefined');
+    //     }
+    //     act(() => {
+    //         handleDrag(
+    //             {},           // event (not used)
+    //             // newColor,     // picked color
+    //             // firstPinId    // pin id
+    //             {id: firstPinId, color: newColor, coordinates: {x:50, y:50}} // updated pin
+    //         );
+    //     });
 
-        // Verify setPinsParent was called again with the updated pin
-        await waitFor(() => {
-            expect(setPinsParent).toHaveBeenCalledTimes(initialCallCount + 1);
+    //     // Verify setPinsParent was called again with the updated pin
+    //     await waitFor(() => {
+    //         //expect(setPinsParent).toHaveBeenCalledTimes(initialCallCount + 1);
 
-            // get the last call's first argument (the updated pins array)
-            const updatedPins = setPinsParent.mock.calls.at(-1)?.[0] as ImagePinTestType[];
-            const updatedPin = updatedPins.find((p: ImagePinTestType) => p.id === firstPinId);
+    //         // get the last call's first argument (the updated pins array)
+    //         const updatedPins = setPinsParent.mock.calls.at(-1)?.[0] as ImagePinTestType[];
+    //         const updatedPin = updatedPins.find((p: ImagePinTestType) => p.id === firstPinId);
 
-            // expect(updatedPin).toBeDefined();
-            // expect(updatedPin!.color).toBeDefined();
-            if (!updatedPin?.color) {
-                throw new Error('Updated pin or color is undefined');
-            }
-            expect(updatedPin.color.r).toBe(255);
-            expect(updatedPin.color.g).toBe(128);
-            expect(updatedPin.color.b).toBe(64);
-        });
-    });
+    //         // expect(updatedPin).toBeDefined();
+    //         // expect(updatedPin!.color).toBeDefined();
+    //         if (!updatedPin?.color) {
+    //             throw new Error('Updated pin or color is undefined');
+    //         }
+    //         expect(updatedPin.color.r).toBe(255);
+    //         expect(updatedPin.color.g).toBe(128);
+    //         expect(updatedPin.color.b).toBe(64);
+    //     });
+    // });
 
-    it('should be able to update multiple pins independently', async () => {
-        pinOnDragHandlers.clear(); // Reset on drag handlers for new pins
-        const setPinsParent = jest.fn();
+    // this version of the test was written when pins themselves were responsible to picking
+    // and passing up color. No longer applies to currrent implementation.
+    // it('should be able to update multiple pins independently', async () => {
+    //     pinOnDragHandlers.clear(); // Reset on drag handlers for new pins
+    //     const setPinsParent = jest.fn();
 
-        const { getAllByTestId } = render(
-            <PinOverlay
-                count={2}
-                setPinsParent={setPinsParent}
-            />
-        )
+    //     const { getAllByTestId } = render(
+    //         <PinOverlay
+    //             count={2}
+    //             setPinsParent={setPinsParent}
+    //         />
+    //     )
 
-        const pinsArray = setPinsParent.mock.calls.at(-1)?.[0] as ImagePinTestType[];
-        expect(pinsArray.length).toBe(2);
-        const [pin1, pin2] = pinsArray;
-        const handleDrag1 = pinOnDragHandlers.get(pin1.id);
-        const handleDrag2 = pinOnDragHandlers.get(pin2.id);
-        expect(handleDrag1).toBeDefined();
-        expect(handleDrag2).toBeDefined();
+    //     const pinsArray = setPinsParent.mock.calls.at(-1)?.[0] as ImagePinTestType[];
+    //     expect(pinsArray.length).toBe(2);
+    //     const [pin1, pin2] = pinsArray;
+    //     const handleDrag1 = pinOnDragHandlers.get(pin1.id);
+    //     const handleDrag2 = pinOnDragHandlers.get(pin2.id);
+    //     expect(handleDrag1).toBeDefined();
+    //     expect(handleDrag2).toBeDefined();
 
-        act(() => {
-            // Drag first pin
-            if (handleDrag1) {
+    //     act(() => {
+    //         // Drag first pin
+    //         if (handleDrag1) {
 
-                //handleDrag1({}, { r: 10, g: 20, b: 30 }, pin1.id);
-                handleDrag1({}, {...pin1, color: { r: 10, g: 20, b: 30 }});
-            }
-            // Drag second pin
-            if (handleDrag2) {
-                //handleDrag2({}, { r: 200, g: 210, b: 220 }, pin2.id);
-                handleDrag2({}, {...pin2, color: { r: 200, g: 210, b: 220 }});
-            }
-        });
+    //             //handleDrag1({}, { r: 10, g: 20, b: 30 }, pin1.id);
+    //             handleDrag1({}, {...pin1, color: { r: 10, g: 20, b: 30 }});
+    //         }
+    //         // Drag second pin
+    //         if (handleDrag2) {
+    //             //handleDrag2({}, { r: 200, g: 210, b: 220 }, pin2.id);
+    //             handleDrag2({}, {...pin2, color: { r: 200, g: 210, b: 220 }});
+    //         }
+    //     });
 
-        // Verify both pins updated correctly
-        await waitFor(() => {
-            // get the last call's first argument (the updated pins array)
-            const updatedPins = setPinsParent.mock.calls.at(-1)?.[0] as ImagePinTestType[];
-            const updatedPin1 = updatedPins.find((p: ImagePinTestType) => p.id === pin1.id);
-            const updatedPin2 = updatedPins.find((p: ImagePinTestType) => p.id === pin2.id);
-            expect(updatedPin1?.color).toEqual({ r: 10, g: 20, b: 30 });
-            expect(updatedPin2?.color).toEqual({ r: 200, g: 210, b: 220 });
-        });
+    //     // Verify both pins updated correctly
+    //     await waitFor(() => {
+    //         // get the last call's first argument (the updated pins array)
+    //         const updatedPins = setPinsParent.mock.calls.at(-1)?.[0] as ImagePinTestType[];
+    //         const updatedPin1 = updatedPins.find((p: ImagePinTestType) => p.id === pin1.id);
+    //         const updatedPin2 = updatedPins.find((p: ImagePinTestType) => p.id === pin2.id);
+    //         expect(updatedPin1?.color).toEqual({ r: 10, g: 20, b: 30 });
+    //         expect(updatedPin2?.color).toEqual({ r: 200, g: 210, b: 220 });
+    //     });
 
-    });
+    // });
 
     it('should not generate pins if canvas is not ready', async () => {
 
