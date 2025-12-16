@@ -5,6 +5,8 @@ import './PinOverlay.scss';
 import { useCanvas } from '../../util/CanvasContext';
 import { ZoomPreview } from '../ZoomPreview/ZoomPreview';
 
+// Component responsible for managing the pins on the image
+
 type PinOverlayProps = {
     count: number,
     setPinsParent: React.Dispatch<React.SetStateAction<ImagePin[]>>

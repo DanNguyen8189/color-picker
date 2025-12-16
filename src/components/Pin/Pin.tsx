@@ -7,6 +7,8 @@ import './Pin.scss';
 import { DraggableData } from 'react-draggable';
 import { getZoomStyle } from '../ZoomPreview/ZoomPreview';
 
+// Component that user can drag around to pick colors from image
+
 type PinProps = {
     //Draggable: any,  // for dynamic import of react-draggable. Didn't want to
     // import it directly in Pin component because we'd be running it for every Pin

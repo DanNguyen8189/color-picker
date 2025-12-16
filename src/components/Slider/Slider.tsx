@@ -1,6 +1,9 @@
 import  { useState } from 'react';
 import './Slider.scss';
-function Slider({handleSlide}: {handleSlide: (value:number) => void}) {
+
+// Slider component to customize the number of colors to extract
+export const Slider: React.FC<{handleSlide: (value:number) => void}> = ({handleSlide}) => {
+//function Slider({handleSlide}: {handleSlide: (value:number) => void}) {
     const [value, setValue] = useState(4);
 
     return (
@@ -29,4 +32,4 @@ function Slider({handleSlide}: {handleSlide: (value:number) => void}) {
     </div>
    );
 }
-export default Slider;
+//export default Slider;
