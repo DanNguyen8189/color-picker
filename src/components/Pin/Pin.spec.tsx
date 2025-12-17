@@ -53,7 +53,7 @@ const mockCanvasInstance: Partial<Canvas> = {
 };
 // Mock the hook PinOverlay uses to access the context. Note: import must match exactly or
 // else it tries to use the real hook!
-jest.mock('../../util/CanvasContext', () => ({
+jest.mock('../../contexts/CanvasContext', () => ({
     __esModule: true,
     useCanvas: () => ({
         canvasInstance: mockCanvasInstance,

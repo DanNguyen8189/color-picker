@@ -1,8 +1,9 @@
 //import React from 'react';
-import { useState } from 'react';
 import { useCanvas, rgbToString } from '../../util';
-import type { ImagePin, RGB, Coordinates } from '../../util';
+import type { ImagePin, RGB } from '../../util';
 import './ZoomPreview.scss';
+
+// Component that shows a zoomed-in preview of the area around a currently active pin
 
 export interface ZoomPreviewProps {
     pin: ImagePin;

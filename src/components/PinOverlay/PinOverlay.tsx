@@ -1,9 +1,11 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Pin } from '../Pin/Pin';
-import type { RGB, ImagePin, Image, Coordinates } from "../../util";
+import type { RGB, ImagePin, Coordinates } from "../../util";
 import './PinOverlay.scss';
-import { useCanvas } from '../../util/CanvasContext';
-import { ZoomPreview } from '../ZoomPreview/ZoomPreview';
+import { useCanvas } from '../../contexts/CanvasContext';
+import { ZoomPreview } from '../index';
+
+// Component responsible for managing the pins on the image
 
 type PinOverlayProps = {
     count: number,

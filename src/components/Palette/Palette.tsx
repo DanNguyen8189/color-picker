@@ -4,6 +4,8 @@ import { rgbToString, rgbToHex, type RGB } from '../../util/Types';
 import './Palette.scss';
 import { set } from 'astro:schema';
 
+// Component displays selected colors and their hexcodes
+
 type PaletteProps = {
     Pins: ImagePin[]
 }

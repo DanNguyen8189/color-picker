@@ -1,9 +1,11 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useCanvas } from '../../util/';
 import './ImageUploader.scss';
 import defaultImage from '../../assets/Nightshade.png';
 
-// export function ImageUploader({ handlePickImage }: { handlePickImage: (image: File) => void }) {
+
+// Component for uploading image 
+
 export const ImageUploader: React.FC = () => {
     const { writeImage, canvasInstance } = useCanvas();
     useEffect(() => {
