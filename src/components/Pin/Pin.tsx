@@ -2,7 +2,7 @@
 import React, { useState, useRef } from 'react';
 import { rgbToString } from '../../util';
 import type { ImagePin, RGB } from '../../util';
-import { useCanvas } from '../../contexts';
+import { useCanvas } from '../../contexts/CanvasContext';
 import './Pin.scss';
 import { DraggableData } from 'react-draggable';
 import { getZoomStyle } from '../index';

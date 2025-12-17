@@ -1,1 +1,1 @@
-export { useCanvas, CanvasProvider } from './CanvasContext'
+export  *  from './CanvasContext'

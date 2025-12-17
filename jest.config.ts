@@ -6,6 +6,7 @@ const config: Config = {
     moduleNameMapper: {
         '^src/(.*)$': '<rootDir>/src/$1',
         '\\.(css|less|sass|scss)$': '<rootDir>/test/styleMock.tsx',
+        '\\.(png|jpg|jpeg|gif|svg)$': '<rootDir>/test/fileMock.tsx',
         // for mocking css imports while testing
     },
     coverageProvider: 'v8',

@@ -1,7 +1,21 @@
+// Mock the hook PinOverlay uses to access the context. Note: import must match exactly or
+// else it tries to use the real hook!
+jest.mock('../../contexts/CanvasContext', () => ({
+    __esModule: true,
+    useCanvas: () => ({
+        canvasInstance: mockCanvasInstance,
+        imageElement: null,
+        imageUrl: null,
+        setImageUrl: jest.fn(),
+        setImageElement: jest.fn(),
+        writeImage: jest.fn(),
+    }),
+}));
+
 import React, { act } from 'react'
 import { render, waitFor } from '@testing-library/react'
 import { PinOverlay } from './PinOverlay'
-import { Canvas } from '../../util/Canvas';
+import { Canvas } from '../../util';
 
 type RGBTestType = { r: number; g: number; b: number } | undefined; // RGB dupe for tests
 type ImagePinTestType = { id: string; color?: RGBTestType; coordinates?: {x: number, y: number} }; // ImagePin dupe for tests
@@ -14,18 +28,6 @@ const mockCanvasInstance: Partial<Canvas> = {
     getPixelColor: jest.fn(),
 }
 
-// Mock the hook PinOverlay uses to access the context. Note: import must match exactly or
-// else it tries to use the real hook!
-jest.mock('../../util/CanvasContext', () => ({
-    useCanvas: () => ({
-        canvasInstance: mockCanvasInstance,
-        imageElement: null,
-        imageUrl: null,
-        setImageUrl: jest.fn(),
-        setImageElement: jest.fn(),
-        writeImage: jest.fn(),
-    }),
-}));
 beforeEach(() => {
     jest.clearAllMocks();
     (mockCanvasInstance.getBounds as jest.Mock).mockReset().mockReturnValue({ width: 300, height: 200 });

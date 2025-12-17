@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 // import { Slider } from '../components/Slider/Slider';
 // import { ImageUploader } from '../components/ImageUploader/ImageUploader';
 // import type { ImagePin } from "../util/Types";
