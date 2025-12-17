@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { useCanvas } from '../../util/';
 import './ImageUploader.scss';
 import defaultImage from '../../assets/Nightshade.png';

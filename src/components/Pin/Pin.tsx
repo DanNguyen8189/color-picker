@@ -1,11 +1,11 @@
 
-import React, { useEffect, useState, useRef } from 'react';
-import { Canvas, rgbToString } from '../../util';
-import type { ImagePin, RGB, Coordinates } from '../../util';
-import { useCanvas } from '../../util/CanvasContext';
+import React, { useState, useRef } from 'react';
+import { rgbToString } from '../../util';
+import type { ImagePin, RGB } from '../../util';
+import { useCanvas } from '../../contexts';
 import './Pin.scss';
 import { DraggableData } from 'react-draggable';
-import { getZoomStyle } from '../ZoomPreview/ZoomPreview';
+import { getZoomStyle } from '../index';
 
 // Component that user can drag around to pick colors from image
 

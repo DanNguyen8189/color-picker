@@ -1,10 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
-import Slider from './Slider/Slider';
-import { ImageUploader } from './ImageUploader/ImageUploader';
-import type { ImagePin } from "../util/Types";
-import { PinOverlay } from './PinOverlay/PinOverlay';
-import { Palette } from './Palette/Palette';
+// import { Slider } from '../components/Slider/Slider';
+// import { ImageUploader } from '../components/ImageUploader/ImageUploader';
+// import type { ImagePin } from "../util/Types";
+// import { PinOverlay } from '../components/PinOverlay/PinOverlay';
+// import { Palette } from '../components/Palette/Palette';
+import { Slider, ImageUploader, PinOverlay, Palette } from '../components';
 import { useCanvas, CanvasProvider } from '../util';
+import type { ImagePin } from '../util';
 import './App.scss';
 
 // Separate component to use the canvas context: CanvasProvider
